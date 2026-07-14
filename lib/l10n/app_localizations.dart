@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'lang_en.dart';
-import 'lang_bn.dart';
+import 'lang_fr.dart';
+import 'lang_nl.dart';
+import 'lang_de.dart';
 
 class AppLocalizations {
   AppLocalizations(this.locale);
@@ -8,15 +10,19 @@ class AppLocalizations {
   final Locale locale;
 
   static const supportedLocales = <Locale>[
+    Locale('fr'),
+    Locale('nl'),
+    Locale('de'),
     Locale('en'),
-    Locale('bn'),
   ];
 
   // Core string tables – each language lives in its own file for easy extension.
-  static const Map<String, Map<String, String>> _values =
+  static final Map<String, Map<String, String>> _values =
       <String, Map<String, String>>{
+        'fr': kLangFr,
+        'nl': kLangNl,
+        'de': kLangDe,
         'en': kLangEn,
-        'bn': kLangBn,
       };
 
   static AppLocalizations of(BuildContext context) {

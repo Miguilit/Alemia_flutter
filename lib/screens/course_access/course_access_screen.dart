@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:video_player/video_player.dart';
@@ -37,6 +38,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
 
   bool _isLoading = true;
   String? _error;
+  String? _videoError;
 
   Map<String, dynamic>? _currentLesson;
   List<dynamic> _topics = [];
@@ -134,6 +136,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
   Future<void> _loadLesson(int lessonId) async {
     setState(() {
       _isVideoLoading = true;
+      _videoError = null;
     });
 
     // Pause existing players
@@ -149,10 +152,33 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
           if (!mounted) return;
+
+          final lessonData = data['data'] as Map<String, dynamic>;
+          final lesson = lessonData['lesson'];
+          final isLiveLesson =
+              lesson != null &&
+              (lesson['is_live'] == true || lesson['is_live'] == 1);
+
           setState(() {
-            _currentLesson = data['data'];
+            _currentLesson = lessonData;
+            _videoError = null;
           });
-          _initializeVideoPlayer(data['data']['video']);
+
+          if (isLiveLesson) {
+            setState(() {
+              _isVideoLoading = false;
+            });
+          } else {
+            final videoData = lessonData['video'];
+
+            if (videoData is Map<String, dynamic>) {
+              _initializeVideoPlayer(videoData);
+            } else {
+              setState(() {
+                _isVideoLoading = false;
+              });
+            }
+          }
         }
       } else {
         if (!mounted) return;
@@ -195,6 +221,8 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
       _videoPlayerController!
           .initialize()
           .then((_) {
+            if (!mounted) return;
+
             setState(() {
               _chewieController = ChewieController(
                 videoPlayerController: _videoPlayerController!,
@@ -211,23 +239,33 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                 systemOverlaysOnEnterFullScreen: const [],
                 systemOverlaysAfterFullScreen: SystemUiOverlay.values,
                 errorBuilder: (context, errorMessage) {
-                  return Center(
-                    child: Text(
-                      'Error playing video: $errorMessage',
-                      style: const TextStyle(color: Colors.white),
-                    ),
+                  if (kDebugMode) {
+                    debugPrint('Chewie playback error: $errorMessage');
+                  }
+
+                  return const _VideoUnavailableView(
+                    message:
+                        'Cette vidéo est indisponible ou la session en direct est terminée.',
                   );
                 },
               );
               _isVideoLoading = false;
             });
           })
-          .catchError((error) {
+          .catchError((Object error, StackTrace stackTrace) {
+            if (!mounted) return;
+
             setState(() {
               _isVideoLoading = false;
-              _error = 'Failed to load video: $error. URL: ${videoData['url']}';
+              _videoError =
+                  'Cette vidéo est indisponible ou la session en direct est terminée.';
             });
-            // debugPrint('Video initialization error: $error');
+
+            if (kDebugMode) {
+              debugPrint('Video initialization error: $error');
+              debugPrint('Video URL: ${videoData['url']}');
+              debugPrintStack(stackTrace: stackTrace);
+            }
           });
     } else {
       setState(() {
@@ -617,10 +655,8 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
     final lessonData = _currentLesson?['lesson'];
     final isLive = lessonData != null && (lessonData['is_live'] == 1 || lessonData['is_live'] == true);
     final liveClass = lessonData?['live_class'];
-    final videoData = _currentLesson?['video'];
-    final videoType = videoData?['type'];
 
-    if (isLive && videoType == 'live' && liveClass != null) {
+    if (isLive && liveClass != null) {
       final classStatus = liveClass['status'];
       final isClassLive = classStatus == 'live';
       final isClassEnded = classStatus == 'ended';
@@ -680,11 +716,11 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
               if (!isClassLive && !isClassEnded)
                 Text(
                   'Starts: $formattedTime',
-                  style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 24),
-              if (isClassLive || !isClassEnded)
+              if (!isClassEnded)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -710,7 +746,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
               if (isClassEnded)
                 Text(
                   'The live stream has ended. The instructor has not uploaded a recording yet.',
-                  style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
             ],
@@ -728,16 +764,19 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
         _videoPlayerController!.value.isInitialized) {
       return Chewie(controller: _chewieController!);
     } else {
-      if (_error != null) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              _error!,
-              style: const TextStyle(color: Colors.red),
-              textAlign: TextAlign.center,
-            ),
-          ),
+      if (_videoError != null) {
+        return _VideoUnavailableView(
+          message: _videoError!,
+          onRetry: () {
+            setState(() {
+              _videoError = null;
+            });
+
+            final lessonId = _currentLesson?['lesson']?['id'];
+            if (lessonId is int) {
+              _loadLesson(lessonId);
+            }
+          },
         );
       }
       return const Center(
@@ -749,3 +788,68 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
     }
   }
 }
+
+class _VideoUnavailableView extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+
+  const _VideoUnavailableView({
+    required this.message,
+    this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: const Color(0xFF111827),
+      padding: const EdgeInsets.all(24),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.videocam_off_outlined,
+              color: Colors.white70,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Vidéo indisponible',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                height: 1.4,
+              ),
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: 20),
+              OutlinedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Réessayer'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white54),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+

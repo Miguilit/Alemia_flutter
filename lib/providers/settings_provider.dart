@@ -10,15 +10,15 @@ class SettingsProvider with ChangeNotifier {
   PlatformSettings? _settings;
   bool _isLoading = false;
   bool _isDarkMode = false;
-  Locale _locale = const Locale('en');
+  Locale _locale = const Locale('fr');
 
   PlatformSettings? get settings => _settings;
   bool get isLoading => _isLoading;
   bool get isDarkMode => _isDarkMode;
   Locale get locale => _locale;
 
-  String get currencySymbol => _settings?.currency.symbol ?? '\$';
-  String get currencyCode => _settings?.currency.code ?? 'USD';
+  String get currencySymbol => _settings?.currency.symbol ?? '€';
+  String get currencyCode => _settings?.currency.code ?? 'EUR';
   List<PaymentMethod> get paymentMethods => _settings?.paymentMethods ?? [];
 
   Future<void> loadSettings() async {

@@ -39,21 +39,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           name = 'English';
           iconPath = 'assets/img/icons/en.png';
           break;
-        case 'es':
-          name = 'Spanish';
-          iconPath = 'assets/img/icons/es.png';
-          break;
-        case 'bn':
-          name = 'বাংলা';
-          iconPath = 'assets/img/icons/bn.png';
-          break;
-        case 'hi':
-          name = 'हिन्दी';
-          iconPath = 'assets/img/icons/hi.png';
-          break;
         case 'fr':
           name = 'Français';
           iconPath = 'assets/img/icons/fr.png';
+          break;
+        case 'nl':
+          name = 'Nederland';
+          iconPath = 'assets/img/icons/nl.png';
+          break;
+        case 'de':
+          name = 'Deutsch';
+          iconPath = 'assets/img/icons/de.png';
           break;
         default:
           name = locale.languageCode.toUpperCase();
