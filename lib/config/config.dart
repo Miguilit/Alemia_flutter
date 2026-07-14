@@ -14,7 +14,7 @@ class AppConfig {
   static const String supportPhone = '+1234567890';
 
   /// Base URL of the backend
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static const String baseUrl = 'https://alemia.org';
 
   /// API Base URL
   static const String apiBaseUrl = '$baseUrl/api';
