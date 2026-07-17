@@ -542,6 +542,7 @@ class AppLocalizations {
   String get noActivity => _t('noActivity');
   String get complete => _t('complete');
   String get failedLoadCourses => _t('failedLoadCourses');
+  String get total => _t('total');
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();

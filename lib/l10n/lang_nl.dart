@@ -282,4 +282,5 @@ final Map<String, String> kLangNl = <String, String>{
   'noActivity': 'Geen activiteit beschikbaar',
   'complete': 'Voltooid',
   'failedLoadCourses': 'Cursussen konden niet worden geladen',
+  'total': 'Totaal',
 };

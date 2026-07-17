@@ -282,4 +282,5 @@ final Map<String, String> kLangDe = <String, String>{
   'noActivity': 'Keine Aktivitäten verfügbar',
   'complete': 'Abgeschlossen',
   'failedLoadCourses': 'Kurse konnten nicht geladen werden',
+  'total': 'Gesamt',
 };

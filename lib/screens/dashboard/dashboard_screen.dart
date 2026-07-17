@@ -139,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     value:
                                         stats?.totalCourses.toString() ?? '0',
                                     icon: HugeIcons.strokeRoundedBook01,
-                                    color: AppTheme.primary,
+                                    color: AppTheme.gold,
                                     onTap: () {
                                       Navigator.of(
                                         context,
@@ -155,7 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         stats?.completedCourses.toString() ??
                                         '0',
                                     icon: Icons.check_circle,
-                                    color: Colors.green,
+                                    color: AppTheme.success,
                                     onTap: () {
                                       Navigator.of(
                                         context,
@@ -166,7 +166,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 32),
                           const SizedBox(height: 32),
                           // Learning Activity Chart
                           Text(
@@ -222,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 route: AppRouter.studyTimer,
                               ),
                               _QuickAccessItem(
-                                title: 'Messages',
+                                title: context.l10n.messages,
                                 icon: HugeIcons.strokeRoundedBubbleChat,
                                 route: AppRouter.messages,
                               ),
@@ -275,6 +274,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+BoxDecoration _dashboardCardDecoration(
+    BuildContext context, {
+      double radius = 20,
+      Color? borderColor,
+    }) {
+  final bool isDark = AppTheme.isDark(context);
+
+  return BoxDecoration(
+    color: AppTheme.getCardColor(context),
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(
+      color: borderColor ?? AppTheme.getBorderColor(context),
+      width: 0.8,
+    ),
+    boxShadow: <BoxShadow>[
+      BoxShadow(
+        color: Colors.black.withValues(
+          alpha: isDark ? 0.24 : 0.055,
+        ),
+        blurRadius: 20,
+        spreadRadius: -6,
+        offset: const Offset(0, 8),
+      ),
+    ],
+  );
+}
+
 class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.title,
@@ -296,9 +322,9 @@ class _StatCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.getCardColor(context),
-          borderRadius: BorderRadius.circular(16),
+        decoration: _dashboardCardDecoration(
+          context,
+          radius: 20,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,17 +341,13 @@ class _StatCard extends StatelessWidget {
                     ? Icon(
                         icon as IconData,
                         size: 20,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : color,
-                      )
+                        color: color,
+                    )
                     : HugeIcon(
                         icon: icon,
                         size: 20,
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.white
-                            : color,
-                      ),
+                        color: color,
+                    ),
               ),
             ),
             const SizedBox(height: 12),
@@ -401,9 +423,9 @@ class _QuickAccessGrid extends StatelessWidget {
             }
           },
           child: Container(
-            decoration: BoxDecoration(
-              color: AppTheme.getCardColor(context),
-              borderRadius: BorderRadius.circular(16),
+            decoration: _dashboardCardDecoration(
+              context,
+              radius: 18,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -413,25 +435,23 @@ class _QuickAccessGrid extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: AppTheme.getMint100(context),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppTheme.getAccentColor(context).withValues(alpha: 0.22),
+                      width: 0.8,
+                    ),
                   ),
                   child: Center(
                     child: item.icon is IconData
                         ? Icon(
                             item.icon as IconData,
                             size: 24,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : AppTheme.getPrimaryColor(context),
+                            color: AppTheme.getAccentColor(context),
                           )
                         : HugeIcon(
                             icon: item.icon,
                             size: 24,
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                ? Colors.white
-                                : AppTheme.getPrimaryColor(context),
+                            color: AppTheme.getAccentColor(context),
                           ),
                   ),
                 ),
@@ -490,9 +510,9 @@ class _ContinueLearningCard extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.getCardColor(context),
-          borderRadius: BorderRadius.circular(16),
+        decoration: _dashboardCardDecoration(
+          context,
+          radius: 20,
         ),
         child: Row(
           children: <Widget>[
@@ -550,16 +570,16 @@ class _ContinueLearningCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor: AppTheme.getSoftGray150(context),
+                      backgroundColor: AppTheme.getMint100(context),
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppTheme.primary,
+                        AppTheme.getAccentColor(context),
                       ),
                       minHeight: 6,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${(progress * 100).toStringAsFixed(0)}% context.l10n.complete',
+                    '${(progress * 100).toStringAsFixed(0)}% ${context.l10n.complete}',
                     style: TextStyle(
                       color: AppTheme.getTextColor(
                         context,
@@ -589,9 +609,9 @@ class _LearningActivityChart extends StatelessWidget {
       return Container(
         height: 100,
         padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppTheme.getCardColor(context),
-          borderRadius: BorderRadius.circular(16),
+        decoration: _dashboardCardDecoration(
+          context,
+          radius: 20,
         ),
         alignment: Alignment.center,
         child: Text(
@@ -611,9 +631,9 @@ class _LearningActivityChart extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.getCardColor(context),
-        borderRadius: BorderRadius.circular(16),
+      decoration: _dashboardCardDecoration(
+        context,
+        radius: 20,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -639,7 +659,7 @@ class _LearningActivityChart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '${activity.fold<int>(0, (sum, e) => sum + e.lessons)} context.l10n.total',
+                  '${activity.fold<int>(0, (sum, e) => sum + e.lessons)} ${context.l10n.total}',
                   style: TextStyle(
                     color: AppTheme.getPrimaryColor(context),
                     fontSize: 12,
@@ -694,10 +714,8 @@ class _LearningActivityChart extends StatelessWidget {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                AppTheme.getPrimaryColor(context),
-                                AppTheme.getPrimaryColor(
-                                  context,
-                                ).withValues(alpha: 0.7),
+                                AppTheme.getAccentColor(context),
+                                AppTheme.getAccentColor(context).withValues(alpha: 0.55),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(6),

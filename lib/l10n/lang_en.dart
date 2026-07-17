@@ -524,5 +524,6 @@ const Map<String, String> kLangEn = <String, String>{
   'noActivity': 'No activity available',
   'complete': 'Complete',
   'failedLoadCourses': 'Failed to load courses',
+  'total': 'Total',
 
 };

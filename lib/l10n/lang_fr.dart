@@ -291,4 +291,5 @@ final Map<String, String> kLangFr = <String, String>{
   'noActivity': 'Aucune activité disponible',
   'complete': 'Terminé',
   'failedLoadCourses': 'Impossible de charger les cours',
+  'total': 'Total',
 };
