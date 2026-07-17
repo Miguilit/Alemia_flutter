@@ -128,6 +128,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               margin: const EdgeInsets.only(bottom: 24),
                             ),
                           ],
+                          if (data != null && data.continueLearning.isNotEmpty) ...[
+                            Text(
+                              context.l10n.continueLearning,
+                              style: TextStyle(
+                                color: AppTheme.getTextColor(context),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _ContinueLearningHeroCard(
+                              courseId: data.continueLearning.first.courseId,
+                              courseTitle: data.continueLearning.first.title,
+                              progress: data.continueLearning.first.progress,
+                              nextLesson: data.continueLearning.first.nextLesson,
+                              imageUrl: data.continueLearning.first.image,
+                            ),
+                            const SizedBox(height: 28),
+                          ],
                           // Stats Cards - Horizontal Scroll
                           SizedBox(
                             height: 140,
@@ -227,8 +247,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ],
                           ),
-                          if (data != null &&
-                              data.continueLearning.isNotEmpty) ...[
+                          if (data != null && data.continueLearning.length > 1) ...[
                             const SizedBox(height: 32),
                             // Continue Learning Section
                             Text(
@@ -244,11 +263,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ListView.separated(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: data.continueLearning.length,
+                              itemCount: data.continueLearning.length - 1,
                               separatorBuilder: (context, index) =>
                                   const SizedBox(height: 16),
                               itemBuilder: (context, index) {
-                                final course = data.continueLearning[index];
+                                final course = data.continueLearning[index + 1];
                                 return _ContinueLearningCard(
                                   courseId: course.courseId,
                                   courseTitle: course.title,
@@ -476,6 +495,216 @@ class _QuickAccessGrid extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _ContinueLearningHeroCard extends StatelessWidget {
+  const _ContinueLearningHeroCard({
+    required this.courseId,
+    required this.courseTitle,
+    required this.progress,
+    required this.nextLesson,
+    required this.imageUrl,
+  });
+
+  final int courseId;
+  final String courseTitle;
+  final double progress;
+  final String nextLesson;
+  final String? imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final double safeProgress = progress.clamp(0.0, 1.0).toDouble();
+
+    return Semantics(
+      button: true,
+      label: courseTitle,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) {
+                  return CourseAccessScreen(
+                    courseId: courseId,
+                    courseTitle: courseTitle,
+                  );
+                },
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(24),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: AppTheme.black,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: AppTheme.gold.withValues(alpha: 0.50),
+                width: 0.9,
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.24),
+                  blurRadius: 26,
+                  spreadRadius: -8,
+                  offset: const Offset(0, 12),
+                ),
+                BoxShadow(
+                  color: AppTheme.gold.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  spreadRadius: -8,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    width: 104,
+                    height: 112,
+                    decoration: BoxDecoration(
+                      color: AppTheme.blackElevated,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: AppTheme.gold.withValues(alpha: 0.18),
+                      ),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: imageUrl != null && imageUrl!.isNotEmpty
+                        ? Image.network(
+                      AppConfig.getImageUrl(imageUrl),
+                      fit: BoxFit.cover,
+                      errorBuilder: (
+                          BuildContext context,
+                          Object error,
+                          StackTrace? stackTrace,
+                          ) {
+                        return Image.asset(
+                          'assets/img/banner.png',
+                          fit: BoxFit.cover,
+                        );
+                      },
+                    )
+                        : Image.asset(
+                      'assets/img/banner.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 9,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppTheme.gold.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: AppTheme.gold.withValues(alpha: 0.28),
+                            ),
+                          ),
+                          child: Text(
+                            context.l10n.continueLearning,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppTheme.goldLight,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          courseTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            height: 1.25,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Text(
+                          nextLesson,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.62),
+                            fontSize: 11,
+                            height: 1.3,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 13),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(999),
+                          child: LinearProgressIndicator(
+                            value: safeProgress,
+                            minHeight: 6,
+                            backgroundColor: Colors.white.withValues(
+                              alpha: 0.12,
+                            ),
+                            valueColor:
+                            const AlwaysStoppedAnimation<Color>(
+                              AppTheme.goldLight,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(
+                                '${(safeProgress * 100).toStringAsFixed(0)}% '
+                                    '${context.l10n.complete}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.70),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: const BoxDecoration(
+                                color: AppTheme.goldLight,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: HugeIcon(
+                                icon: HugeIcons.strokeRoundedArrowRight01,
+                                size: 16,
+                                color: AppTheme.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
