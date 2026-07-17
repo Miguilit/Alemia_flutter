@@ -245,4 +245,41 @@ final Map<String, String> kLangNl = <String, String>{
   'answered': 'Beantwoord',
   'posts': 'berichten',
   'members': 'leden',
+
+  // Toegang tot cursus
+  'markComplete': 'Als voltooid markeren',
+  'curriculum': 'Lesprogramma',
+  'forums': 'Discussies',
+  'previousLesson': 'Vorige les',
+  'nextLesson': 'Volgende les',
+  'lessonCompleted': 'Les voltooid!',
+  'lessonLocked':
+  'De volgende les is vergrendeld. Voltooi eerst de huidige les.',
+  'unsupportedItemType':
+  'Dit inhoudstype wordt nog niet ondersteund.',
+  'selectLessonToPlay': 'Selecteer een les om te beginnen',
+  'videoUnavailable': 'Video niet beschikbaar',
+  'videoUnavailableMessage':
+  'Deze video is niet beschikbaar of de livesessie is beëindigd.',
+  'retry': 'Opnieuw proberen',
+  'liveNow': 'NU LIVE',
+  'sessionEnded': 'SESSIE BEËINDIGD',
+  'scheduled': 'GEPLAND',
+  'startsAt': 'Start',
+  'openJoiningLink': 'Deelnamelink openen',
+  'liveClassSession': 'Live les',
+  'liveSessionEndedMessage':
+  'De livesessie is beëindigd. De lesgever heeft nog geen opname toegevoegd.',
+  'accessDeniedCourse':
+  'Toegang geweigerd. Je bent niet ingeschreven voor deze cursus.',
+  'failedToLoadCourse': 'De cursus kon niet worden geladen.',
+  'failedToLoadLesson': 'De les kon niet worden geladen.',
+  'failedToLoadCourseData':
+  'De cursusgegevens konden niet worden geladen.',
+  'notAvailable': 'Niet beschikbaar',
+  'liveClassLabel': 'LIVE LES',
+  'lessonsCompleted': 'Voltooide lessen',
+  'noActivity': 'Geen activiteit beschikbaar',
+  'complete': 'Voltooid',
+  'failedLoadCourses': 'Cursussen konden niet worden geladen',
 };

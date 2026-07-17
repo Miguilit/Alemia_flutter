@@ -26,6 +26,6 @@ void main() async {
   };
 
   runApp(
-    MultiProvider(providers: AppProviders.providers, child: const EduExApp()),
+    MultiProvider(providers: AppProviders.providers, child: const AlemiaApp()),
   );
 }

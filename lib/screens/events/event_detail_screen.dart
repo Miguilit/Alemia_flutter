@@ -303,7 +303,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  'EduEx Events',
+                                  'Alemia Events',
                                   style: TextStyle(
                                     color: AppTheme.getTextColor(context),
                                     fontSize: 16,

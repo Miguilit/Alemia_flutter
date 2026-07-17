@@ -1,6 +1,6 @@
-# eduex_app
+# alemia_app
 
-EduEx – AI Assisted LMS & Course Selling Flutter UI Kit
+Alemia – AI Assisted LMS & Course Selling Flutter
 
 
 ## Getting Started

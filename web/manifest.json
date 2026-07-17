@@ -1,6 +1,6 @@
 {
-    "name": "eduex_app",
-    "short_name": "eduex_app",
+    "name": "Alemia Academy",
+    "short_name": "Alemia_LMS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

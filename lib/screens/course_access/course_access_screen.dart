@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
 import 'package:hugeicons/hugeicons.dart';
+import '../../l10n/app_localizations.dart';
 import '../../router/app_router.dart';
 import '../../services/student_course_service.dart';
 import '../../theme/app_theme.dart';
@@ -108,19 +109,19 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
           }
         } else {
           setState(() {
-            _error = data['message'] ?? 'Failed to load course data';
+            _error = data['message'] ?? context.l10n.failedToLoadCourseData;
             _isLoading = false;
           });
         }
       } else {
         if (response.statusCode == 403) {
           setState(() {
-            _error = 'Access Denied. You are not enrolled in this course.';
+            _error = context.l10n.accessDeniedCourse;
             _isLoading = false;
           });
         } else {
           setState(() {
-            _error = 'Failed to load course. Status: ${response.statusCode}';
+            _error = '${context.l10n.failedToLoadCourse} (${response.statusCode})';
             _isLoading = false;
           });
         }
@@ -184,7 +185,8 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load lesson: ${response.statusCode}'),
+            content: Text(
+                '${context.l10n.failedToLoadLesson} (${response.statusCode})'),
           ),
         );
       }
@@ -243,9 +245,9 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                     debugPrint('Chewie playback error: $errorMessage');
                   }
 
-                  return const _VideoUnavailableView(
-                    message:
-                        'Cette vidéo est indisponible ou la session en direct est terminée.',
+                  return _VideoUnavailableView(
+                      title: context.l10n.videoUnavailable,
+                      message: context.l10n.videoUnavailableMessage,
                   );
                 },
               );
@@ -258,7 +260,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
             setState(() {
               _isVideoLoading = false;
               _videoError =
-                  'Cette vidéo est indisponible ou la session en direct est terminée.';
+                  context.l10n.videoUnavailableMessage;
             });
 
             if (kDebugMode) {
@@ -290,7 +292,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
           if (!mounted) return;
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(const SnackBar(content: Text('Lesson Completed!')));
+          ).showSnackBar(SnackBar(content: Text(context.l10n.lessonCompleted)));
 
           // Refresh curriculum to show checkmark
           _fetchCourseCurriculum();
@@ -364,9 +366,9 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
 
       if (nextItem['is_accessible'] == false) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Next lesson is locked. Complete the current one first.',
+              (context.l10n.lessonLocked),
             ),
           ),
         );
@@ -457,7 +459,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                                     ? _goToPrevious
                                     : null,
                                 icon: const Icon(Icons.arrow_back_ios),
-                                tooltip: 'Previous Lesson',
+                                tooltip: context.l10n.previousLesson,
                               ),
                               Expanded(
                                 child: Text(
@@ -472,7 +474,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                               IconButton(
                                 onPressed: _hasNextItem() ? _goToNext : null,
                                 icon: const Icon(Icons.arrow_forward_ios),
-                                tooltip: 'Next Lesson',
+                                tooltip: context.l10n.nextLesson,
                               ),
                             ],
                           ),
@@ -483,7 +485,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                               ElevatedButton.icon(
                                 onPressed: _markComplete,
                                 icon: const Icon(Icons.check_circle_outline),
-                                label: const Text('Mark Complete'),
+                                label: Text(context.l10n.markComplete),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppTheme.getPrimaryColor(
                                     context,
@@ -504,9 +506,15 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                     unselectedLabelColor: Colors.grey,
                     indicatorColor: AppTheme.getPrimaryColor(context),
                     indicatorSize: TabBarIndicatorSize.tab,
-                    tabs: const [
-                      Tab(icon: Icon(Icons.menu_book), text: 'Curriculum'),
-                      Tab(icon: Icon(Icons.forum_outlined), text: 'Forums'),
+                    tabs: [
+                      Tab(
+                        icon: const Icon(Icons.menu_book),
+                        text: context.l10n.curriculum,
+                      ),
+                      Tab(
+                        icon: const Icon(Icons.forum_outlined),
+                        text: context.l10n.forums,
+                      ),
                     ],
                   ),
                   const Divider(height: 1),
@@ -570,7 +578,9 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(
-                                            item['live_class']?['status'] == 'live' ? 'LIVE' : 'LIVE CLASS',
+                                            item['live_class']?['status'] == 'live'
+                                                ? context.l10n.live
+                                                : context.l10n.liveClassLabel,
                                             style: const TextStyle(
                                               color: Colors.white,
                                               fontSize: 9,
@@ -629,7 +639,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                                             ).showSnackBar(
                                               SnackBar(
                                                 content: Text(
-                                                  'Item type not supported yet.',
+                                                  context.l10n.unsupportedItemType,
                                                 ),
                                               ),
                                             );
@@ -663,7 +673,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
       final scheduledAtStr = liveClass['scheduled_at'];
       final formattedTime = scheduledAtStr != null 
           ? DateFormat('MMM dd, yyyy @ hh:mm a').format(DateTime.parse(scheduledAtStr).toLocal())
-          : 'N/A';
+          : context.l10n.notAvailable;
 
       return Container(
         color: const Color(0xFF1E293B),
@@ -686,21 +696,21 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                     if (isClassLive) ...[
                       const Icon(Icons.circle, color: Colors.white, size: 10),
                       const SizedBox(width: 6),
-                      const Text(
-                        'LIVE NOW',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      Text(
+                        context.l10n.liveNow,
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ] else if (isClassEnded) ...[
-                      const Text(
-                        'SESSION ENDED',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      Text(
+                        context.l10n.sessionEnded,
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ] else ...[
                       const Icon(Icons.calendar_month, color: Colors.white, size: 12),
                       const SizedBox(width: 6),
-                      const Text(
-                        'SCHEDULED',
-                        style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                      Text(
+                        context.l10n.scheduled,
+                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ],
@@ -708,14 +718,14 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                liveClass['title'] ?? 'Live Class Session',
+                liveClass['title'] ?? context.l10n.liveClassSession,
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               if (!isClassLive && !isClassEnded)
                 Text(
-                  'Starts: $formattedTime',
+                  '${context.l10n.startsAt}: $formattedTime',
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
@@ -739,13 +749,15 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
                   },
                   icon: const Icon(Icons.videocam),
                   label: Text(
-                    isClassLive ? 'Join Live Class' : 'Open Joining Link',
+                    isClassLive
+                        ? context.l10n.joinLiveClass
+                        : context.l10n.openJoiningLink,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               if (isClassEnded)
                 Text(
-                  'The live stream has ended. The instructor has not uploaded a recording yet.',
+                  context.l10n.liveSessionEndedMessage,
                   style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -766,6 +778,7 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
     } else {
       if (_videoError != null) {
         return _VideoUnavailableView(
+          title: context.l10n.videoUnavailable,
           message: _videoError!,
           onRetry: () {
             setState(() {
@@ -779,10 +792,10 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
           },
         );
       }
-      return const Center(
+      return Center(
         child: Text(
-          'Select a lesson to start playing',
-          style: TextStyle(color: Colors.white),
+          context.l10n.selectLessonToPlay,
+          style: const TextStyle(color: Colors.white),
         ),
       );
     }
@@ -790,10 +803,12 @@ class _CourseAccessScreenState extends State<CourseAccessScreen> {
 }
 
 class _VideoUnavailableView extends StatelessWidget {
+  final String title;
   final String message;
   final VoidCallback? onRetry;
 
   const _VideoUnavailableView({
+    required this.title,
     required this.message,
     this.onRetry,
   });
@@ -815,10 +830,10 @@ class _VideoUnavailableView extends StatelessWidget {
               size: 48,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Vidéo indisponible',
+            Text(
+              title,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -839,7 +854,7 @@ class _VideoUnavailableView extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Réessayer'),
+                label: Text(context.l10n.retry),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: const BorderSide(color: Colors.white54),

@@ -107,7 +107,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
       } else {
         if (!mounted) return;
         setState(() {
-          _error = 'Failed to load courses';
+          _error = context.l10n.failedLoadCourses;
           _isLoading = false;
           _isMoreLoading = false;
         });
@@ -296,7 +296,7 @@ class _MyCoursesScreenState extends State<MyCoursesScreen> {
                                       ),
                                       foregroundColor: Colors.white,
                                     ),
-                                    child: const Text('Retry'),
+                                    child: Text(context.l10n.retry),
                                   ),
                                 ],
                               ),

@@ -902,7 +902,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                           Navigator.of(context).pushAndRemoveUntil(
                             MaterialPageRoute(
-                              builder: (context) => const EduExApp(),
+                              builder: (context) => const AlemiaApp(),
                             ),
                             (route) => false,
                           );

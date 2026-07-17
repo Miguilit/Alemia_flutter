@@ -245,4 +245,41 @@ final Map<String, String> kLangDe = <String, String>{
   'answered': 'Beantwortet',
   'posts': 'Beiträge',
   'members': 'Mitglieder',
+
+  // Kurszugang
+  'markComplete': 'Als abgeschlossen markieren',
+  'curriculum': 'Lehrplan',
+  'forums': 'Diskussionen',
+  'previousLesson': 'Vorherige Lektion',
+  'nextLesson': 'Nächste Lektion',
+  'lessonCompleted': 'Lektion abgeschlossen!',
+  'lessonLocked':
+  'Die nächste Lektion ist gesperrt. Schließen Sie zuerst die aktuelle Lektion ab.',
+  'unsupportedItemType':
+  'Dieser Inhaltstyp wird noch nicht unterstützt.',
+  'selectLessonToPlay': 'Wählen Sie eine Lektion aus',
+  'videoUnavailable': 'Video nicht verfügbar',
+  'videoUnavailableMessage':
+  'Dieses Video ist nicht verfügbar oder die Live-Sitzung wurde beendet.',
+  'retry': 'Erneut versuchen',
+  'liveNow': 'JETZT LIVE',
+  'sessionEnded': 'SITZUNG BEENDET',
+  'scheduled': 'GEPLANT',
+  'startsAt': 'Beginn',
+  'openJoiningLink': 'Teilnahmelink öffnen',
+  'liveClassSession': 'Live-Unterricht',
+  'liveSessionEndedMessage':
+  'Die Live-Sitzung ist beendet. Der Dozent hat noch keine Aufzeichnung hinzugefügt.',
+  'accessDeniedCourse':
+  'Zugriff verweigert. Sie sind nicht für diesen Kurs eingeschrieben.',
+  'failedToLoadCourse': 'Der Kurs konnte nicht geladen werden.',
+  'failedToLoadLesson': 'Die Lektion konnte nicht geladen werden.',
+  'failedToLoadCourseData':
+  'Die Kursdaten konnten nicht geladen werden.',
+  'notAvailable': 'Nicht verfügbar',
+  'liveClassLabel': 'LIVE-UNTERRICHT',
+  'lessonsCompleted': 'Abgeschlossene Lektionen',
+  'noActivity': 'Keine Aktivitäten verfügbar',
+  'complete': 'Abgeschlossen',
+  'failedLoadCourses': 'Kurse konnten nicht geladen werden',
 };

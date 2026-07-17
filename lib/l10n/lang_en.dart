@@ -489,4 +489,40 @@ const Map<String, String> kLangEn = <String, String>{
   'accepted': 'Accepted',
   'writeComment': 'Write a comment...',
   'postComment': 'Post Comment',
+
+  // Course access
+  'markComplete': 'Mark Complete',
+  'curriculum': 'Curriculum',
+  'forums': 'Forums',
+  'previousLesson': 'Previous Lesson',
+  'nextLesson': 'Next Lesson',
+  'lessonCompleted': 'Lesson Completed!',
+  'lessonLocked':
+  'The next lesson is locked. Complete the current lesson first.',
+  'unsupportedItemType': 'This content type is not supported yet.',
+  'selectLessonToPlay': 'Select a lesson to start playing',
+  'videoUnavailable': 'Video unavailable',
+  'videoUnavailableMessage':
+  'This video is unavailable or the live session has ended.',
+  'retry': 'Retry',
+  'liveNow': 'LIVE NOW',
+  'sessionEnded': 'SESSION ENDED',
+  'scheduled': 'SCHEDULED',
+  'startsAt': 'Starts',
+  'openJoiningLink': 'Open Joining Link',
+  'liveClassSession': 'Live Class Session',
+  'liveSessionEndedMessage':
+  'The live stream has ended. The instructor has not uploaded a recording yet.',
+  'accessDeniedCourse':
+  'Access denied. You are not enrolled in this course.',
+  'failedToLoadCourse': 'Failed to load course.',
+  'failedToLoadLesson': 'Failed to load lesson.',
+  'failedToLoadCourseData': 'Failed to load course data.',
+  'notAvailable': 'Not available',
+  'liveClassLabel': 'LIVE CLASS',
+  'lessonsCompleted': 'Lessons Completed',
+  'noActivity': 'No activity available',
+  'complete': 'Complete',
+  'failedLoadCourses': 'Failed to load courses',
+
 };

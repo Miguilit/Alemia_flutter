@@ -339,15 +339,20 @@ class _StatCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              title,
-              style: TextStyle(
-                color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.left,
+                maxLines: 3,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  height: 1.2,
+                ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -431,16 +436,20 @@ class _QuickAccessGrid extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  item.title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: AppTheme.getTextColor(context),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                Flexible(
+                  child: Text(
+                    item.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: AppTheme.getTextColor(context),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                    ),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -550,7 +559,7 @@ class _ContinueLearningCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${(progress * 100).toStringAsFixed(0)}% Complete',
+                    '${(progress * 100).toStringAsFixed(0)}% context.l10n.complete',
                     style: TextStyle(
                       color: AppTheme.getTextColor(
                         context,
@@ -586,7 +595,7 @@ class _LearningActivityChart extends StatelessWidget {
         ),
         alignment: Alignment.center,
         child: Text(
-          'No activity data available',
+          context.l10n.noActivity,
           style: TextStyle(
             color: AppTheme.getTextColor(context).withValues(alpha: 0.5),
             fontSize: 14,
@@ -613,7 +622,7 @@ class _LearningActivityChart extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                'Lessons Completed',
+                context.l10n.lessonsCompleted,
                 style: TextStyle(
                   color: AppTheme.getTextColor(context),
                   fontSize: 16,
@@ -630,7 +639,7 @@ class _LearningActivityChart extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
-                  '${activity.fold<int>(0, (sum, e) => sum + e.lessons)} Total',
+                  '${activity.fold<int>(0, (sum, e) => sum + e.lessons)} context.l10n.total',
                   style: TextStyle(
                     color: AppTheme.getPrimaryColor(context),
                     fontSize: 12,

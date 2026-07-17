@@ -1,4 +1,4 @@
-package com.example.eduex_app
+package com.miguil.alemia
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

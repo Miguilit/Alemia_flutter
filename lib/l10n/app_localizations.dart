@@ -512,8 +512,40 @@ class AppLocalizations {
   String get writeComment => _t('writeComment');
   String get postComment => _t('postComment');
 
+  // Course access
+  String get markComplete => _t('markComplete');
+  String get curriculum => _t('curriculum');
+  String get forums => _t('forums');
+  String get previousLesson => _t('previousLesson');
+  String get nextLesson => _t('nextLesson');
+  String get lessonCompleted => _t('lessonCompleted');
+  String get lessonLocked => _t('lessonLocked');
+  String get unsupportedItemType => _t('unsupportedItemType');
+  String get selectLessonToPlay => _t('selectLessonToPlay');
+  String get videoUnavailable => _t('videoUnavailable');
+  String get videoUnavailableMessage => _t('videoUnavailableMessage');
+  String get retry => _t('retry');
+  String get liveNow => _t('liveNow');
+  String get sessionEnded => _t('sessionEnded');
+  String get scheduled => _t('scheduled');
+  String get startsAt => _t('startsAt');
+  String get openJoiningLink => _t('openJoiningLink');
+  String get liveClassSession => _t('liveClassSession');
+  String get liveSessionEndedMessage => _t('liveSessionEndedMessage');
+  String get accessDeniedCourse => _t('accessDeniedCourse');
+  String get failedToLoadCourse => _t('failedToLoadCourse');
+  String get failedToLoadLesson => _t('failedToLoadLesson');
+  String get failedToLoadCourseData => _t('failedToLoadCourseData');
+  String get notAvailable => _t('notAvailable');
+  String get liveClassLabel => _t('liveClassLabel');
+  String get lessonsCompleted => _t('lessonsCompleted');
+  String get noActivity => _t('noActivity');
+  String get complete => _t('complete');
+  String get failedLoadCourses => _t('failedLoadCourses');
+
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
+
 }
 
 class _AppLocalizationsDelegate

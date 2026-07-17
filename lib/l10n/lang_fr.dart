@@ -254,4 +254,41 @@ final Map<String, String> kLangFr = <String, String>{
   'answered': 'Répondu',
   'posts': 'publications',
   'members': 'membres',
+
+  // Accès au cours
+  'markComplete': 'Marquer comme terminée',
+  'curriculum': 'Programme',
+  'forums': 'Discussions',
+  'previousLesson': 'Leçon précédente',
+  'nextLesson': 'Leçon suivante',
+  'lessonCompleted': 'Leçon terminée !',
+  'lessonLocked':
+  'La leçon suivante est verrouillée. Terminez d’abord la leçon actuelle.',
+  'unsupportedItemType':
+  'Ce type de contenu n’est pas encore pris en charge.',
+  'selectLessonToPlay': 'Sélectionnez une leçon pour commencer',
+  'videoUnavailable': 'Vidéo indisponible',
+  'videoUnavailableMessage':
+  'Cette vidéo est indisponible ou la session en direct est terminée.',
+  'retry': 'Réessayer',
+  'liveNow': 'EN DIRECT',
+  'sessionEnded': 'SESSION TERMINÉE',
+  'scheduled': 'PROGRAMMÉE',
+  'startsAt': 'Début',
+  'openJoiningLink': 'Ouvrir le lien de participation',
+  'liveClassSession': 'Classe en direct',
+  'liveSessionEndedMessage':
+  'La session en direct est terminée. Le formateur n’a pas encore ajouté d’enregistrement.',
+  'accessDeniedCourse':
+  'Accès refusé. Vous n’êtes pas inscrit à ce cours.',
+  'failedToLoadCourse': 'Impossible de charger le cours.',
+  'failedToLoadLesson': 'Impossible de charger la leçon.',
+  'failedToLoadCourseData':
+  'Impossible de charger les données du cours.',
+  'notAvailable': 'Non disponible',
+  'liveClassLabel': 'CLASSE EN DIRECT',
+  'lessonsCompleted': 'Leçons terminées',
+  'noActivity': 'Aucune activité disponible',
+  'complete': 'Terminé',
+  'failedLoadCourses': 'Impossible de charger les cours',
 };

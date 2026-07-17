@@ -30,9 +30,9 @@ class PlatformSettings {
     );
   }
 
-  String get siteName => platform['site_name'] ?? 'EduEx';
+  String get siteName => platform['site_name'] ?? 'Alemia';
   String get tagline => platform['tagline'] ?? '';
-  String get supportEmail => contact['support_email'] ?? 'info@eduex.com';
+  String get supportEmail => contact['support_email'] ?? 'support@alemia.org';
   String get supportPhone => contact['support_phone'] ?? '';
 }
 

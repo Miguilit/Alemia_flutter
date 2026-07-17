@@ -11,8 +11,8 @@ import 'screens/splash/splash_wrapper.dart';
 import 'theme/app_theme.dart';
 
 /// Root widget of the application
-class EduExApp extends StatelessWidget {
-  const EduExApp({super.key});
+class AlemiaApp extends StatelessWidget {
+  const AlemiaApp({super.key});
 
   @override
   Widget build(BuildContext context) {

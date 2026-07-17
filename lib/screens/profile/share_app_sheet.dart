@@ -53,7 +53,7 @@ class _ShareAppSheet extends StatelessWidget {
 
     // Using share_plus to share the app link
     // ignore: deprecated_member_use
-    Share.share('Check out EduEx App! https://eduex.example.com');
+    Share.share('Check out Alemia LMS! https://alemia.org');
   }
 
   @override
@@ -91,7 +91,7 @@ class _ShareAppSheet extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Share EduEx App',
+                'Share Alemia App',
                 style: TextStyle(
                   color: AppTheme.getTextColor(context),
                   fontSize: 20,
@@ -188,7 +188,7 @@ class _ShareAppSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'EduEx App',
+                            'Alemia App',
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 16,
