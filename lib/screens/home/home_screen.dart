@@ -1108,8 +1108,26 @@ class _TopCategoriesRow extends StatelessWidget {
         separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (BuildContext context, int index) {
           final Category category = categories[index];
-          // Simple color generation or mapping could be here. Using default for now.
-          final Color background = AppTheme.primary.withValues(alpha: 0.1);
+
+          final bool isDark = AppTheme.isDark(context);
+
+          final Color cardBackground = isDark
+              ? const Color(0xFF24272D)
+              : AppTheme.goldPale;
+
+          final Color circleBackground = isDark
+              ? const Color(0xFF2B2F36)
+              : AppTheme.goldSoft;
+
+          final Color borderColor = AppTheme.getAccentColor(context).withValues(
+            alpha: isDark ? 0.75 : 0.35,
+          );
+
+          final Color iconColor = isDark
+              ? AppTheme.goldLight
+              : AppTheme.black;
+
+          final Color labelColor = AppTheme.getTextColor(context);
 
           return GestureDetector(
             onTap: () {
@@ -1131,8 +1149,14 @@ class _TopCategoriesRow extends StatelessWidget {
                     top: 20,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: background,
+                        color: cardBackground,
                         borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: borderColor.withValues(
+                            alpha: isDark ? 0.55 : 0.25,
+                          ),
+                          width: 0.8,
+                        ),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -1146,7 +1170,7 @@ class _TopCategoriesRow extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: AppTheme.primary,
+                            color: labelColor,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             height: 1.2,
@@ -1155,7 +1179,8 @@ class _TopCategoriesRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // Floating circular icon slightly above the card
+
+                  // Icône circulaire flottante
                   Positioned(
                     top: 2,
                     left: 0,
@@ -1166,17 +1191,26 @@ class _TopCategoriesRow extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: background,
+                          color: circleBackground,
                           border: Border.all(
-                            color: AppTheme.getCardColor(context),
-                            width: 2,
+                            color: borderColor,
+                            width: isDark ? 1.3 : 1,
                           ),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: AppTheme.getAccentColor(context).withValues(
+                                alpha: isDark ? 0.16 : 0.08,
+                              ),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Center(
                           child: Icon(
-                            _getCategoryIcon(category.icon), // Default icon
+                            _getCategoryIcon(category.icon),
                             size: 24,
-                            color: AppTheme.primary,
+                            color: iconColor,
                           ),
                         ),
                       ),

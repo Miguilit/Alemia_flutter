@@ -33,6 +33,16 @@ class AppTheme {
   static const Color danger = Color(0xFFD94A4A);
   static const Color info = Color(0xFF3977D5);
 
+  // Home categories
+  static const Color categorySurfaceLight = goldPale;
+  static const Color categorySurfaceDark = Color(0xFF24272D);
+
+  static const Color categoryBorderLight = Color(0xFFE6D18A);
+  static const Color categoryBorderDark = Color(0xFF80651F);
+
+  static const Color categoryIconLight = black;
+  static const Color categoryIconDark = goldLight;
+
   // ---------------------------------------------------------------------------
   // Legacy aliases
   //
@@ -783,5 +793,17 @@ class AppTheme {
 
   static Color getSoftGray150(BuildContext context) {
     return isDark(context) ? surfaceDark : softGray150;
+  }
+
+  static Color getCategorySurfaceColor(BuildContext context) {
+    return isDark(context) ? categorySurfaceDark : categorySurfaceLight;
+  }
+
+  static Color getCategoryBorderColor(BuildContext context) {
+    return isDark(context) ? categoryBorderDark : categoryBorderLight;
+  }
+
+  static Color getCategoryIconColor(BuildContext context) {
+    return isDark(context) ? categoryIconDark : categoryIconLight;
   }
 }
