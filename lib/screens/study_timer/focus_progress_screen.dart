@@ -1,12 +1,97 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'task_breakdown_screen.dart';
 
 import '../../services/focus_service.dart';
+
+String _formatLocalizedHours(
+    BuildContext context,
+    double value,
+    ) {
+  final String languageCode =
+      Localizations.localeOf(context).languageCode;
+
+  return NumberFormat(
+    '0.0',
+    languageCode,
+  ).format(value);
+}
+
+String _localizedWeekday(
+    BuildContext context,
+    String rawDay, {
+      bool abbreviated = false,
+    }) {
+  final String normalized = rawDay
+      .trim()
+      .toLowerCase()
+      .replaceAll('.', '');
+
+  final Map<String, int> weekdays = <String, int>{
+    'mon': DateTime.monday,
+    'monday': DateTime.monday,
+    'lun': DateTime.monday,
+    'lundi': DateTime.monday,
+
+    'tue': DateTime.tuesday,
+    'tues': DateTime.tuesday,
+    'tuesday': DateTime.tuesday,
+    'mar': DateTime.tuesday,
+    'mardi': DateTime.tuesday,
+
+    'wed': DateTime.wednesday,
+    'wednesday': DateTime.wednesday,
+    'mer': DateTime.wednesday,
+    'mercredi': DateTime.wednesday,
+
+    'thu': DateTime.thursday,
+    'thur': DateTime.thursday,
+    'thurs': DateTime.thursday,
+    'thursday': DateTime.thursday,
+    'jeu': DateTime.thursday,
+    'jeudi': DateTime.thursday,
+
+    'fri': DateTime.friday,
+    'friday': DateTime.friday,
+    'ven': DateTime.friday,
+    'vendredi': DateTime.friday,
+
+    'sat': DateTime.saturday,
+    'saturday': DateTime.saturday,
+    'sam': DateTime.saturday,
+    'samedi': DateTime.saturday,
+
+    'sun': DateTime.sunday,
+    'sunday': DateTime.sunday,
+    'dim': DateTime.sunday,
+    'dimanche': DateTime.sunday,
+  };
+
+  final int? weekday = weekdays[normalized];
+
+  if (weekday == null) {
+    return rawDay;
+  }
+
+  // Le 1er janvier 2024 était un lundi.
+  final DateTime date = DateTime(
+    2024,
+    1,
+    weekday,
+  );
+
+  final String languageCode =
+      Localizations.localeOf(context).languageCode;
+
+  return abbreviated
+      ? DateFormat.E(languageCode).format(date)
+      : DateFormat.EEEE(languageCode).format(date);
+}
 
 class FocusProgressScreen extends StatefulWidget {
   const FocusProgressScreen({super.key});
@@ -18,6 +103,7 @@ class FocusProgressScreen extends StatefulWidget {
 class _FocusProgressScreenState extends State<FocusProgressScreen> {
   final FocusService _focusService = FocusService();
   bool _isLoading = true;
+  bool _hasLoadError = false;
   double _totalHours = 0;
   double _averageHours = 0;
   int _streak = 0;
@@ -32,37 +118,75 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
 
   Future<void> _loadData() async {
     try {
-      final data = await _focusService.getStats();
-      if (mounted) {
-        setState(() {
-          _totalHours = (data['total_focus_hours'] as num).toDouble();
-          _averageHours = (data['daily_average_hours'] as num).toDouble();
-          _streak = data['streak'];
+      final Map<String, dynamic> data =
+      await _focusService.getStats();
 
-          final List<dynamic> weeklyData = data['weekly_progress'];
-          _dailyProgress = weeklyData
-              .map(
-                (item) => _DailyProgressData(
-                  day: item['day'],
-                  hours: (item['hours'] as num).toDouble(),
-                ),
-              )
-              .toList();
-
-          if (_dailyProgress.isNotEmpty) {
-            _maxHours = _dailyProgress
-                .map((d) => d.hours)
-                .reduce((a, b) => a > b ? a : b);
-          }
-
-          _isLoading = false;
-        });
+      if (!mounted) {
+        return;
       }
-    } catch (e) {
-      debugPrint('Error loading progress: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
+
+      final List<dynamic> weeklyData =
+      data['weekly_progress'] is List
+          ? data['weekly_progress'] as List<dynamic>
+          : <dynamic>[];
+
+      final List<_DailyProgressData> dailyProgress =
+      weeklyData.map((dynamic item) {
+        final Map<String, dynamic> progress =
+        item as Map<String, dynamic>;
+
+        return _DailyProgressData(
+          day: progress['day']?.toString() ?? '',
+          hours:
+          (progress['hours'] as num?)?.toDouble() ??
+              0.0,
+        );
+      }).toList();
+
+      double maxHours = 0;
+
+      if (dailyProgress.isNotEmpty) {
+        maxHours = dailyProgress
+            .map((_DailyProgressData day) => day.hours)
+            .reduce(
+              (double first, double second) =>
+          first > second ? first : second,
+        );
       }
+
+      setState(() {
+        _totalHours =
+            (data['total_focus_hours'] as num?)
+                ?.toDouble() ??
+                0.0;
+
+        _averageHours =
+            (data['daily_average_hours'] as num?)
+                ?.toDouble() ??
+                0.0;
+
+        _streak =
+            (data['streak'] as num?)?.toInt() ?? 0;
+
+        _dailyProgress = dailyProgress;
+        _maxHours = maxHours;
+        _hasLoadError = false;
+        _isLoading = false;
+      });
+    } catch (error, stackTrace) {
+      debugPrint(
+        'FocusProgressScreen: failed to load data: '
+            '$error\n$stackTrace',
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _hasLoadError = true;
+        _isLoading = false;
+      });
     }
   }
 
@@ -148,7 +272,9 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                   Expanded(
                     child: _StatCard(
                       icon: Icons.timer,
-                      value: '${_totalHours.toStringAsFixed(1)}h',
+                      value:
+                      '${_formatLocalizedHours(context, _totalHours)} '
+                          '${context.l10n.hourShort}',
                       label: context.l10n.totalFocusTime,
                       color: AppTheme.getPrimaryColor(context),
                     ),
@@ -157,7 +283,9 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                   Expanded(
                     child: _StatCard(
                       icon: Icons.trending_up,
-                      value: '${_averageHours.toStringAsFixed(1)}h',
+                      value:
+                      '${_formatLocalizedHours(context, _averageHours)} '
+                          '${context.l10n.hourShort}',
                       label: context.l10n.dailyAverage,
                       color: AppTheme.softBlue800,
                     ),
@@ -208,7 +336,65 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
             const SizedBox(height: 20),
             // Weekly Chart
             Expanded(
-              child: SingleChildScrollView(
+              child: _hasLoadError || _dailyProgress.isEmpty
+                  ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppTheme.getMint100(context),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: HugeIcon(
+                          icon: HugeIcons
+                              .strokeRoundedAnalytics01,
+                          size: 36,
+                          color: AppTheme.getAccentColor(
+                            context,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        _hasLoadError
+                            ? context
+                            .l10n
+                            .failedLoadFocusProgress
+                            : context.l10n.noFocusData,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppTheme.getSecondaryTextColor(
+                            context,
+                          ),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (_hasLoadError) ...[
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isLoading = true;
+                              _hasLoadError = false;
+                            });
+
+                            _loadData();
+                          },
+                          child: Text(context.l10n.retry),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              )
+                  : SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: <Widget>[
@@ -232,7 +418,11 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                                       .map(
                                         (data) => Expanded(
                                           child: _BarChartItem(
-                                            day: data.day,
+                                            day: _localizedWeekday(
+                                              context,
+                                              data.day,
+                                              abbreviated: true,
+                                            ),
                                             hours: data.hours,
                                             maxHours: _maxHours,
                                           ),
@@ -401,7 +591,7 @@ class _BarChartItem extends StatelessWidget {
         children: <Widget>[
           Flexible(
             child: Text(
-              hours.toStringAsFixed(1),
+              _formatLocalizedHours(context, hours),
               style: TextStyle(
                 color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
                 fontSize: 9,
@@ -471,7 +661,10 @@ class _DailyDetailCard extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                progress.day,
+                _localizedWeekday(
+                  context,
+                  progress.day,
+                ),
                 style: TextStyle(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
@@ -489,7 +682,8 @@ class _DailyDetailCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  '${progress.hours.toStringAsFixed(1)} ${context.l10n.hours}',
+                  '${_formatLocalizedHours(context, progress.hours)} '
+                      '${context.l10n.hourShort}',
                   style: TextStyle(
                     color: AppTheme.getTextColor(context),
                     fontSize: 16,

@@ -292,4 +292,78 @@ final Map<String, String> kLangFr = <String, String>{
   'complete': 'Terminé',
   'failedLoadCourses': 'Impossible de charger les cours',
   'total': 'Total',
+  'guestUser': 'Utilisateur invité',
+  'learningAndProgress': 'Apprentissage et progression',
+  'learningOverviewSubtitle':
+  'Consultez la vue d’ensemble de votre apprentissage',
+  'assignmentsSubtitle': 'Consultez vos devoirs',
+  'productivityAndTracking': 'Productivité et suivi',
+  'studyTimerSubtitle':
+  'Minuteur Pomodoro pour des sessions d’étude concentrées',
+  'focusProgressSubtitle':
+  'Suivez vos sessions d’étude et votre progression',
+  'weeklyReviewSubtitle':
+  'Consultez votre progression et vos réussites de la semaine',
+  'aiTools': 'Outils IA',
+  'novaAiAssistant': 'Nova - Assistant IA',
+  'novaAiAssistantSubtitle':
+  'Discutez avec votre assistant alimenté par l’IA',
+  'aiLearningPathGenerator':
+  'Générateur de parcours d’apprentissage IA',
+  'aiLearningPathSubtitle':
+  'Générez un parcours d’apprentissage personnalisé',
+  'community': 'Communauté',
+  'accountAndPayments': 'Compte et paiements',
+  'settingsAndPreferences': 'Paramètres et préférences',
+  'failedLoadBookings':
+  'Impossible de charger les réservations',
+  'standardTicket': 'Standard',
+  'focusProgress': 'Progression de concentration',
+  'totalFocusTime': 'Temps total de concentration',
+  'dailyAverage': 'Moyenne quotidienne',
+  'dayStreak': 'Jours consécutifs',
+  'weeklyProgress': 'Progression hebdomadaire',
+  'thisWeek': 'Cette semaine',
+  'focusHours': 'Heures de concentration',
+  'dailyDetails': 'Détails par jour',
+  'hourShort': 'h',
+  'focusTime': 'Temps de concentration',
+  'noFocusData':
+  'Aucune donnée de concentration cette semaine',
+  'failedLoadFocusProgress':
+  'Impossible de charger votre progression',
+  // Réservations de billets
+  'myTicketBookings': 'Mes réservations',
+  'ticketBookings': 'Réservations de billets',
+  'totalTickets': 'Total des billets',
+  'confirmedTickets': 'Confirmés',
+  'noTicketBookings': 'Aucune réservation de billet trouvée',
+  'quantity': 'Quantité',
+  'seats': 'Places',
+  'cancelled': 'Annulé',
+  // Productivité et suivi
+  'studyTimer': 'Minuteur d’étude',
+  'weeklyReview': 'Bilan hebdomadaire',
+  'focus': 'Concentration',
+  'shortBreak': 'Pause courte',
+  'longBreak': 'Pause longue',
+  'custom': 'Personnalisé',
+  'sessionsToday': 'Sessions aujourd’hui',
+  'setCustomTime': 'Définir une durée personnalisée',
+  'customTimeDescription':
+  'Choisissez la durée de votre session',
+  'set': 'Définir',
+  'sessionSaved': 'Session enregistrée avec succès',
+  'congratulations': 'Félicitations !',
+  'completedSessionMessage':
+  'Vous avez terminé une session {phase}.',
+  'completionRate': 'Taux de réalisation',
+  'completedDays': 'Jours complétés',
+  'missedDays': 'Jours manqués',
+  'habitsThisWeek': 'Habitudes cette semaine',
+  'noWeeklyReviewData':
+  'Aucune activité hebdomadaire disponible',
+  'failedLoadWeeklyReview':
+  'Impossible de charger le bilan hebdomadaire',
+  'askAndAnswerQuestions': 'Poser des questions et y répondre',
 };

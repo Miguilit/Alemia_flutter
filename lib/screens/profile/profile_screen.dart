@@ -9,6 +9,7 @@ import '../../app.dart';
 import '../../providers/settings_provider.dart';
 import '../common/webview_screen.dart';
 import '../../router/app_router.dart';
+import '../../utils/localized_web_url.dart';
 
 class _LanguageData {
   const _LanguageData({
@@ -44,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           iconPath = 'assets/img/icons/fr.png';
           break;
         case 'nl':
-          name = 'Nederland';
+          name = 'Nederlands';
           iconPath = 'assets/img/icons/nl.png';
           break;
         case 'de':
@@ -301,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             children: <Widget>[
                               // Name
                               Text(
-                                user?.name ?? 'Guest User',
+                                user?.name ?? context.l10n.guestUser,
                                 style: TextStyle(
                                   color: AppTheme.getTextColor(context),
                                   fontSize: 20,
@@ -353,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Learning & Progress',
+                      context.l10n.learningAndProgress,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -374,7 +375,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _MenuItemWithCustomIcon(
                           icon: Icons.dashboard,
                           title: context.l10n.dashboard,
-                          subtitle: 'View your learning overview',
+                          subtitle: context.l10n.learningOverviewSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -406,7 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _MenuItem(
                           icon: HugeIcons.strokeRoundedAssignments,
                           title: context.l10n.myAssignments,
-                          subtitle: 'View your assignments',
+                          subtitle: context.l10n.assignmentsSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -451,7 +452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Productivity & Tracking',
+                      context.l10n.productivityAndTracking,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -471,8 +472,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: <Widget>[
                         _MenuItemWithCustomIcon(
                           icon: Icons.timer_outlined,
-                          title: 'Study Timer',
-                          subtitle: 'Pomodoro timer for focused study sessions',
+                          title: context.l10n.studyTimer,
+                          subtitle: context.l10n.studyTimerSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -481,8 +482,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         _MenuItemWithCustomIcon(
                           icon: Icons.trending_up,
-                          title: 'Focus Progress',
-                          subtitle: 'Track your study sessions and progress',
+                          title: context.l10n.focusProgress,
+                          subtitle: context.l10n.focusProgressSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -491,9 +492,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         _MenuItemWithCustomIcon(
                           icon: Icons.calendar_today,
-                          title: 'Weekly Review',
+                          title: context.l10n.weeklyReview,
                           subtitle:
-                              'Review your weekly progress and achievements',
+                          context.l10n.weeklyReviewSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -508,7 +509,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'AI Tools',
+                      context.l10n.aiTools,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -528,8 +529,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: <Widget>[
                         _MenuItem(
                           icon: HugeIcons.strokeRoundedAiChat02,
-                          title: 'Nova - AI Assistant',
-                          subtitle: 'Chat with our AI powered assistant',
+                          title: context.l10n.novaAiAssistant,
+                          subtitle: context.l10n.novaAiAssistantSubtitle,
                           onTap: () {
                             Navigator.of(context).pushNamed(AppRouter.aiChat);
                           },
@@ -546,8 +547,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         _MenuItem(
                           icon: HugeIcons.strokeRoundedAiUser,
-                          title: 'AI Learning Path Generator',
-                          subtitle: 'Generate personalized learning roadmap',
+                          title: context.l10n.aiLearningPathGenerator,
+                          subtitle: context.l10n.aiLearningPathSubtitle,
                           onTap: () {
                             Navigator.of(
                               context,
@@ -562,7 +563,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Community',
+                      context.l10n.community,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -596,7 +597,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Account & Payments',
+                      context.l10n.accountAndPayments,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -632,7 +633,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Settings & Preferences',
+                      context.l10n.settingsAndPreferences,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -795,7 +796,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Text(
-                      'Support & Info',
+                      context.l10n.supportInfo,
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -818,10 +819,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           title: context.l10n.helpSupport,
                           subtitle: context.l10n.helpSupportSubtitle,
                           onTap: () {
+                            final String url = buildLocalizedWebUrl(
+                              context,
+                              '/contact',
+                            );
+
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => WebViewScreen(
-                                  url: '${AppConfig.baseUrl}/contact',
+                              MaterialPageRoute<void>(
+                                builder: (_) => WebViewScreen(
+                                  url: url,
                                   title: context.l10n.helpSupport,
                                 ),
                               ),
@@ -833,10 +839,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           title: context.l10n.about,
                           subtitle: context.l10n.aboutSubtitle,
                           onTap: () {
+                            final String url = buildLocalizedWebUrl(
+                              context,
+                              '/about',
+                            );
+
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => WebViewScreen(
-                                  url: '${AppConfig.baseUrl}/about',
+                              MaterialPageRoute<void>(
+                                builder: (_) => WebViewScreen(
+                                  url: url,
                                   title: context.l10n.about,
                                 ),
                               ),

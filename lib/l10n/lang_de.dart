@@ -283,4 +283,79 @@ final Map<String, String> kLangDe = <String, String>{
   'complete': 'Abgeschlossen',
   'failedLoadCourses': 'Kurse konnten nicht geladen werden',
   'total': 'Gesamt',
+  'guestUser': 'Gastbenutzer',
+  'learningAndProgress': 'Lernen und Fortschritt',
+  'learningOverviewSubtitle': 'Lernübersicht anzeigen',
+  'assignmentsSubtitle': 'Aufgaben anzeigen',
+  'productivityAndTracking':
+  'Produktivität und Fortschrittsverfolgung',
+  'studyTimerSubtitle':
+  'Pomodoro-Timer für konzentrierte Lerneinheiten',
+  'focusProgressSubtitle':
+  'Lerneinheiten und Fortschritt verfolgen',
+  'weeklyReviewSubtitle':
+  'Wöchentlichen Fortschritt und Erfolge überprüfen',
+  'aiTools': 'KI-Tools',
+  'novaAiAssistant': 'Nova – KI-Assistent',
+  'novaAiAssistantSubtitle':
+  'Mit Ihrem KI-Assistenten chatten',
+  'aiLearningPathGenerator': 'KI-Lernpfad-Generator',
+  'aiLearningPathSubtitle':
+  'Einen personalisierten Lernpfad erstellen',
+  'community': 'Community',
+  'accountAndPayments': 'Konto und Zahlungen',
+  'settingsAndPreferences':
+  'Einstellungen und Präferenzen',
+  'failedLoadBookings':
+  'Buchungen konnten nicht geladen werden',
+  'standardTicket': 'Standard',
+  // Ticketbuchungen
+  'myTicketBookings': 'Meine Buchungen',
+  'ticketBookings': 'Ticketbuchungen',
+  'totalTickets': 'Tickets insgesamt',
+  'confirmedTickets': 'Bestätigt',
+  'noTicketBookings': 'Keine Ticketbuchungen gefunden',
+  'quantity': 'Anzahl',
+  'seats': 'Plätze',
+  'cancelled': 'Storniert',
+  // Produktivität und Fortschrittsverfolgung
+  'studyTimer': 'Lerntimer',
+  'focusProgress': 'Fokusfortschritt',
+  'weeklyReview': 'Wochenrückblick',
+  'focus': 'Fokus',
+  'shortBreak': 'Kurze Pause',
+  'longBreak': 'Lange Pause',
+  'custom': 'Benutzerdefiniert',
+  'sessionsToday': 'Heutige Sitzungen',
+  'setCustomTime':
+  'Benutzerdefinierte Zeit festlegen',
+  'customTimeDescription':
+  'Wählen Sie die Dauer Ihrer Sitzung',
+  'set': 'Festlegen',
+  'sessionSaved': 'Sitzung erfolgreich gespeichert',
+  'congratulations': 'Glückwunsch!',
+  'completedSessionMessage':
+  'Sie haben eine Sitzung „{phase}“ abgeschlossen.',
+  'totalFocusTime': 'Gesamte Fokuszeit',
+  'dailyAverage': 'Tagesdurchschnitt',
+  'dayStreak': 'Tage in Folge',
+  'weeklyProgress': 'Wöchentlicher Fortschritt',
+  'thisWeek': 'Diese Woche',
+  'focusHours': 'Fokusstunden',
+  'dailyDetails': 'Tägliche Details',
+  'hourShort': 'Std.',
+  'focusTime': 'Fokuszeit',
+  'noFocusData':
+  'Für diese Woche sind keine Fokusdaten verfügbar',
+  'failedLoadFocusProgress':
+  'Ihr Fokusfortschritt konnte nicht geladen werden',
+  'completionRate': 'Abschlussquote',
+  'completedDays': 'Abgeschlossene Tage',
+  'missedDays': 'Verpasste Tage',
+  'habitsThisWeek': 'Gewohnheiten diese Woche',
+  'noWeeklyReviewData':
+  'Noch keine wöchentlichen Aktivitäten verfügbar',
+  'failedLoadWeeklyReview':
+  'Der Wochenrückblick konnte nicht geladen werden',
+  'askAndAnswerQuestions': 'Fragen stellen und beantworten',
 };

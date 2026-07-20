@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -232,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _onRefresh,
-                color: AppTheme.primary,
+                color: AppTheme.getAccentColor(context),
                 displacement: 40,
                 edgeOffset: 0,
                 triggerMode: RefreshIndicatorTriggerMode.onEdge,
@@ -634,6 +635,20 @@ class _HomeAppBar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppTheme.getCardColor(context),
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppTheme.getAccentColor(context).withValues(alpha: 0.60),
+                      width: 1.2,
+                    ),
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: Colors.black.withValues(
+                          alpha: AppTheme.isDark(context) ? 0.24 : 0.08,
+                        ),
+                        blurRadius: 12,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                     image: DecorationImage(
                       image: (isAuthenticated && user?.profilePhotoUrl != null)
                           ? NetworkImage(user!.profilePhotoUrl!)
@@ -692,14 +707,28 @@ class _HomeAppBar extends StatelessWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: AppTheme.primary.withValues(alpha: 0.06),
+                                color: AppTheme.getCardColor(context),
                                 shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTheme.getBorderColor(context),
+                                  width: 0.8,
+                                ),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: AppTheme.isDark(context) ? 0.22 : 0.06,
+                                    ),
+                                    blurRadius: 10,
+                                    spreadRadius: -4,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: Icon(
                                   Icons.favorite_border,
                                   size: 18,
-                                  color: AppTheme.getTextColor(context),
+                                  color: AppTheme.getAccentColor(context),
                                 ),
                               ),
                             ),
@@ -753,14 +782,28 @@ class _HomeAppBar extends StatelessWidget {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                color: AppTheme.primary.withValues(alpha: 0.06),
+                                color: AppTheme.getCardColor(context),
                                 shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTheme.getBorderColor(context),
+                                  width: 0.8,
+                                ),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Colors.black.withValues(
+                                      alpha: AppTheme.isDark(context) ? 0.22 : 0.06,
+                                    ),
+                                    blurRadius: 10,
+                                    spreadRadius: -4,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: HugeIcon(
                                   icon: HugeIcons.strokeRoundedBubbleChat,
                                   size: 18,
-                                  color: AppTheme.getTextColor(context),
+                                  color: AppTheme.getAccentColor(context),
                                 ),
                               ),
                             ),
@@ -816,14 +859,28 @@ class _HomeAppBar extends StatelessWidget {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: AppTheme.primary.withValues(alpha: 0.06),
+                            color: AppTheme.getCardColor(context),
                             shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppTheme.getBorderColor(context),
+                              width: 0.8,
+                            ),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                color: Colors.black.withValues(
+                                  alpha: AppTheme.isDark(context) ? 0.22 : 0.06,
+                                ),
+                                blurRadius: 10,
+                                spreadRadius: -4,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
                           child: Center(
                             child: HugeIcon(
                               icon: HugeIcons.strokeRoundedNotification01,
                               size: 18,
-                              color: AppTheme.getTextColor(context),
+                              color: AppTheme.getAccentColor(context),
                             ),
                           ),
                         ),
@@ -857,70 +914,111 @@ class _HomeAppBar extends StatelessWidget {
 }
 
 class _SearchRow extends StatelessWidget {
-  const _SearchRow({required this.controller, required this.onSearch});
+  const _SearchRow({
+    required this.controller,
+    required this.onSearch,
+  });
 
   final TextEditingController controller;
   final Function(String) onSearch;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final bool isDark = AppTheme.isDark(context);
+
+    return Container(
+      height: 54,
+      decoration: BoxDecoration(
+        color: AppTheme.getCardColor(context),
+        borderRadius: BorderRadius.circular(27),
+        border: Border.all(
+          color: AppTheme.getBorderColor(context),
+          width: 0.8,
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: isDark ? 0.24 : 0.055,
+            ),
+            blurRadius: 18,
+            spreadRadius: -6,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Stack(
         alignment: Alignment.centerRight,
         children: <Widget>[
           TextField(
             controller: controller,
             onSubmitted: onSearch,
+            textInputAction: TextInputAction.search,
             decoration: InputDecoration(
-              filled: true,
-              fillColor: AppTheme.getCardColor(context),
+              filled: false,
               hintText: context.l10n.search,
               hintStyle: TextStyle(
-                color: AppTheme.getTextColor(context).withValues(alpha: 0.65),
+                color: AppTheme.getSecondaryTextColor(context),
                 fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
-                borderSide: BorderSide(
-                  color: AppTheme.primary.withValues(alpha: 0.2),
-                  width: 1.5,
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 10,
+                ),
+                child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedSearch01,
+                  size: 19,
+                  color: AppTheme.getSecondaryTextColor(context),
                 ),
               ),
+              prefixIconConstraints: const BoxConstraints(
+                minWidth: 44,
+                minHeight: 44,
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 0,
-              ).copyWith(right: 52),
+                vertical: 16,
+              ).copyWith(right: 62),
             ),
             style: TextStyle(
               color: AppTheme.getTextColor(context),
               fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
           Positioned(
             right: 6,
-            child: GestureDetector(
-              onTap: () => onSearch(controller.text),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: AppTheme.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: HugeIcon(
-                    icon: HugeIcons.strokeRoundedSearch01,
-                    size: 18,
-                    color: Colors.white,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => onSearch(controller.text),
+                customBorder: const CircleBorder(),
+                child: Ink(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getAccentColor(context),
+                    shape: BoxShape.circle,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: AppTheme.getAccentColor(context).withValues(
+                          alpha: 0.24,
+                        ),
+                        blurRadius: 12,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: HugeIcon(
+                      icon: HugeIcons.strokeRoundedArrowRight01,
+                      size: 18,
+                      color: AppTheme.black,
+                    ),
                   ),
                 ),
               ),
@@ -957,10 +1055,59 @@ class _HeroBannerSlider extends StatefulWidget {
 
 class _HeroBannerSliderState extends State<_HeroBannerSlider> {
   final PageController _controller = PageController();
+
+  Timer? _autoSlideTimer;
   int _page = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _autoSlideTimer?.cancel();
+
+    if (widget.banners.length <= 1) {
+      return;
+    }
+
+    _autoSlideTimer = Timer.periodic(
+      const Duration(seconds: 4),
+          (_) {
+        if (!mounted || !_controller.hasClients) {
+          return;
+        }
+
+        final int nextPage = (_page + 1) % widget.banners.length;
+
+        _controller.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOutCubic,
+        );
+      },
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _HeroBannerSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.banners.length != widget.banners.length) {
+      _page = 0;
+
+      if (_controller.hasClients) {
+        _controller.jumpToPage(0);
+      }
+
+      _startAutoSlide();
+    }
+  }
+
+  @override
   void dispose() {
+    _autoSlideTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -973,10 +1120,17 @@ class _HeroBannerSliderState extends State<_HeroBannerSlider> {
           height: 150,
           child: PageView.builder(
             controller: _controller,
-            onPageChanged: (int index) => setState(() => _page = index),
+            onPageChanged: (int index) {
+              if (!mounted) return;
+
+              setState(() {
+                _page = index;
+              });
+            },
             itemCount: widget.banners.length,
             itemBuilder: (BuildContext context, int index) {
               final banner = widget.banners[index];
+
               return Container(
                 margin: const EdgeInsets.only(right: 4),
                 decoration: BoxDecoration(
@@ -993,21 +1147,25 @@ class _HeroBannerSliderState extends State<_HeroBannerSlider> {
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List<Widget>.generate(widget.banners.length, (int index) {
-            final bool isActive = index == _page;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              height: 4,
-              width: isActive ? 16 : 8,
-              decoration: BoxDecoration(
-                color: isActive
-                    ? AppTheme.primary
-                    : AppTheme.primary.withValues(alpha: 0.25),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            );
-          }),
+          children: List<Widget>.generate(
+            widget.banners.length,
+                (int index) {
+              final bool isActive = index == _page;
+
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                height: 5,
+                width: isActive ? 20 : 8,
+                decoration: BoxDecoration(
+                  color: isActive
+                      ? AppTheme.getAccentColor(context)
+                      : AppTheme.getBorderColor(context),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              );
+            },
+          ),
         ),
       ],
     );
@@ -1033,8 +1191,10 @@ class _SectionHeader extends StatelessWidget {
           title,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
-            fontSize: 16,
+            fontSize: 18,
+            height: 1.25,
             fontWeight: FontWeight.w700,
+            letterSpacing: -0.15,
           ),
         ),
         const Spacer(),
@@ -1043,9 +1203,9 @@ class _SectionHeader extends StatelessWidget {
           child: Text(
             actionText,
             style: TextStyle(
-              color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+              color: AppTheme.getAccentColor(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

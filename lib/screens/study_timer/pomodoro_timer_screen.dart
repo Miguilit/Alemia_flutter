@@ -44,8 +44,11 @@ class _PomodoroTimerScreenState extends State<PomodoroTimerScreen>
       final stats = await _focusService.getStats();
       if (mounted) {
         setState(() {
-          _sessionsToday = stats['sessions_today'];
-          _completedToday = stats['completed_today'];
+          _sessionsToday =
+              (stats['sessions_today'] as num?)?.toInt() ?? 0;
+
+          _completedToday =
+              (stats['completed_today'] as num?)?.toInt() ?? 0;
         });
       }
     } catch (e) {
@@ -305,7 +308,24 @@ class _PomodoroTimerScreenState extends State<PomodoroTimerScreen>
       },
     );
   }
+  String _localizedPhaseLabel(BuildContext context) {
+    switch (_currentPhase) {
+      case 'Focus':
+        return context.l10n.focus;
 
+      case 'Short Break':
+        return context.l10n.shortBreak;
+
+      case 'Long Break':
+        return context.l10n.longBreak;
+
+      case 'Custom':
+        return context.l10n.custom;
+
+      default:
+        return _currentPhase;
+    }
+  }
   void _onTimerComplete() async {
     // Save session
     try {
@@ -318,8 +338,9 @@ class _PomodoroTimerScreenState extends State<PomodoroTimerScreen>
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          // SnackBar(content: Text(context.l10n.sessionSaved)),
-          SnackBar(content: Text('Session saved successfully')),
+          SnackBar(
+            content: Text(context.l10n.sessionSaved),
+          ),
         );
         _loadStats(); // Refresh stats
       }
@@ -331,17 +352,42 @@ class _PomodoroTimerScreenState extends State<PomodoroTimerScreen>
     if (mounted) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          // title: Text(context.l10n.congratulations),
-          title: Text('Congratulations!'),
-          content: Text('You completed a $_currentPhase session!'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(context.l10n.ok),
+        builder: (BuildContext context) {
+          final String phaseLabel =
+          _localizedPhaseLabel(context);
+
+          final String message = context
+              .l10n
+              .completedSessionMessage
+              .replaceAll('{phase}', phaseLabel);
+
+          return AlertDialog(
+            backgroundColor: AppTheme.getCardColor(context),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ],
-        ),
+            title: Text(
+              context.l10n.congratulations,
+              style: TextStyle(
+                color: AppTheme.getTextColor(context),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            content: Text(
+              message,
+              style: TextStyle(
+                color: AppTheme.getTextColor(context)
+                    .withValues(alpha: 0.75),
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(context.l10n.ok),
+              ),
+            ],
+          );
+        },
       );
     }
   }

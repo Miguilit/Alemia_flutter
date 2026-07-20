@@ -1,11 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:intl/intl.dart';
 
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 
 import '../../services/habit_service.dart';
+
+String _formatLocalizedPercent(
+    BuildContext context,
+    int value,
+    ) {
+  final String locale =
+  Localizations.localeOf(context).toLanguageTag();
+
+  final double normalizedValue =
+      value.clamp(0, 100).toDouble() / 100;
+
+  return NumberFormat.percentPattern(
+    locale,
+  ).format(normalizedValue);
+}
+
+String _localizedWeekday(
+    BuildContext context,
+    String rawDay,
+    ) {
+  final String normalized = rawDay
+      .trim()
+      .toLowerCase()
+      .replaceAll('.', '');
+
+  final Map<String, int> weekdays = <String, int>{
+    'mon': DateTime.monday,
+    'monday': DateTime.monday,
+    'lun': DateTime.monday,
+    'lundi': DateTime.monday,
+
+    'tue': DateTime.tuesday,
+    'tues': DateTime.tuesday,
+    'tuesday': DateTime.tuesday,
+    'mar': DateTime.tuesday,
+    'mardi': DateTime.tuesday,
+
+    'wed': DateTime.wednesday,
+    'wednesday': DateTime.wednesday,
+    'mer': DateTime.wednesday,
+    'mercredi': DateTime.wednesday,
+
+    'thu': DateTime.thursday,
+    'thur': DateTime.thursday,
+    'thurs': DateTime.thursday,
+    'thursday': DateTime.thursday,
+    'jeu': DateTime.thursday,
+    'jeudi': DateTime.thursday,
+
+    'fri': DateTime.friday,
+    'friday': DateTime.friday,
+    'ven': DateTime.friday,
+    'vendredi': DateTime.friday,
+
+    'sat': DateTime.saturday,
+    'saturday': DateTime.saturday,
+    'sam': DateTime.saturday,
+    'samedi': DateTime.saturday,
+
+    'sun': DateTime.sunday,
+    'sunday': DateTime.sunday,
+    'dim': DateTime.sunday,
+    'dimanche': DateTime.sunday,
+  };
+
+  final int? weekday = weekdays[normalized];
+
+  if (weekday == null) {
+    return rawDay;
+  }
+
+  final DateTime date = DateTime(
+    2024,
+    1,
+    weekday,
+  );
+
+  final String locale =
+  Localizations.localeOf(context).toLanguageTag();
+
+  return DateFormat.E(locale).format(date);
+}
 
 class WeeklyReviewScreen extends StatefulWidget {
   const WeeklyReviewScreen({super.key});
@@ -17,6 +100,7 @@ class WeeklyReviewScreen extends StatefulWidget {
 class _WeeklyReviewScreenState extends State<WeeklyReviewScreen> {
   final HabitService _habitService = HabitService();
   bool _isLoading = true;
+  bool _hasLoadError = false;
   int _weeklyCompletionRate = 0;
   int _totalCompletedDays = 0;
   int _missedDays = 0;
@@ -31,45 +115,104 @@ class _WeeklyReviewScreenState extends State<WeeklyReviewScreen> {
 
   Future<void> _loadData() async {
     try {
-      final data = await _habitService.getWeeklyReview();
-      if (mounted) {
-        setState(() {
-          _weeklyCompletionRate = data['weekly_completion_rate'];
-          _totalCompletedDays = data['total_completed_days'];
-          _missedDays = data['missed_days'];
+      final Map<String, dynamic> data =
+      await _habitService.getWeeklyReview();
 
-          final List<dynamic> calendar = data['week_calendar'];
-          _weekData = calendar
-              .map(
-                (item) => _WeekDayData(
-                  day: item['day'],
-                  date: item['date'],
-                  isCompleted: item['is_completed'],
-                  fullDate: item['full_date'], // Add fullDate to _WeekDayData
-                ),
-              )
-              .toList();
-
-          final List<dynamic> habits = data['habits_summary'];
-          _weeklyHabits = habits
-              .map(
-                (item) => _WeeklyHabitData(
-                  name: item['name'],
-                  completionCount: item['completion_count'],
-                  totalDays: item['total_days'],
-                  trend: item['trend'],
-                ),
-              )
-              .toList();
-
-          _isLoading = false;
-        });
+      if (!mounted) {
+        return;
       }
-    } catch (e) {
-      debugPrint('Error loading review: $e');
-      if (mounted) {
-        setState(() => _isLoading = false);
+
+      final List<dynamic> calendar =
+      data['week_calendar'] is List
+          ? data['week_calendar'] as List<dynamic>
+          : <dynamic>[];
+
+      final List<_WeekDayData> weekData =
+      calendar.map((dynamic item) {
+        final Map<String, dynamic> day =
+        Map<String, dynamic>.from(
+          item as Map,
+        );
+
+        final dynamic rawCompleted =
+        day['is_completed'];
+
+        return _WeekDayData(
+          day: day['day']?.toString() ?? '',
+          date: day['date']?.toString() ?? '',
+          isCompleted:
+          rawCompleted == true ||
+              rawCompleted == 1 ||
+              rawCompleted?.toString() == '1',
+          fullDate:
+          day['full_date']?.toString() ?? '',
+        );
+      }).toList();
+
+      final List<dynamic> habits =
+      data['habits_summary'] is List
+          ? data['habits_summary'] as List<dynamic>
+          : <dynamic>[];
+
+      final List<_WeeklyHabitData> weeklyHabits =
+      habits.map((dynamic item) {
+        final Map<String, dynamic> habit =
+        Map<String, dynamic>.from(
+          item as Map,
+        );
+
+        return _WeeklyHabitData(
+          name: habit['name']?.toString() ?? '',
+          completionCount:
+          (habit['completion_count'] as num?)
+              ?.toInt() ??
+              0,
+          totalDays:
+          (habit['total_days'] as num?)
+              ?.toInt() ??
+              0,
+          trend:
+          habit['trend']?.toString() ?? '0%',
+        );
+      }).toList();
+
+      setState(() {
+        _weeklyCompletionRate =
+            ((data['weekly_completion_rate'] as num?)
+                ?.round() ??
+                0)
+                .clamp(0, 100)
+                .toInt();
+
+        _totalCompletedDays =
+            (data['total_completed_days'] as num?)
+                ?.toInt() ??
+                0;
+
+        _missedDays =
+            (data['missed_days'] as num?)
+                ?.toInt() ??
+                0;
+
+        _weekData = weekData;
+        _weeklyHabits = weeklyHabits;
+        _hasLoadError = false;
+        _isLoading = false;
+      });
+    } catch (error, stackTrace) {
+      debugPrint(
+        'WeeklyReviewScreen: failed to load data: '
+            '$error\n$stackTrace',
+      );
+
+      if (!mounted) {
+        return;
       }
+
+      setState(() {
+        _hasLoadError = true;
+        _isLoading = false;
+      });
     }
   }
 
@@ -160,7 +303,10 @@ class _WeeklyReviewScreenState extends State<WeeklyReviewScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '$_weeklyCompletionRate%',
+                      _formatLocalizedPercent(
+                        context,
+                        _weeklyCompletionRate,
+                      ),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 48,
@@ -249,16 +395,83 @@ class _WeeklyReviewScreenState extends State<WeeklyReviewScreen> {
             ),
             const SizedBox(height: 24),
             // Weekly Habits List
+            // Weekly Habits List
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _hasLoadError || _weeklyHabits.isEmpty
+                  ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppTheme.getMint100(context),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          _hasLoadError
+                              ? Icons.cloud_off_outlined
+                              : Icons.calendar_month_outlined,
+                          size: 36,
+                          color: AppTheme.getAccentColor(
+                            context,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        _hasLoadError
+                            ? context
+                            .l10n
+                            .failedLoadWeeklyReview
+                            : context
+                            .l10n
+                            .noWeeklyReviewData,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppTheme
+                              .getSecondaryTextColor(context),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (_hasLoadError) ...[
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _isLoading = true;
+                              _hasLoadError = false;
+                            });
+
+                            _loadData();
+                          },
+                          child: Text(
+                            context.l10n.retry,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              )
+                  : SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
                       context.l10n.habitsThisWeek,
                       style: TextStyle(
-                        color: AppTheme.getTextColor(context),
+                        color:
+                        AppTheme.getTextColor(context),
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.2,
@@ -266,12 +479,19 @@ class _WeeklyReviewScreenState extends State<WeeklyReviewScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    ..._weeklyHabits.map((habit) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: _WeeklyHabitCard(habit: habit),
-                      );
-                    }),
+                    ..._weeklyHabits.map(
+                          (_WeeklyHabitData habit) {
+                        return Padding(
+                          padding:
+                          const EdgeInsets.only(
+                            bottom: 16,
+                          ),
+                          child: _WeeklyHabitCard(
+                            habit: habit,
+                          ),
+                        );
+                      },
+                    ),
                     const SizedBox(height: 24),
                   ],
                 ),
@@ -322,7 +542,10 @@ class _DayCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text(
-            dayData.day,
+            _localizedWeekday(
+              context,
+              dayData.day,
+            ),
             style: TextStyle(
               color: isToday
                   ? Colors.white
@@ -382,7 +605,10 @@ class _WeeklyHabitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double completionRate = habit.completionCount / habit.totalDays;
+    final double completionRate =
+    habit.totalDays > 0
+        ? habit.completionCount / habit.totalDays
+        : 0.0;
     final bool isPositiveTrend = habit.trend.startsWith('+');
     final bool isNegativeTrend = habit.trend.startsWith('-');
 
@@ -465,7 +691,10 @@ class _WeeklyHabitCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
-                    value: completionRate,
+                    value: completionRate.clamp(
+                      0.0,
+                      1.0,
+                    ),
                     backgroundColor: AppTheme.getBackgroundColor(context),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppTheme.getPrimaryColor(context),

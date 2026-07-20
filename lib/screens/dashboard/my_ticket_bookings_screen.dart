@@ -32,24 +32,49 @@ class _MyTicketBookingsScreenState extends State<MyTicketBookingsScreen> {
   Future<void> _fetchBookings() async {
     try {
       final response = await EventService().getMyBookings();
+
+      if (!mounted) {
+        return;
+      }
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final List<dynamic> bookingsJson = data['data'];
+        final dynamic decodedData = jsonDecode(response.body);
+
+        final List<dynamic> bookingsJson =
+        decodedData['data'] is List
+            ? decodedData['data'] as List<dynamic>
+            : <dynamic>[];
+
         setState(() {
           _allTickets = bookingsJson
-              .map((json) => EventBooking.fromJson(json))
+              .map(
+                (dynamic json) => EventBooking.fromJson(
+              json as Map<String, dynamic>,
+            ),
+          )
               .toList();
+
+          _error = null;
           _isLoading = false;
         });
       } else {
         setState(() {
-          _error = 'Failed to load bookings';
+          _error = context.l10n.failedLoadBookings;
           _isLoading = false;
         });
       }
-    } catch (e) {
+    } catch (error, stackTrace) {
+      debugPrint(
+        'MyTicketBookingsScreen: failed to load bookings: '
+            '$error\n$stackTrace',
+      );
+
+      if (!mounted) {
+        return;
+      }
+
       setState(() {
-        _error = e.toString();
+        _error = context.l10n.failedLoadBookings;
         _isLoading = false;
       });
     }
@@ -128,7 +153,7 @@ class _MyTicketBookingsScreenState extends State<MyTicketBookingsScreen> {
                           });
                           _fetchBookings();
                         },
-                        child: const Text('Retry'),
+                        child: Text(context.l10n.retry),
                       ),
                     ],
                   ),
@@ -316,19 +341,28 @@ class _TicketCard extends StatelessWidget {
 
     switch (ticket.status) {
       case 'confirmed':
-        statusColor = Colors.green;
+        statusColor = AppTheme.success;
         statusText = context.l10n.confirmed;
         break;
+
       case 'pending':
-        statusColor = AppTheme.softOrange800;
+        statusColor = AppTheme.warning;
         statusText = context.l10n.pending;
         break;
+
       case 'cancelled':
-        statusColor = Colors.red;
+        statusColor = AppTheme.danger;
         statusText = context.l10n.cancelled;
         break;
+
+      case 'completed':
+        statusColor = AppTheme.success;
+        statusText = context.l10n.completed;
+        break;
+
       default:
-        statusColor = AppTheme.getTextColor(context).withValues(alpha: 0.5);
+        statusColor =
+            AppTheme.getTextColor(context).withValues(alpha: 0.5);
         statusText = ticket.status;
     }
 
@@ -398,7 +432,7 @@ class _TicketCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    statusText.toUpperCase(),
+                    statusText,
                     style: TextStyle(
                       color: statusColor,
                       fontSize: 10,
@@ -457,8 +491,8 @@ class _TicketCard extends StatelessWidget {
                   ),
                   child: Text(
                     ticket.totalPrice > 0
-                        ? 'Standard'
-                        : 'Free', // Or assume Standard for now
+                        ? context.l10n.standardTicket
+                        : context.l10n.free, // Or assume Standard for now
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 11,

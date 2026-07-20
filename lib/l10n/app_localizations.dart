@@ -161,6 +161,39 @@ class AppLocalizations {
   String get accountCourses => _t('accountCourses');
   String get preferences => _t('preferences');
   String get supportInfo => _t('supportInfo');
+  String get guestUser => _t('guestUser');
+
+  String get learningAndProgress => _t('learningAndProgress');
+  String get learningOverviewSubtitle =>
+      _t('learningOverviewSubtitle');
+  String get assignmentsSubtitle => _t('assignmentsSubtitle');
+
+  String get productivityAndTracking =>
+      _t('productivityAndTracking');
+  String get studyTimerSubtitle => _t('studyTimerSubtitle');
+  String get focusProgressSubtitle =>
+      _t('focusProgressSubtitle');
+  String get weeklyReviewSubtitle =>
+      _t('weeklyReviewSubtitle');
+  String get hourShort => _t('hourShort');
+  String get noFocusData => _t('noFocusData');
+  String get failedLoadFocusProgress =>
+      _t('failedLoadFocusProgress');
+
+  String get aiTools => _t('aiTools');
+  String get novaAiAssistant => _t('novaAiAssistant');
+  String get novaAiAssistantSubtitle =>
+      _t('novaAiAssistantSubtitle');
+  String get aiLearningPathGenerator =>
+      _t('aiLearningPathGenerator');
+  String get aiLearningPathSubtitle =>
+      _t('aiLearningPathSubtitle');
+
+  String get community => _t('community');
+  String get accountAndPayments =>
+      _t('accountAndPayments');
+  String get settingsAndPreferences =>
+      _t('settingsAndPreferences');
 
   // Chat
   String get messages => _t('messages');
@@ -230,6 +263,8 @@ class AppLocalizations {
   String get totalTickets => _t('totalTickets');
   String get confirmedTickets => _t('confirmedTickets');
   String get noTicketBookings => _t('noTicketBookings');
+  String get failedLoadBookings => _t('failedLoadBookings');
+  String get standardTicket => _t('standardTicket');
   String get quantity => _t('quantity');
   String get seats => _t('seats');
   String get cancelled => _t('cancelled');
@@ -449,6 +484,11 @@ class AppLocalizations {
   String get completedDays => _t('completedDays');
   String get missedDays => _t('missedDays');
   String get habitsThisWeek => _t('habitsThisWeek');
+  String get noWeeklyReviewData =>
+      _t('noWeeklyReviewData');
+
+  String get failedLoadWeeklyReview =>
+      _t('failedLoadWeeklyReview');
 
   // Study Timer
   String get studyTimer => _t('studyTimer');
@@ -543,6 +583,11 @@ class AppLocalizations {
   String get complete => _t('complete');
   String get failedLoadCourses => _t('failedLoadCourses');
   String get total => _t('total');
+  String get sessionSaved => _t('sessionSaved');
+  String get congratulations => _t('congratulations');
+  String get completedSessionMessage =>
+      _t('completedSessionMessage');
+
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();

@@ -148,43 +148,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             const SizedBox(height: 28),
                           ],
-                          // Stats Cards - Horizontal Scroll
-                          SizedBox(
-                            height: 140,
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  child: _StatCard(
+
+                          // Stats Cards
+                          LayoutBuilder(
+                            builder: (
+                                BuildContext context,
+                                BoxConstraints constraints,
+                                ) {
+                              final bool compact = constraints.maxWidth < 340;
+
+                              return GridView.count(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                crossAxisCount: compact ? 1 : 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: compact ? 2.55 : 1.15,
+                                children: <Widget>[
+                                  _StatCard(
                                     title: context.l10n.totalCourses,
-                                    value:
-                                        stats?.totalCourses.toString() ?? '0',
+                                    value: stats?.totalCourses.toString() ?? '0',
                                     icon: HugeIcons.strokeRoundedBook01,
                                     color: AppTheme.gold,
                                     onTap: () {
-                                      Navigator.of(
-                                        context,
-                                      ).pushNamed(AppRouter.myCourses);
+                                      Navigator.of(context).pushNamed(
+                                        AppRouter.myCourses,
+                                      );
                                     },
                                   ),
-                                ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: _StatCard(
+                                  _StatCard(
                                     title: context.l10n.completedCourses,
-                                    value:
-                                        stats?.completedCourses.toString() ??
-                                        '0',
+                                    value: stats?.completedCourses.toString() ?? '0',
                                     icon: Icons.check_circle,
                                     color: AppTheme.success,
                                     onTap: () {
-                                      Navigator.of(
-                                        context,
-                                      ).pushNamed(AppRouter.myCourses);
+                                      Navigator.of(context).pushNamed(
+                                        AppRouter.myCourses,
+                                      );
                                     },
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              );
+                            },
                           ),
                           const SizedBox(height: 32),
                           // Learning Activity Chart
@@ -421,78 +426,97 @@ class _QuickAccessGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.9,
-      ),
-      itemCount: items.length,
-      itemBuilder: (BuildContext context, int index) {
-        final _QuickAccessItem item = items[index];
-        return GestureDetector(
-          onTap: () {
-            if (item.route.startsWith('/')) {
-              Navigator.of(context).pushNamed(item.route);
-            } else {
-              // Handle other cases or throw error
-            }
-          },
-          child: Container(
-            decoration: _dashboardCardDecoration(
-              context,
-              radius: 18,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    color: AppTheme.getMint100(context),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppTheme.getAccentColor(context).withValues(alpha: 0.22),
-                      width: 0.8,
-                    ),
+    return LayoutBuilder(
+      builder: (
+          BuildContext context,
+          BoxConstraints constraints,
+          ) {
+        final bool compact = constraints.maxWidth < 350;
+        final int columnCount = compact ? 2 : 3;
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columnCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: compact ? 1.25 : 0.92,
+          ),
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            final _QuickAccessItem item = items[index];
+
+            return Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  if (item.route.startsWith('/')) {
+                    Navigator.of(context).pushNamed(item.route);
+                  }
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: Ink(
+                  decoration: _dashboardCardDecoration(
+                    context,
+                    radius: 18,
                   ),
-                  child: Center(
-                    child: item.icon is IconData
-                        ? Icon(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 10,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppTheme.getMint100(context),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: AppTheme.getAccentColor(context)
+                                  .withValues(alpha: 0.22),
+                              width: 0.8,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: item.icon is IconData
+                              ? Icon(
                             item.icon as IconData,
                             size: 24,
                             color: AppTheme.getAccentColor(context),
                           )
-                        : HugeIcon(
+                              : HugeIcon(
                             icon: item.icon,
                             size: 24,
                             color: AppTheme.getAccentColor(context),
                           ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Flexible(
-                  child: Text(
-                    item.title,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppTheme.getTextColor(context),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      height: 1.2,
+                        ),
+                        const SizedBox(height: 9),
+                        Flexible(
+                          child: Text(
+                            item.title,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: AppTheme.getTextColor(context),
+                              fontSize: compact ? 12 : 11.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -798,7 +822,7 @@ class _ContinueLearningCard extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: progress,
+                      value: progress.clamp(0.0, 1.0).toDouble(),
                       backgroundColor: AppTheme.getMint100(context),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         AppTheme.getAccentColor(context),

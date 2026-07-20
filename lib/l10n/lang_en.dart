@@ -202,6 +202,8 @@ const Map<String, String> kLangEn = <String, String>{
   'totalTickets': 'Total Tickets',
   'confirmedTickets': 'Confirmed',
   'noTicketBookings': 'No ticket bookings found',
+  'failedLoadBookings': 'Unable to load bookings',
+  'standardTicket': 'Standard',
   'quantity': 'Quantity',
   'seats': 'Seats',
   'cancelled': 'Cancelled',
@@ -427,6 +429,10 @@ const Map<String, String> kLangEn = <String, String>{
   'completedDays': 'Completed Days',
   'missedDays': 'Missed Days',
   'habitsThisWeek': 'Habits This Week',
+  'noWeeklyReviewData':
+  'No weekly activity available yet',
+  'failedLoadWeeklyReview':
+  'Unable to load the weekly review',
 
   // Study Timer
   'studyTimer': 'Study Timer',
@@ -456,6 +462,9 @@ const Map<String, String> kLangEn = <String, String>{
   'customTimeDescription': 'Set your own timer duration (1-120 minutes)',
   'cancel': 'Cancel',
   'set': 'Set',
+  'noFocusData': 'No focus data available this week',
+  'failedLoadFocusProgress':
+  'Unable to load your focus progress',
 
   // Community Rooms
   'groupChatRooms': 'Group Chat Rooms',
@@ -525,5 +534,31 @@ const Map<String, String> kLangEn = <String, String>{
   'complete': 'Complete',
   'failedLoadCourses': 'Failed to load courses',
   'total': 'Total',
+  'guestUser': 'Guest User',
+  'learningAndProgress': 'Learning & Progress',
+  'learningOverviewSubtitle': 'View your learning overview',
+  'assignmentsSubtitle': 'View your assignments',
+  'productivityAndTracking': 'Productivity & Tracking',
+  'studyTimerSubtitle':
+  'Pomodoro timer for focused study sessions',
+  'focusProgressSubtitle':
+  'Track your study sessions and progress',
+  'weeklyReviewSubtitle':
+  'Review your weekly progress and achievements',
+  'aiTools': 'AI Tools',
+  'novaAiAssistant': 'Nova - AI Assistant',
+  'novaAiAssistantSubtitle':
+  'Chat with your AI-powered assistant',
+  'aiLearningPathGenerator':
+  'AI Learning Path Generator',
+  'aiLearningPathSubtitle':
+  'Generate a personalized learning roadmap',
+  'community': 'Community',
+  'accountAndPayments': 'Account & Payments',
+  'settingsAndPreferences': 'Settings & Preferences',
+  'sessionSaved': 'Session saved successfully',
+  'congratulations': 'Congratulations!',
+  'completedSessionMessage':
+  'You completed a {phase} session!',
 
 };
