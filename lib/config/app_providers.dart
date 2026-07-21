@@ -9,6 +9,7 @@ import '../providers/settings_provider.dart';
 import '../providers/ai_chat_provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/course_discussion_provider.dart';
+import '../providers/ai_learning_path_provider.dart';
 
 class AppProviders {
   static List<SingleChildWidget> get providers {
@@ -16,6 +17,7 @@ class AppProviders {
       ChangeNotifierProvider(create: (_) => AuthProvider()..loadUser()),
       ChangeNotifierProvider(create: (_) => WishlistProvider()),
       ChangeNotifierProvider(create: (_) => AiSuggestionsProvider()),
+      ChangeNotifierProvider(create: (_) => AiLearningPathProvider()),
       ChangeNotifierProvider(create: (_) => DashboardProvider()),
       ChangeNotifierProvider(create: (_) => SettingsProvider()..loadSettings()),
       ChangeNotifierProvider(create: (_) => AiChatProvider()),
