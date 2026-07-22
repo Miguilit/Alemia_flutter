@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
+import 'package:provider/provider.dart';
+
+import '../../l10n/app_localizations.dart';
+import '../../models/ai_learning_path.dart';
+import '../../models/ai_learning_profile.dart';
+import '../../models/category.dart';
+import '../../providers/ai_learning_path_provider.dart';
+import '../../providers/ai_suggestions_provider.dart';
 import '../../theme/app_theme.dart';
 
 class AiLearningPathScreen extends StatefulWidget {
@@ -10,135 +17,246 @@ class AiLearningPathScreen extends StatefulWidget {
 }
 
 class _AiLearningPathScreenState extends State<AiLearningPathScreen> {
-  String? _selectedCareer;
-  bool _isGenerating = false;
-  bool _hasGenerated = false;
+  final Set<int> _selectedCategoryIds = <int>{};
+  final TextEditingController _customGoalController = TextEditingController();
+  final TextEditingController _weeklyHoursController = TextEditingController(
+    text: '5',
+  );
 
-  // Hard-coded career options
-  final List<Map<String, dynamic>> _careerOptions = <Map<String, dynamic>>[
-    <String, dynamic>{
-      'id': 'ui_ux_designer',
-      'title': 'UI/UX Designer',
-      'icon': HugeIcons.strokeRoundedBook01,
-      'color': AppTheme.primary,
-    },
-    <String, dynamic>{
-      'id': 'frontend_developer',
-      'title': 'Frontend Developer',
-      'icon': HugeIcons.strokeRoundedAiUser,
-      'color': AppTheme.softBlue800,
-    },
-    <String, dynamic>{
-      'id': 'backend_developer',
-      'title': 'Backend Developer',
-      'icon': HugeIcons.strokeRoundedAiUser,
-      'color': AppTheme.softOrange800,
-    },
-    <String, dynamic>{
-      'id': 'fullstack_developer',
-      'title': 'Full Stack Developer',
-      'icon': HugeIcons.strokeRoundedAiUser,
-      'color': Colors.purple,
-    },
-    <String, dynamic>{
-      'id': 'data_scientist',
-      'title': 'Data Scientist',
-      'icon': HugeIcons.strokeRoundedStar,
-      'color': Colors.teal,
-    },
-    <String, dynamic>{
-      'id': 'mobile_developer',
-      'title': 'Mobile Developer',
-      'icon': HugeIcons.strokeRoundedAiUser,
-      'color': Colors.indigo,
-    },
-  ];
+  String _skillLevel = 'beginner';
+  String _goal = 'skill_enhancement';
+  String _preferredLanguage = 'fr';
+  String _learningStyle = 'balanced';
+  DateTime? _targetDate;
 
-  // Hard-coded learning path data
-  final List<Map<String, dynamic>> _learningPath = <Map<String, dynamic>>[
-    <String, dynamic>{
-      'step': 1,
-      'title': 'Foundation: Design Principles',
-      'duration': '2 weeks',
-      'courses': <String>[
-        'Introduction to UI Design',
-        'Color Theory Basics',
-        'Typography Fundamentals',
-      ],
-      'progress': 0.3,
-      'completed': false,
-    },
-    <String, dynamic>{
-      'step': 2,
-      'title': 'Design Tools & Software',
-      'duration': '3 weeks',
-      'courses': <String>[
-        'Figma Masterclass',
-        'Adobe XD Essentials',
-        'Prototyping Techniques',
-      ],
-      'progress': 0.0,
-      'completed': false,
-    },
-    <String, dynamic>{
-      'step': 3,
-      'title': 'User Research & Testing',
-      'duration': '2 weeks',
-      'courses': <String>[
-        'User Research Methods',
-        'Usability Testing',
-        'User Personas',
-      ],
-      'progress': 0.0,
-      'completed': false,
-    },
-    <String, dynamic>{
-      'step': 4,
-      'title': 'Advanced Design Patterns',
-      'duration': '4 weeks',
-      'courses': <String>[
-        'Design Systems',
-        'Responsive Design',
-        'Accessibility in Design',
-      ],
-      'progress': 0.0,
-      'completed': false,
-    },
-    <String, dynamic>{
-      'step': 5,
-      'title': 'Portfolio Development',
-      'duration': '3 weeks',
-      'courses': <String>[
-        'Building Your Portfolio',
-        'Case Study Creation',
-        'Presentation Skills',
-      ],
-      'progress': 0.0,
-      'completed': false,
-    },
-  ];
+  bool _screenReady = false;
+  bool _editingPreferences = false;
 
-  void _selectCareer(String careerId) {
-    setState(() {
-      _selectedCareer = careerId;
-      _hasGenerated = false;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeScreen();
     });
   }
 
-  Future<void> _generateLearningPath() async {
-    if (_selectedCareer == null) return;
+  @override
+  void dispose() {
+    _customGoalController.dispose();
+    _weeklyHoursController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeScreen() async {
+    final AiLearningPathProvider provider = context
+        .read<AiLearningPathProvider>();
+
+    await provider.initialize();
+
+    if (!mounted) {
+      return;
+    }
+
+    _seedForm(provider.profile);
 
     setState(() {
-      _isGenerating = true;
+      _screenReady = true;
     });
+  }
 
-    // Simulate AI generation delay
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _reload() async {
+    final AiLearningPathProvider provider = context
+        .read<AiLearningPathProvider>();
+
+    await provider.initialize();
+
+    if (!mounted) {
+      return;
+    }
+
+    _seedForm(provider.profile);
 
     setState(() {
-      _isGenerating = false;
-      _hasGenerated = true;
+      _screenReady = true;
     });
+  }
+
+  void _seedForm(AiLearningProfile? profile) {
+    final String deviceLanguage = Localizations.localeOf(context).languageCode;
+
+    final String safeDeviceLanguage =
+        <String>{'fr', 'nl', 'de', 'en'}.contains(deviceLanguage)
+        ? deviceLanguage
+        : 'en';
+
+    _selectedCategoryIds
+      ..clear()
+      ..addAll(profile?.categoryIds ?? const <int>[]);
+
+    _skillLevel = profile?.skillLevel ?? 'beginner';
+    _goal = profile?.goal ?? 'skill_enhancement';
+    _preferredLanguage = profile?.preferredLanguage ?? safeDeviceLanguage;
+    _learningStyle = profile?.learningStyle ?? 'balanced';
+    _targetDate = profile?.targetDate;
+
+    _customGoalController.text = profile?.customGoal ?? '';
+    _weeklyHoursController.text = (profile?.weeklyHours ?? 5).toString();
+  }
+
+  Future<void> _saveProfile(AiLearningPathProvider provider) async {
+    if (_selectedCategoryIds.isEmpty) {
+      _showMessage(context.l10n.aiPathSelectCategoryError);
+      return;
+    }
+
+    final int? weeklyHours = int.tryParse(_weeklyHoursController.text.trim());
+
+    if (weeklyHours == null || weeklyHours < 1 || weeklyHours > 80) {
+      _showMessage(context.l10n.aiPathWeeklyHoursError);
+      return;
+    }
+
+    if (_goal == 'custom' && _customGoalController.text.trim().isEmpty) {
+      _showMessage(context.l10n.aiPathCustomGoalError);
+      return;
+    }
+
+    final AiLearningProfile profile = AiLearningProfile(
+      id: provider.profile?.id,
+      categoryIds: _selectedCategoryIds.toList()..sort(),
+      skillLevel: _skillLevel,
+      goal: _goal,
+      customGoal: _goal == 'custom' ? _customGoalController.text.trim() : null,
+      weeklyHours: weeklyHours,
+      targetDate: _targetDate,
+      preferredLanguage: _preferredLanguage,
+      learningStyle: _learningStyle,
+    );
+
+    final bool saved = await provider.saveProfile(profile);
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!saved) {
+      _showProviderError(provider);
+      return;
+    }
+
+    setState(() {
+      _editingPreferences = false;
+    });
+  }
+
+  Future<void> _generatePath(AiLearningPathProvider provider) async {
+    if (provider.readiness?.ready != true) {
+      final bool ready = await provider.checkReadiness();
+
+      if (!mounted) {
+        return;
+      }
+
+      if (!ready) {
+        _showProviderError(provider);
+        return;
+      }
+    }
+
+    final bool generated = await provider.generatePath(
+      locale: _preferredLanguage,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!generated) {
+      _showProviderError(provider);
+      return;
+    }
+
+    setState(() {
+      _editingPreferences = false;
+    });
+  }
+
+  Future<void> _archivePath(AiLearningPathProvider provider) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(context.l10n.aiPathArchiveTitle),
+          content: Text(context.l10n.aiPathArchiveBody),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(context.l10n.aiPathCancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(context.l10n.aiPathConfirmArchive),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !mounted) {
+      return;
+    }
+
+    final bool archived = await provider.archiveCurrentPath();
+
+    if (!mounted) {
+      return;
+    }
+
+    if (!archived) {
+      _showProviderError(provider);
+      return;
+    }
+
+    setState(() {
+      _editingPreferences = true;
+    });
+  }
+
+  Future<void> _chooseTargetDate() async {
+    final DateTime now = DateTime.now();
+    final DateTime initialDate =
+        _targetDate ?? now.add(const Duration(days: 30));
+
+    final DateTime? selected = await showDatePicker(
+      context: context,
+      initialDate: initialDate.isBefore(now) ? now : initialDate,
+      firstDate: DateTime(now.year, now.month, now.day),
+      lastDate: DateTime(now.year + 5),
+    );
+
+    if (!mounted || selected == null) {
+      return;
+    }
+
+    setState(() {
+      _targetDate = selected;
+    });
+  }
+
+  void _showProviderError(AiLearningPathProvider provider) {
+    final String message =
+        provider.errorMessage ??
+        _readinessMessage(provider.businessCode, provider.readiness) ??
+        context.l10n.aiPathConnectionError;
+
+    _showMessage(message);
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -149,15 +267,14 @@ class _AiLearningPathScreenState extends State<AiLearningPathScreen> {
         backgroundColor: AppTheme.getBackgroundColor(context),
         elevation: 0,
         leading: IconButton(
-          icon: HugeIcon(
-            icon: HugeIcons.strokeRoundedArrowLeft01,
-            size: 20,
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(
+            Icons.arrow_back_rounded,
             color: AppTheme.getTextColor(context),
           ),
-          onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'AI Learning Path Generator',
+          context.l10n.aiLearningPathGenerator,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
             fontSize: 18,
@@ -165,344 +282,880 @@ class _AiLearningPathScreenState extends State<AiLearningPathScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            // Header Section
-            Text(
-              'Choose Your Career Goal',
-              style: TextStyle(
-                color: AppTheme.getTextColor(context),
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Select a career path and AI will generate a personalized learning roadmap for you',
-              style: TextStyle(
-                color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Career Options Grid
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.1,
-              ),
-              itemCount: _careerOptions.length,
-              itemBuilder: (BuildContext context, int index) {
-                final Map<String, dynamic> career = _careerOptions[index];
-                final bool isSelected = _selectedCareer == career['id'];
-                return GestureDetector(
-                  onTap: () => _selectCareer(career['id'] as String),
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (career['color'] as Color).withValues(alpha: 0.1)
-                          : AppTheme.getCardColor(context),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected
-                            ? career['color'] as Color
-                            : AppTheme.getSoftGray150(context),
-                        width: isSelected ? 2 : 1,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: (career['color'] as Color).withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: HugeIcon(
-                              icon: career['icon'] as dynamic,
-                              size: 24,
-                              color: career['color'] as Color,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          career['title'] as String,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppTheme.getTextColor(context),
-                            fontSize: 14,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w600,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
+      body: Consumer2<AiLearningPathProvider, AiSuggestionsProvider>(
+        builder:
+            (
+              BuildContext context,
+              AiLearningPathProvider pathProvider,
+              AiSuggestionsProvider categoryProvider,
+              Widget? child,
+            ) {
+              if (!_screenReady || pathProvider.isLoading) {
+                return _buildLoadingState();
+              }
+
+              final AiLearningPath? path = pathProvider.currentPath;
+
+              if (path != null && !_editingPreferences) {
+                return RefreshIndicator(
+                  onRefresh: _reload,
+                  child: _buildCurrentPath(pathProvider, path),
                 );
-              },
-            ),
-            const SizedBox(height: 24),
-            // Generate Button
-            if (_selectedCareer != null && !_hasGenerated)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isGenerating ? null : _generateLearningPath,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: _isGenerating
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            HugeIcon(
-                              icon: HugeIcons.strokeRoundedAiUser,
-                              size: 20,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Generate Learning Path',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
+              }
+
+              return RefreshIndicator(
+                onRefresh: _reload,
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+                  children: <Widget>[
+                    _buildIntroCard(),
+                    const SizedBox(height: 18),
+                    _buildProfileForm(pathProvider, categoryProvider),
+                    if (pathProvider.profile?.exists == true) ...[
+                      const SizedBox(height: 18),
+                      _buildReadinessCard(pathProvider),
+                    ],
+                  ],
                 ),
-              ),
-            // Learning Path Timeline
-            if (_hasGenerated) ...<Widget>[
-              const SizedBox(height: 32),
-              Text(
-                'Your Learning Roadmap',
-                style: TextStyle(
-                  color: AppTheme.getTextColor(context),
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.3,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ..._learningPath.asMap().entries.map((entry) {
-                final int index = entry.key;
-                final Map<String, dynamic> step = entry.value;
-                final bool isLast = index == _learningPath.length - 1;
-                return _buildTimelineStep(step, isLast, index);
-              }),
-            ],
-          ],
-        ),
+              );
+            },
       ),
     );
   }
 
-  Widget _buildTimelineStep(
-    Map<String, dynamic> step,
-    bool isLast,
-    int index,
-  ) {
-    final bool isCompleted = step['completed'] as bool;
-    final double progress = step['progress'] as double;
-    final int stepNumber = step['step'] as int;
-    final String title = step['title'] as String;
-    final String duration = step['duration'] as String;
-    final List<String> courses = step['courses'] as List<String>;
+  Widget _buildLoadingState() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          const CircularProgressIndicator(),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.aiPathLoading,
+            style: TextStyle(
+              color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        // Timeline Line & Circle
-        Column(
-          children: <Widget>[
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: isCompleted
-                    ? AppTheme.primary
-                    : progress > 0
-                        ? AppTheme.primary.withValues(alpha: 0.3)
-                        : AppTheme.getMint100(context),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isCompleted || progress > 0
-                      ? AppTheme.primary
-                      : AppTheme.getTextColor(context).withValues(alpha: 0.2),
-                  width: 2,
+  Widget _buildIntroCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.primary.withValues(alpha: 0.09),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppTheme.primary,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(Icons.auto_awesome_rounded, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            context.l10n.aiPathPersonalizeTitle,
+            style: TextStyle(
+              color: AppTheme.getTextColor(context),
+              fontSize: 23,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            context.l10n.aiPathPersonalizeSubtitle,
+            style: TextStyle(
+              color: AppTheme.getTextColor(context).withValues(alpha: 0.68),
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileForm(
+    AiLearningPathProvider pathProvider,
+    AiSuggestionsProvider categoryProvider,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppTheme.getCardColor(context),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppTheme.getSoftGray150(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _sectionTitle(context.l10n.aiPathCategories),
+          const SizedBox(height: 6),
+          _sectionHint(context.l10n.aiPathCategoriesHint),
+          const SizedBox(height: 14),
+          _buildCategories(categoryProvider),
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathSkillLevel),
+          const SizedBox(height: 12),
+          _choiceWrap(
+            values: const <String>['beginner', 'intermediate', 'advanced'],
+            selectedValue: _skillLevel,
+            labelBuilder: _skillLabel,
+            onSelected: (String value) {
+              setState(() {
+                _skillLevel = value;
+              });
+            },
+          ),
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathGoal),
+          const SizedBox(height: 12),
+          _choiceWrap(
+            values: const <String>[
+              'career_change',
+              'skill_enhancement',
+              'personal_interest',
+              'certification',
+              'freelancing',
+              'custom',
+            ],
+            selectedValue: _goal,
+            labelBuilder: _goalLabel,
+            onSelected: (String value) {
+              setState(() {
+                _goal = value;
+              });
+            },
+          ),
+          if (_goal == 'custom') ...[
+            const SizedBox(height: 14),
+            TextField(
+              controller: _customGoalController,
+              minLines: 2,
+              maxLines: 4,
+              maxLength: 1000,
+              decoration: _inputDecoration(context.l10n.aiPathCustomGoal),
+            ),
+          ],
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathWeeklyHours),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _weeklyHoursController,
+            keyboardType: TextInputType.number,
+            decoration: _inputDecoration(
+              context.l10n.aiPathWeeklyHours,
+              suffixText: context.l10n.aiPathHours,
+            ),
+          ),
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathTargetDate),
+          const SizedBox(height: 12),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: _chooseTargetDate,
+                  icon: const Icon(Icons.calendar_month_rounded),
+                  label: Text(
+                    _targetDate == null
+                        ? context.l10n.aiPathChooseDate
+                        : _formatDate(_targetDate!),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 15,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
                 ),
               ),
-              child: Center(
-                child: isCompleted
-                    ? const Icon(
-                        Icons.check,
+              if (_targetDate != null) ...[
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: context.l10n.aiPathClearDate,
+                  onPressed: () {
+                    setState(() {
+                      _targetDate = null;
+                    });
+                  },
+                  icon: const Icon(Icons.close_rounded),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathLanguage),
+          const SizedBox(height: 12),
+          _choiceWrap(
+            values: const <String>['fr', 'nl', 'de', 'en'],
+            selectedValue: _preferredLanguage,
+            labelBuilder: _languageLabel,
+            onSelected: (String value) {
+              setState(() {
+                _preferredLanguage = value;
+              });
+            },
+          ),
+          const SizedBox(height: 24),
+          _sectionTitle(context.l10n.aiPathLearningStyle),
+          const SizedBox(height: 12),
+          _choiceWrap(
+            values: const <String>['fast', 'balanced', 'in_depth'],
+            selectedValue: _learningStyle,
+            labelBuilder: _learningStyleLabel,
+            onSelected: (String value) {
+              setState(() {
+                _learningStyle = value;
+              });
+            },
+          ),
+          const SizedBox(height: 26),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: pathProvider.isSavingProfile
+                  ? null
+                  : () => _saveProfile(pathProvider),
+              icon: pathProvider.isSavingProfile
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
                         color: Colors.white,
-                        size: 20,
-                      )
-                    : Text(
-                        '$stepNumber',
-                        style: TextStyle(
-                          color: progress > 0
-                              ? AppTheme.primary
-                              : AppTheme.getTextColor(context).withValues(alpha: 0.6),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
                       ),
+                    )
+                  : const Icon(Icons.tune_rounded),
+              label: Text(context.l10n.aiPathSaveAnalyze),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.primary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
             ),
-            if (!isLast)
-              Container(
-                width: 2,
-                height: 120,
-                color: AppTheme.getTextColor(context).withValues(alpha: 0.1),
-              ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategories(AiSuggestionsProvider categoryProvider) {
+    if (categoryProvider.isLoadingCategories) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(18),
+          child: CircularProgressIndicator(),
         ),
-        const SizedBox(width: 16),
-        // Step Content
-        Expanded(
+      );
+    }
+
+    if (categoryProvider.categoryError != null) {
+      return _inlineError(
+        categoryProvider.categoryError!,
+        onRetry: categoryProvider.fetchCategories,
+      );
+    }
+
+    if (categoryProvider.interests.isEmpty) {
+      return _inlineError(
+        context.l10n.aiPathConnectionError,
+        onRetry: categoryProvider.fetchCategories,
+      );
+    }
+
+    return Wrap(
+      spacing: 9,
+      runSpacing: 9,
+      children: categoryProvider.interests
+          .map((Category category) {
+            final bool selected = _selectedCategoryIds.contains(category.id);
+
+            return FilterChip(
+              selected: selected,
+              label: Text(category.name),
+              avatar: Icon(
+                selected ? Icons.check_circle_rounded : Icons.category_outlined,
+                size: 18,
+              ),
+              onSelected: (bool value) {
+                setState(() {
+                  if (value) {
+                    _selectedCategoryIds.add(category.id);
+                  } else {
+                    _selectedCategoryIds.remove(category.id);
+                  }
+                });
+              },
+              selectedColor: AppTheme.primary.withValues(alpha: 0.14),
+              checkmarkColor: AppTheme.primary,
+              side: BorderSide(
+                color: selected
+                    ? AppTheme.primary
+                    : AppTheme.getSoftGray150(context),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+            );
+          })
+          .toList(growable: false),
+    );
+  }
+
+  Widget _buildReadinessCard(AiLearningPathProvider provider) {
+    final String? code = provider.readiness?.code ?? provider.businessCode;
+
+    final String message =
+        _readinessMessage(code, provider.readiness) ??
+        context.l10n.aiPathConnectionError;
+
+    final bool ready = provider.readiness?.ready == true;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: ready
+            ? AppTheme.primary.withValues(alpha: 0.08)
+            : AppTheme.getCardColor(context),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: ready
+              ? AppTheme.primary.withValues(alpha: 0.28)
+              : AppTheme.getSoftGray150(context),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Icon(
+                ready ? Icons.auto_awesome_rounded : Icons.info_outline_rounded,
+                color: ready
+                    ? AppTheme.primary
+                    : AppTheme.getTextColor(context).withValues(alpha: 0.65),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  ready
+                      ? context.l10n.aiPathReadyTitle
+                      : context.l10n.aiLearningPathGenerator,
+                  style: TextStyle(
+                    color: AppTheme.getTextColor(context),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            ready ? context.l10n.aiPathReadyBody : message,
+            style: TextStyle(
+              color: AppTheme.getTextColor(context).withValues(alpha: 0.72),
+              height: 1.45,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          if (provider.readiness != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              '${provider.readiness!.candidateCount}'
+              ' / '
+              '${provider.readiness!.minimumRequired}',
+              style: TextStyle(
+                color: AppTheme.primary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ready
+                ? FilledButton.icon(
+                    onPressed: provider.isGenerating
+                        ? null
+                        : () => _generatePath(provider),
+                    icon: provider.isGenerating
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded),
+                    label: Text(
+                      provider.isGenerating
+                          ? context.l10n.aiPathGenerating
+                          : context.l10n.aiPathGenerate,
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                  )
+                : OutlinedButton.icon(
+                    onPressed: provider.isGenerating
+                        ? null
+                        : provider.checkReadiness,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(context.l10n.aiPathCheckAvailability),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrentPath(
+    AiLearningPathProvider provider,
+    AiLearningPath path,
+  ) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: AppTheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: AppTheme.primary.withValues(alpha: 0.22)),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(
                 children: <Widget>[
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const Icon(Icons.route_rounded, color: Colors.white),
+                  ),
+                  const SizedBox(width: 13),
                   Expanded(
                     child: Text(
-                      title,
+                      context.l10n.aiPathCurrentTitle,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.getMint100(context),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      duration,
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              // Progress Indicator
-              if (progress > 0 || isCompleted)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: isCompleted ? 1.0 : progress,
-                        backgroundColor: AppTheme.getSoftGray150(context),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppTheme.primary,
-                        ),
-                        minHeight: 6,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      isCompleted
-                          ? 'Completed'
-                          : '${(progress * 100).toInt()}% Complete',
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 12),
-              // Recommended Courses
+              const SizedBox(height: 18),
               Text(
-                'Recommended Courses:',
+                path.title,
                 style: TextStyle(
-                  color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  color: AppTheme.getTextColor(context),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  height: 1.15,
                 ),
               ),
-              const SizedBox(height: 8),
-              ...courses.map((course) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          course,
-                          style: TextStyle(
-                            color: AppTheme.getTextColor(context),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
+              if (path.summary.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  path.summary,
+                  style: TextStyle(
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.72),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
                   ),
-                );
-              }),
+                ),
+              ],
               const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: <Widget>[
+                  _metaChip(
+                    Icons.calendar_view_week_rounded,
+                    '${path.estimatedWeeks} '
+                    '${context.l10n.aiPathWeeks}',
+                  ),
+                  _metaChip(Icons.layers_rounded, '${path.steps.length}'),
+                  _metaChip(
+                    Icons.auto_awesome_rounded,
+                    path.generationMode.toUpperCase(),
+                  ),
+                ],
+              ),
             ],
+          ),
+        ),
+        const SizedBox(height: 22),
+        ...path.steps.map((AiLearningPathStep step) => _buildPathStep(step)),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: () {
+            setState(() {
+              _editingPreferences = true;
+            });
+          },
+          icon: const Icon(Icons.tune_rounded),
+          label: Text(context.l10n.aiPathEditPreferences),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextButton.icon(
+          onPressed: provider.isArchiving ? null : () => _archivePath(provider),
+          icon: provider.isArchiving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.archive_outlined),
+          label: Text(context.l10n.aiPathArchive),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPathStep(AiLearningPathStep step) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppTheme.primary,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '${step.position}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(17),
+              decoration: BoxDecoration(
+                color: AppTheme.getCardColor(context),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppTheme.getSoftGray150(context)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  if (step.stage.isNotEmpty)
+                    Text(
+                      step.stage.toUpperCase(),
+                      style: TextStyle(
+                        color: AppTheme.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  if (step.stage.isNotEmpty) const SizedBox(height: 7),
+                  Text(
+                    step.course.title,
+                    style: TextStyle(
+                      color: AppTheme.getTextColor(context),
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _detailBlock(context.l10n.aiPathObjective, step.objective),
+                  const SizedBox(height: 10),
+                  _detailBlock(context.l10n.aiPathWhy, step.reason),
+                  const SizedBox(height: 12),
+                  _metaChip(
+                    Icons.schedule_rounded,
+                    '${step.estimatedHours} '
+                    '${context.l10n.aiPathHours}',
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _detailBlock(String label, String value) {
+    if (value.trim().isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(
+          label,
+          style: TextStyle(
+            color: AppTheme.getTextColor(context).withValues(alpha: 0.55),
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+            color: AppTheme.getTextColor(context).withValues(alpha: 0.78),
+            height: 1.4,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
+  }
+
+  Widget _metaChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.getBackgroundColor(context),
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: AppTheme.getSoftGray150(context)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Icon(icon, size: 15, color: AppTheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: AppTheme.getTextColor(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _choiceWrap({
+    required List<String> values,
+    required String selectedValue,
+    required String Function(String value) labelBuilder,
+    required ValueChanged<String> onSelected,
+  }) {
+    return Wrap(
+      spacing: 9,
+      runSpacing: 9,
+      children: values
+          .map((String value) {
+            final bool selected = selectedValue == value;
+
+            return ChoiceChip(
+              selected: selected,
+              label: Text(labelBuilder(value)),
+              onSelected: (_) => onSelected(value),
+              selectedColor: AppTheme.primary.withValues(alpha: 0.14),
+              side: BorderSide(
+                color: selected
+                    ? AppTheme.primary
+                    : AppTheme.getSoftGray150(context),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(13),
+              ),
+            );
+          })
+          .toList(growable: false),
+    );
+  }
+
+  Widget _sectionTitle(String value) {
+    return Text(
+      value,
+      style: TextStyle(
+        color: AppTheme.getTextColor(context),
+        fontSize: 16,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+  }
+
+  Widget _sectionHint(String value) {
+    return Text(
+      value,
+      style: TextStyle(
+        color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+        height: 1.4,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  Widget _inlineError(
+    String message, {
+    required Future<void> Function() onRetry,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.getBackgroundColor(context),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: AppTheme.getTextColor(context).withValues(alpha: 0.72),
+              ),
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.aiPathRetry)),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label, {String? suffixText}) {
+    return InputDecoration(
+      labelText: label,
+      suffixText: suffixText,
+      filled: true,
+      fillColor: AppTheme.getBackgroundColor(context),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: AppTheme.getSoftGray150(context)),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: AppTheme.getSoftGray150(context)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
+      ),
+    );
+  }
+
+  String? _readinessMessage(String? code, dynamic readiness) {
+    switch (code) {
+      case 'READY':
+        return context.l10n.aiPathReadyBody;
+      case 'NO_MATCHING_COURSES':
+        return context.l10n.aiPathNoMatching;
+      case 'INSUFFICIENT_CATALOG':
+        return context.l10n.aiPathInsufficient;
+      case 'ALL_MATCHING_COURSES_COMPLETED':
+        return context.l10n.aiPathAllCompleted;
+      case 'LEARNING_PROFILE_REQUIRED':
+        return context.l10n.aiPathProfileRequired;
+      default:
+        return null;
+    }
+  }
+
+  String _skillLabel(String value) {
+    switch (value) {
+      case 'beginner':
+        return context.l10n.aiPathBeginner;
+      case 'intermediate':
+        return context.l10n.aiPathIntermediate;
+      case 'advanced':
+        return context.l10n.aiPathAdvanced;
+      default:
+        return value;
+    }
+  }
+
+  String _goalLabel(String value) {
+    switch (value) {
+      case 'career_change':
+        return context.l10n.aiPathCareerChange;
+      case 'skill_enhancement':
+        return context.l10n.aiPathSkillEnhancement;
+      case 'personal_interest':
+        return context.l10n.aiPathPersonalInterest;
+      case 'certification':
+        return context.l10n.aiPathCertification;
+      case 'freelancing':
+        return context.l10n.aiPathFreelancing;
+      case 'custom':
+        return context.l10n.aiPathCustom;
+      default:
+        return value;
+    }
+  }
+
+  String _learningStyleLabel(String value) {
+    switch (value) {
+      case 'fast':
+        return context.l10n.aiPathFast;
+      case 'balanced':
+        return context.l10n.aiPathBalanced;
+      case 'in_depth':
+        return context.l10n.aiPathInDepth;
+      default:
+        return value;
+    }
+  }
+
+  String _languageLabel(String value) {
+    switch (value) {
+      case 'fr':
+        return 'FranÃ§ais';
+      case 'nl':
+        return 'Nederlands';
+      case 'de':
+        return 'Deutsch';
+      case 'en':
+        return 'English';
+      default:
+        return value.toUpperCase();
+    }
+  }
+
+  String _formatDate(DateTime value) {
+    final String day = value.day.toString().padLeft(2, '0');
+    final String month = value.month.toString().padLeft(2, '0');
+
+    return '$day/$month/${value.year}';
   }
 }

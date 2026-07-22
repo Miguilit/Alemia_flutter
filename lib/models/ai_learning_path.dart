@@ -147,6 +147,8 @@ class AiLearningPathCourse {
   const AiLearningPathCourse({
     required this.id,
     required this.title,
+    required this.lessonsCount,
+    required this.rating,
     this.slug,
     this.thumbnail,
     this.difficulty,
@@ -157,6 +159,8 @@ class AiLearningPathCourse {
 
   final int id;
   final String title;
+  final int lessonsCount;
+  final double rating;
   final String? slug;
   final String? thumbnail;
   final String? difficulty;
@@ -172,6 +176,8 @@ class AiLearningPathCourse {
     return AiLearningPathCourse(
       id: _asInt(json['id']),
       title: json['title']?.toString() ?? '',
+      lessonsCount: _asInt(json['lessons_count']),
+      rating: _asDouble(json['rating']),
       slug: _nullableString(json['slug']),
       thumbnail: _nullableString(json['thumbnail'] ?? json['featured_image']),
       difficulty: _nullableString(json['difficulty']),
@@ -189,6 +195,14 @@ class AiLearningPathCourse {
     }
 
     return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static double _asDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+
+    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   static String? _nullableString(dynamic value) {
