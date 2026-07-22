@@ -182,7 +182,7 @@ class _CertificateViewScreenState extends State<CertificateViewScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            user?.name ?? 'Student',
+                            user?.name ?? context.l10n.residualStudent,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
@@ -422,7 +422,7 @@ class _CertificateViewScreenState extends State<CertificateViewScreen> {
                             const SizedBox(width: 8),
                             Text(
                               _isDownloading
-                                  ? 'Downloading...'
+                                  ? context.l10n.residualDownloading
                                   : context.l10n.download,
                               style: const TextStyle(
                                 color: Colors.white,
@@ -461,8 +461,8 @@ class _CertificateViewScreenState extends State<CertificateViewScreen> {
         if (!status.isGranted) {
           if (!mounted) return;
           scaffoldMessenger.showSnackBar(
-            const SnackBar(
-              content: Text('Storage permission is required to download'),
+            SnackBar(
+              content: Text(context.l10n.residualStoragePermissionRequired),
               backgroundColor: Colors.red,
             ),
           );
@@ -502,11 +502,13 @@ class _CertificateViewScreenState extends State<CertificateViewScreen> {
           if (!mounted) return;
           scaffoldMessenger.showSnackBar(
             SnackBar(
-              content: Text('Certificate downloaded to ${file.path}'),
+              content: Text(
+                context.l10n.residualCertificateDownloadedTo(file.path),
+              ),
               backgroundColor: Colors.green,
               duration: const Duration(seconds: 5),
               action: SnackBarAction(
-                label: 'Open',
+                label: context.l10n.residualOpen,
                 textColor: Colors.white,
                 onPressed: () {
                   // Open the file
@@ -518,13 +520,13 @@ class _CertificateViewScreenState extends State<CertificateViewScreen> {
           );
         }
       } else {
-        throw Exception('Failed to download certificate');
+        throw Exception(context.l10n.residualFailedToDownloadCertificate);
       }
     } catch (e) {
       if (!mounted) return;
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text('Download failed: ${e.toString()}'),
+          content: Text(context.l10n.residualDownloadFailed(e.toString())),
           backgroundColor: Colors.red,
         ),
       );

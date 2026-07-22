@@ -68,9 +68,11 @@ class _QaRoomScreenState extends State<QaRoomScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading questions: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.communityErrorLoadingQuestions(e)),
+          ),
+        );
       }
     }
   }
@@ -621,7 +623,7 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                     TextField(
                       controller: _titleController,
                       decoration: InputDecoration(
-                        hintText: 'Question title...',
+                        hintText: context.l10n.communityQuestionTitleHint,
                         hintStyle: TextStyle(
                           color: AppTheme.getTextColor(
                             context,
@@ -651,7 +653,7 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                     TextField(
                       controller: _tagController,
                       decoration: InputDecoration(
-                        hintText: 'Add tags (press Enter)...',
+                        hintText: context.l10n.communityTagsHint,
                         hintStyle: TextStyle(
                           color: AppTheme.getTextColor(
                             context,
@@ -715,7 +717,7 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                       controller: _descriptionController,
                       maxLines: 5,
                       decoration: InputDecoration(
-                        hintText: 'Describe your question in detail...',
+                        hintText: context.l10n.communityQuestionDescriptionHint,
                         hintStyle: TextStyle(
                           color: AppTheme.getTextColor(
                             context,

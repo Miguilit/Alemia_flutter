@@ -28,7 +28,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-
           _BackgroundDecoration(size: size),
 
           SafeArea(
@@ -78,16 +77,15 @@ class _HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final String logoPath = isDarkMode ? 'assets/img/logo_white.svg' : 'assets/img/logo.svg';
-    
+    final String logoPath = isDarkMode
+        ? 'assets/img/logo_white.svg'
+        : 'assets/img/logo.svg';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-
-          SvgPicture.asset(logoPath, width: 142, height: 44),
-        ],
+        children: <Widget>[SvgPicture.asset(logoPath, width: 142, height: 44)],
       ),
     );
   }
@@ -120,7 +118,6 @@ class _ForgotPasswordCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-
             IconButton(
               icon: HugeIcon(
                 icon: HugeIcons.strokeRoundedArrowLeft01,
@@ -160,7 +157,7 @@ class _ForgotPasswordCard extends StatelessWidget {
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 labelText: context.l10n.email,
-                hintText: 'tom@mail.com',
+                hintText: context.l10n.authEmailExample,
                 filled: true,
                 fillColor: Theme.of(context).brightness == Brightness.dark
                     ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -177,7 +174,9 @@ class _ForgotPasswordCard extends StatelessWidget {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.2),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -208,9 +207,8 @@ class _ForgotPasswordCard extends StatelessWidget {
                   // Navigate to OTP verification screen
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => OtpVerificationScreen(
-                        email: emailController.text,
-                      ),
+                      builder: (context) =>
+                          OtpVerificationScreen(email: emailController.text),
                     ),
                   );
                 },
@@ -249,7 +247,9 @@ class _ForgotPasswordCard extends StatelessWidget {
                 child: Text(
                   context.l10n.backToLogin,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),

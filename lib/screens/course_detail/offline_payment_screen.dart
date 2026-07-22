@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_receiptFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please upload a payment receipt')),
+        SnackBar(content: Text(context.l10n.offlineUploadReceiptRequired)),
       );
       return;
     }
@@ -85,7 +86,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
           );
         }
       } else {
-        String errorMessage = 'Failed to submit enrollment request';
+        String errorMessage = context.l10n.offlineEnrollmentRequestFailed;
         try {
           final errorData = json.decode(responseBody);
           if (errorData['message'] != null) {
@@ -103,9 +104,9 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     } finally {
       if (mounted) {
@@ -139,7 +140,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
                           const SizedBox(height: 24),
                           _buildInstructions(context),
                           Text(
-                            'Transaction Details',
+                            context.l10n.offlineTransactionDetails,
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 18,
@@ -197,7 +198,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
           ),
           Expanded(
             child: Text(
-              'Offline Payment',
+              context.l10n.offlinePaymentTitle,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppTheme.getTextColor(context),
@@ -288,7 +289,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
       (method) => method.identifier == 'offline',
       orElse: () => PaymentMethod(
         identifier: 'offline',
-        name: 'Offline Payment',
+        name: context.l10n.offlinePaymentTitle,
         type: 'offline',
         isEnabled: false,
         instructions: null,
@@ -304,7 +305,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payment Details',
+          context.l10n.offlinePaymentDetails,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
             fontSize: 18,
@@ -352,14 +353,14 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
     return TextFormField(
       controller: _transactionController,
       decoration: InputDecoration(
-        labelText: 'Transaction ID / Reference',
-        hintText: 'Enter your payment transaction ID',
+        labelText: context.l10n.offlineTransactionReference,
+        hintText: context.l10n.offlineTransactionReferenceHint,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         prefixIcon: const Icon(Icons.receipt_long),
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Please enter transaction ID';
+          return context.l10n.offlineTransactionReferenceRequired;
         }
         return null;
       },
@@ -371,7 +372,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Payment Receipt',
+          context.l10n.offlinePaymentReceipt,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
             fontSize: 18,
@@ -407,7 +408,7 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Upload Receipt Image',
+                          context.l10n.offlineUploadReceiptImage,
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ],
@@ -441,9 +442,12 @@ class _OfflinePaymentScreenState extends State<OfflinePaymentScreen> {
                   strokeWidth: 2,
                 ),
               )
-            : const Text(
-                'Submit Enrollment Request',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            : Text(
+                context.l10n.offlineSubmitEnrollmentRequest,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
       ),
     );

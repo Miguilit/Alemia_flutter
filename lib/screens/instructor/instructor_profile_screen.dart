@@ -5,6 +5,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/instructor_service.dart';
 import '../../models/instructor.dart';
 import '../../config/config.dart';
@@ -48,13 +49,13 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
             });
           }
         } else {
-          _handleError('Failed to load instructor data');
+          _handleError(context.l10n.residualFailedToLoadInstructor);
         }
       } else {
-        _handleError('Server error: ${response.statusCode}');
+        _handleError(context.l10n.residualServerError(response.statusCode));
       }
     } catch (e) {
-      _handleError('Connection error: $e');
+      _handleError(context.l10n.residualConnectionError);
     }
   }
 
@@ -90,7 +91,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
             color: Colors.red.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
-          Text(_error ?? 'Something went wrong'),
+          Text(_error ?? context.l10n.residualSomethingWentWrong),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
@@ -100,7 +101,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
               });
               _fetchInstructorDetails();
             },
-            child: const Text('Try Again'),
+            child: Text(context.l10n.residualTryAgain),
           ),
         ],
       ),
@@ -192,7 +193,8 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                       const SizedBox(height: 8),
                       // Title
                       Text(
-                        _instructor!.professionalTitle ?? 'Instructor',
+                        _instructor!.professionalTitle ??
+                            context.l10n.residualInstructor,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: AppTheme.getTextColor(
@@ -227,7 +229,8 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            _instructor!.averageRating?.toStringAsFixed(1) ?? '0.0',
+                            _instructor!.averageRating?.toStringAsFixed(1) ??
+                                '0.0',
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 17,
@@ -236,7 +239,9 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '(${_instructor!.reviewsCount ?? 0} reviews)',
+                            context.l10n.residualReviewsCount(
+                              _instructor!.reviewsCount ?? 0,
+                            ),
                             style: TextStyle(
                               color: AppTheme.getTextColor(
                                 context,
@@ -254,23 +259,26 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                         children: <Widget>[
                           _StatItem(
                             value: '${_instructor!.coursesCount ?? 0}',
-                            label: 'Courses',
+                            label: context.l10n.residualCourses,
                             icon: HugeIcons.strokeRoundedBook01,
                           ),
                           _StatItem(
                             value: '${_instructor!.studentsCount ?? 0}',
-                            label: 'Students',
+                            label: context.l10n.residualStudents,
                             icon: HugeIcons.strokeRoundedAiUser,
                           ),
                           _StatItem(
                             value: '${_instructor!.reviewsCount ?? 0}',
-                            label: 'Rating',
+                            label: context.l10n.residualRating,
                             icon: HugeIcons.strokeRoundedStar,
                           ),
                           _StatItem(
                             value:
-                                _instructor!.averageRating?.toStringAsFixed(1) ?? '0.0',
-                            label: 'Avg Reviews',
+                                _instructor!.averageRating?.toStringAsFixed(
+                                  1,
+                                ) ??
+                                '0.0',
+                            label: context.l10n.residualAverageRating,
                             icon: HugeIcons.strokeRoundedStar,
                           ),
                         ],
@@ -294,7 +302,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                             size: 18,
                             color: Colors.white,
                           ),
-                          label: const Text('Send Message'),
+                          label: Text(context.l10n.residualSendMessage),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primary,
                             foregroundColor: Colors.white,
@@ -333,7 +341,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                 ],
                 // About Section
                 Text(
-                  'About',
+                  context.l10n.residualAbout,
                   style: TextStyle(
                     color: AppTheme.getTextColor(context),
                     fontSize: 22,
@@ -348,9 +356,11 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    _instructor!.bio ?? 'No bio available.',
+                    _instructor!.bio ?? context.l10n.residualNoBioAvailable,
                     style: TextStyle(
-                      color: AppTheme.getTextColor(context).withValues(alpha: 0.8),
+                      color: AppTheme.getTextColor(
+                        context,
+                      ).withValues(alpha: 0.8),
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       height: 1.6,
@@ -365,7 +375,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        'Courses',
+                        context.l10n.residualCourses,
                         style: TextStyle(
                           color: AppTheme.getTextColor(context),
                           fontSize: 20,
@@ -398,7 +408,7 @@ class _InstructorProfileScreenState extends State<InstructorProfileScreen> {
                 if (_instructor!.latestReviews != null &&
                     _instructor!.latestReviews!.isNotEmpty) ...[
                   Text(
-                    'Reviews',
+                    context.l10n.residualReviews,
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 20,
@@ -547,7 +557,7 @@ class _ReviewCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      user?['name'] ?? 'Anonymous',
+                      user?['name'] ?? context.l10n.residualAnonymous,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 14,
@@ -643,7 +653,9 @@ class _CourseCard extends StatelessWidget {
                       child: Center(
                         child: Icon(
                           Icons.book,
-                          color: AppTheme.getTextColor(context).withValues(alpha: 0.5),
+                          color: AppTheme.getTextColor(
+                            context,
+                          ).withValues(alpha: 0.5),
                         ),
                       ),
                     ),
@@ -745,7 +757,7 @@ class _CourseCard extends StatelessWidget {
                         Text(
                           course.price != null && course.price! > 0
                               ? settingsProvider.formatPrice(course.price)
-                              : 'Free',
+                              : context.l10n.residualFree,
                           style: TextStyle(
                             color: AppTheme.getTextColor(context),
                             fontSize: 13,

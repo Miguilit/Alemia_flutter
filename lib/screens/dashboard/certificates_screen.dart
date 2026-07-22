@@ -401,7 +401,9 @@ class _CertificateCard extends StatelessWidget {
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not launch download URL')),
+          SnackBar(
+            content: Text(context.l10n.residualCouldNotLaunchDownloadUrl),
+          ),
         );
       }
     }

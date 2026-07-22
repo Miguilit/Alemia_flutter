@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../../l10n/app_localizations.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sslcommerz/sslcommerz.dart';
@@ -24,7 +25,11 @@ import '../auth/auth_screen.dart';
 class CheckoutScreen extends StatefulWidget {
   final Course course;
   final bool isBundle;
-  const CheckoutScreen({super.key, required this.course, this.isBundle = false});
+  const CheckoutScreen({
+    super.key,
+    required this.course,
+    this.isBundle = false,
+  });
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -113,7 +118,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(data['message'] ?? 'Payment verification failed'),
+              content: Text(
+                data['message'] ??
+                    context.l10n.checkoutPaymentVerificationFailed,
+              ),
             ),
           );
         }
@@ -121,9 +129,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -136,7 +146,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _handleRazorpayError(PaymentFailureResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Payment Failed: ${response.message}')),
+      SnackBar(
+        content: Text(
+          context.l10n.checkoutPaymentFailed(response.message?.toString()),
+        ),
+      ),
     );
   }
 
@@ -190,9 +204,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _razorpay.open(options);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error initializing payment: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.checkoutPaymentInitializationError('$e')),
+        ),
+      );
     }
   }
 
@@ -228,14 +244,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Payment ${result.status ?? 'Failed'}')),
+          SnackBar(
+            content: Text(
+              context.l10n.checkoutPaymentStatus(result.status?.toString()),
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -273,15 +293,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error from Stripe: ${e.error.localizedMessage}'),
+              content: Text(
+                context.l10n.checkoutStripeError(e.error.localizedMessage),
+              ),
             ),
           );
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+          );
         }
       }
     }
@@ -310,7 +332,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         MaterialPageRoute(
           builder: (context) => WebViewScreen(
             url: checkoutUrl,
-            title: 'Paystack Payment',
+            title: context.l10n.checkoutProviderPayment('Paystack'),
             shouldExit: (url) {
               return url.contains('/payment/paystack/callback') ||
                   url.contains('paystack.com/close');
@@ -332,9 +354,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -345,9 +367,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final approveUrl = data['approve_url'];
 
     if (orderId == null || enrollmentId == null || approveUrl == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Invalid PayPal data')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.checkoutInvalidPaypalData)),
+      );
       return;
     }
 
@@ -355,7 +377,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       MaterialPageRoute(
         builder: (context) => WebViewScreen(
           url: approveUrl,
-          title: 'Paypal Payment',
+          title: context.l10n.checkoutProviderPayment('PayPal'),
           shouldExit: (url) {
             return url.contains('/payment/paypal/callback');
           },
@@ -368,9 +390,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (result.contains('success=true') || result.contains('token=')) {
         _handlePaypalSuccess(orderId, enrollmentId);
       } else if (result.contains('success=false')) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Payment Cancelled')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutPaymentCancelled)),
+        );
       }
     }
   }
@@ -416,16 +438,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -457,7 +483,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         MaterialPageRoute(
           builder: (context) => WebViewScreen(
             url: checkoutUrl,
-            title: 'Mollie Payment',
+            title: context.l10n.checkoutProviderPayment('Mollie'),
             shouldExit: (url) {
               // Exit if we hit the callback URL
               return url.contains('/payment/mollie/callback');
@@ -473,9 +499,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -521,16 +547,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -583,16 +613,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -640,16 +674,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -684,7 +722,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
 
       return Course(
-        id: item['id'] is int ? item['id'] : int.tryParse(item['id'].toString()) ?? 0,
+        id: item['id'] is int
+            ? item['id']
+            : int.tryParse(item['id'].toString()) ?? 0,
         title: item['title']?.toString() ?? '',
         thumbnail: item['thumbnail']?.toString(),
         instructorName: item['instructor_name']?.toString(),
@@ -734,16 +774,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -764,14 +808,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     try {
       final courseService = CourseService();
-      final response = await courseService.validateCoupon(code, widget.course.id);
+      final response = await courseService.validateCoupon(
+        code,
+        widget.course.id,
+      );
       final data = jsonDecode(response.body);
 
       if (response.statusCode == 200 && data['success'] == true) {
         setState(() {
           _appliedCouponCode = code;
-          final double couponDiscount = (data['discount_amount'] ?? 0.0).toDouble();
-          final double saleDiscount = _originalPrice - (widget.course.discountedPrice ?? _originalPrice);
+          final double couponDiscount = (data['discount_amount'] ?? 0.0)
+              .toDouble();
+          final double saleDiscount =
+              _originalPrice -
+              (widget.course.discountedPrice ?? _originalPrice);
           _discount = saleDiscount + couponDiscount;
           _discountPercent = _originalPrice > 0
               ? (_discount / _originalPrice) * 100
@@ -780,13 +830,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Coupon applied successfully!')),
+            SnackBar(content: Text(context.l10n.checkoutCouponApplied)),
           );
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'] ?? 'Invalid coupon code')),
+            SnackBar(
+              content: Text(
+                data['message'] ?? context.l10n.checkoutInvalidCoupon,
+              ),
+            ),
           );
         }
         _removeCoupon();
@@ -794,7 +848,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to validate coupon: $e')),
+          SnackBar(
+            content: Text(context.l10n.checkoutCouponValidationFailed('$e')),
+          ),
         );
       }
       _removeCoupon();
@@ -811,7 +867,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     setState(() {
       _appliedCouponCode = null;
       _couponController.clear();
-      _discount = _originalPrice - (widget.course.discountedPrice ?? _originalPrice);
+      _discount =
+          _originalPrice - (widget.course.discountedPrice ?? _originalPrice);
       _discountPercent = _originalPrice > 0
           ? (_discount / _originalPrice) * 100
           : 0.0;
@@ -822,7 +879,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (_isProcessing) return;
     if (_finalPrice > 0 && _selectedPaymentMethod == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a payment method')),
+        SnackBar(content: Text(context.l10n.checkoutSelectPaymentMethod)),
       );
       return;
     }
@@ -830,9 +887,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     if (!authProvider.isAuthenticated) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please login to continue')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.checkoutLoginRequired)),
+      );
       return;
     }
 
@@ -840,7 +897,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => OfflinePaymentScreen(
-            course: widget.course, 
+            course: widget.course,
             isBundle: widget.isBundle,
             couponCode: _appliedCouponCode,
           ),
@@ -862,7 +919,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     try {
       final courseService = CourseService();
-      final response = widget.isBundle 
+      final response = widget.isBundle
           ? await courseService.enrollBundle(
               widget.course.id,
               _selectedPaymentMethod!,
@@ -883,21 +940,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'razorpay') {
+        if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'razorpay') {
           await _processRazorpay(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'sslcommerz') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'sslcommerz') {
           await _processSslCommerz(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'stripe') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'stripe') {
           await _processStripe(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'paystack') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'paystack') {
           await _processPaystack(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'mollie') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'mollie') {
           await _processMollie(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'paypal') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'paypal') {
           await _processPaypal(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'bkash') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'bkash') {
           await _processBkash(data);
-        } else if (_finalPrice > 0 && _selectedPaymentMethod?.toLowerCase() == 'xpay') {
+        } else if (_finalPrice > 0 &&
+            _selectedPaymentMethod?.toLowerCase() == 'xpay') {
           await _processXpay(data);
         } else if (data['message'] != null && data['success'] == true) {
           // Probably free or offline
@@ -915,7 +980,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? 'Enrollment failed')),
+          SnackBar(
+            content: Text(
+              data['message'] ?? context.l10n.checkoutEnrollmentFailed,
+            ),
+          ),
         );
       }
     } catch (e) {
@@ -924,9 +993,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         setState(() {
           _isProcessing = false;
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -939,7 +1008,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       _lastEnrollmentId = data['enrollment_id'];
       final String checkoutUrl = data['checkout_url'] ?? '';
-      final String paymentId   = data['payment_id']   ?? '';
+      final String paymentId = data['payment_id'] ?? '';
 
       if (checkoutUrl.isEmpty || paymentId.isEmpty) {
         throw Exception('Invalid bKash configuration');
@@ -947,7 +1016,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       setState(() {
         _bkashPaymentId = paymentId;
-        _bkashPending   = true;
+        _bkashPending = true;
       });
 
       // Open bKash checkout in in-app WebView (same pattern as Mollie)
@@ -956,7 +1025,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         MaterialPageRoute(
           builder: (context) => WebViewScreen(
             url: checkoutUrl,
-            title: 'bKash Payment',
+            title: context.l10n.checkoutProviderPayment('bKash'),
             shouldExit: (url) {
               return url.contains('/payment/bkash/callback');
             },
@@ -971,8 +1040,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -992,7 +1062,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final courseService = CourseService();
       final verifyResponse = await courseService.verifyBkashPayment(
-        paymentId:    paymentId,
+        paymentId: paymentId,
         enrollmentId: _lastEnrollmentId!,
       );
 
@@ -1017,15 +1087,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -1042,7 +1117,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       _lastEnrollmentId = data['enrollment_id'];
       final String checkoutUrl = data['checkout_url'] ?? '';
-      final String orderId     = data['order_id']     ?? '';
+      final String orderId = data['order_id'] ?? '';
 
       if (checkoutUrl.isEmpty || orderId.isEmpty) {
         throw Exception('Invalid XPay configuration');
@@ -1059,7 +1134,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         MaterialPageRoute(
           builder: (context) => WebViewScreen(
             url: checkoutUrl,
-            title: 'XPay Payment',
+            title: context.l10n.checkoutProviderPayment('XPay'),
             shouldExit: (url) {
               return url.contains('/payment/xpay/callback');
             },
@@ -1074,8 +1149,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     }
   }
@@ -1095,7 +1171,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final courseService = CourseService();
       final verifyResponse = await courseService.verifyXpayPayment(
-        orderId:      orderId,
+        orderId: orderId,
         enrollmentId: _lastEnrollmentId!,
       );
 
@@ -1120,15 +1196,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(data['message'] ?? 'Payment verification failed'),
+            content: Text(
+              data['message'] ?? context.l10n.checkoutPaymentVerificationFailed,
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.of(context, rootNavigator: true).pop(); // Close loading
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to verify payment: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.checkoutFailedToVerifyPayment('$e')),
+          ),
+        );
       }
     } finally {
       if (mounted) {
@@ -1200,7 +1281,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       Expanded(
                         child: Text(
-                          'Checkout',
+                          context.l10n.checkoutTitle,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppTheme.getTextColor(context),
@@ -1235,7 +1316,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Text(
-                                  'Course Summary',
+                                  context.l10n.checkoutCourseSummary,
                                   style: TextStyle(
                                     color: AppTheme.getTextColor(context),
                                     fontSize: 18,
@@ -1339,7 +1420,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               ),
                                               const SizedBox(width: 6),
                                               Text(
-                                                '${widget.course.studentsCount ?? 0} Students',
+                                                context.l10n
+                                                    .checkoutStudentsCount(
+                                                      widget
+                                                              .course
+                                                              .studentsCount ??
+                                                          0,
+                                                    ),
                                                 style: TextStyle(
                                                   color: AppTheme.getTextColor(
                                                     context,
@@ -1365,7 +1452,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  'Price Breakdown',
+                                  context.l10n.checkoutPriceBreakdown,
                                   style: TextStyle(
                                     color: AppTheme.getTextColor(context),
                                     fontSize: 18,
@@ -1375,7 +1462,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                                 const SizedBox(height: 20),
                                 _PriceRow(
-                                  label: 'Course Price',
+                                  label: context.l10n.checkoutCoursePrice,
                                   amount: settingsProvider.formatPrice(
                                     _originalPrice,
                                   ),
@@ -1396,7 +1483,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
-                                            'Discount (${_discountPercent.toStringAsFixed(0)}%)',
+                                            context.l10n
+                                                .checkoutDiscountPercent(
+                                                  _discountPercent
+                                                      .toStringAsFixed(0),
+                                                ),
                                             style: TextStyle(
                                               color: Colors.green,
                                               fontSize: 14,
@@ -1426,7 +1517,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 _PriceRow(
-                                  label: 'Total',
+                                  label: context.l10n.checkoutTotal,
                                   amount: settingsProvider.formatPrice(
                                     _finalPrice,
                                   ),
@@ -1436,7 +1527,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           // Coupon Code Input (only for single courses, not bundles)
-                          if (!widget.isBundle && widget.course.price != null && widget.course.price! > 0) ...[
+                          if (!widget.isBundle &&
+                              widget.course.price != null &&
+                              widget.course.price! > 0) ...[
                             Container(
                               margin: const EdgeInsets.only(bottom: 20),
                               padding: const EdgeInsets.all(20),
@@ -1448,7 +1541,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    'Promo Code',
+                                    context.l10n.checkoutPromoCode,
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(context),
                                       fontSize: 18,
@@ -1462,30 +1555,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       Expanded(
                                         child: TextField(
                                           controller: _couponController,
-                                          enabled: _appliedCouponCode == null && !_isValidatingCoupon,
+                                          enabled:
+                                              _appliedCouponCode == null &&
+                                              !_isValidatingCoupon,
                                           style: TextStyle(
-                                            color: AppTheme.getTextColor(context),
+                                            color: AppTheme.getTextColor(
+                                              context,
+                                            ),
                                             fontSize: 14,
                                           ),
                                           decoration: InputDecoration(
-                                            hintText: 'Enter promo code',
+                                            hintText: context
+                                                .l10n
+                                                .checkoutPromoCodeHint,
                                             hintStyle: TextStyle(
-                                              color: AppTheme.getTextColor(context).withValues(alpha: 0.5),
+                                              color: AppTheme.getTextColor(
+                                                context,
+                                              ).withValues(alpha: 0.5),
                                             ),
-                                            contentPadding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12,
-                                            ),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                  horizontal: 16,
+                                                  vertical: 12,
+                                                ),
                                             border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                               borderSide: BorderSide(
-                                                color: AppTheme.getTextColor(context).withValues(alpha: 0.15),
+                                                color: AppTheme.getTextColor(
+                                                  context,
+                                                ).withValues(alpha: 0.15),
                                               ),
                                             ),
                                             enabledBorder: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                               borderSide: BorderSide(
-                                                color: AppTheme.getTextColor(context).withValues(alpha: 0.15),
+                                                color: AppTheme.getTextColor(
+                                                  context,
+                                                ).withValues(alpha: 0.15),
                                               ),
                                             ),
                                           ),
@@ -1495,27 +1603,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       _isValidatingCoupon
                                           ? const CircularProgressIndicator()
                                           : ElevatedButton(
-                                              onPressed: _appliedCouponCode != null
+                                              onPressed:
+                                                  _appliedCouponCode != null
                                                   ? _removeCoupon
                                                   : _applyCoupon,
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: _appliedCouponCode != null
-                                                    ? Colors.red.withValues(alpha: 0.1)
+                                                backgroundColor:
+                                                    _appliedCouponCode != null
+                                                    ? Colors.red.withValues(
+                                                        alpha: 0.1,
+                                                      )
                                                     : AppTheme.mint100,
-                                                foregroundColor: _appliedCouponCode != null
+                                                foregroundColor:
+                                                    _appliedCouponCode != null
                                                     ? Colors.red
                                                     : AppTheme.primary,
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 20,
-                                                  vertical: 14,
-                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 14,
+                                                    ),
                                                 shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
                                                 ),
                                                 elevation: 0,
                                               ),
                                               child: Text(
-                                                _appliedCouponCode != null ? 'Remove' : 'Apply',
+                                                _appliedCouponCode != null
+                                                    ? context
+                                                          .l10n
+                                                          .checkoutRemove
+                                                    : context
+                                                          .l10n
+                                                          .checkoutApply,
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w700,
@@ -1535,7 +1656,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          'Code $_appliedCouponCode applied',
+                                          context.l10n
+                                              .checkoutCouponCodeApplied(
+                                                _appliedCouponCode!,
+                                              ),
                                           style: const TextStyle(
                                             color: Colors.green,
                                             fontSize: 12,
@@ -1562,7 +1686,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    'Payment Method',
+                                    context.l10n.checkoutPaymentMethod,
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(context),
                                       fontSize: 18,
@@ -1573,7 +1697,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   const SizedBox(height: 20),
                                   ...paymentMethods.map((method) {
                                     return Padding(
-                                      padding: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.only(
+                                        bottom: 12,
+                                      ),
                                       child: _PaymentMethodOption(
                                         icon: method.identifier == 'razorpay'
                                             ? Icons.payment
@@ -1589,7 +1715,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         title: method.name,
                                         subtitle:
                                             method.description ??
-                                            'Pay with ${method.name}',
+                                            context.l10n.checkoutPayWith(
+                                              method.name,
+                                            ),
                                         isSelected:
                                             _selectedPaymentMethod ==
                                             method.identifier,
@@ -1652,7 +1780,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'Total',
+                              context.l10n.checkoutTotal,
                               style: TextStyle(
                                 color: AppTheme.getTextColor(
                                   context,
@@ -1690,7 +1818,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 elevation: 0,
                               ),
                               child: Text(
-                                'Confirm Payment',
+                                context.l10n.checkoutConfirmPayment,
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,

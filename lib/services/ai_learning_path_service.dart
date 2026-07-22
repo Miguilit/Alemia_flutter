@@ -1,11 +1,46 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 import '../models/ai_learning_path.dart';
 import '../models/ai_learning_path_readiness.dart';
 import '../models/ai_learning_profile.dart';
 import 'base_service.dart';
+
+String _aiLearningPathServiceMessage(String key) {
+  final String language = Intl.getCurrentLocale()
+      .split(RegExp(r'[-_]'))
+      .first
+      .toLowerCase();
+
+  const Map<String, Map<String, String>> messages =
+      <String, Map<String, String>>{
+        'request_failed': <String, String>{
+          'fr': 'La demande n’a pas pu être finalisée.',
+          'en': 'The request could not be completed.',
+          'nl': 'De aanvraag kon niet worden voltooid.',
+          'de': 'Die Anfrage konnte nicht abgeschlossen werden.',
+        },
+        'invalid_response': <String, String>{
+          'fr': 'Le serveur a renvoyé une réponse invalide.',
+          'en': 'The server returned an invalid response.',
+          'nl': 'De server heeft een ongeldig antwoord teruggestuurd.',
+          'de': 'Der Server hat eine ungültige Antwort zurückgegeben.',
+        },
+        'invalid_data': <String, String>{
+          'fr': 'La réponse ne contient pas de données valides.',
+          'en': 'The response does not contain valid data.',
+          'nl': 'Het antwoord bevat geen geldige gegevens.',
+          'de': 'Die Antwort enthält keine gültigen Daten.',
+        },
+      };
+
+  final Map<String, String> values =
+      messages[key] ?? messages['request_failed']!;
+
+  return values[language] ?? values['en']!;
+}
 
 class AiLearningPathService extends BaseService {
   static const Duration _defaultTimeout = Duration(seconds: 60);
@@ -134,7 +169,7 @@ class AiLearningPathService extends BaseService {
         code: body['code']?.toString(),
         message:
             body['message']?.toString() ??
-            'The request could not be completed.',
+            _aiLearningPathServiceMessage('request_failed'),
         data: body['data'],
       );
     }
@@ -152,9 +187,9 @@ class AiLearningPathService extends BaseService {
 
       return _asMap(decoded);
     } on FormatException {
-      throw const AiLearningPathApiException(
+      throw AiLearningPathApiException(
         statusCode: 0,
-        message: 'The server returned an invalid response.',
+        message: _aiLearningPathServiceMessage('invalid_response'),
       );
     }
   }
@@ -166,9 +201,9 @@ class AiLearningPathService extends BaseService {
       return Map<String, dynamic>.from(data);
     }
 
-    throw const AiLearningPathApiException(
+    throw AiLearningPathApiException(
       statusCode: 0,
-      message: 'The response does not contain valid data.',
+      message: _aiLearningPathServiceMessage('invalid_data'),
     );
   }
 
@@ -211,8 +246,5 @@ class AiLearningPathApiException implements Exception {
   }
 
   @override
-  String toString() {
-    return 'AiLearningPathApiException'
-        '(statusCode: $statusCode, code: $code, message: $message)';
-  }
+  String toString() => message;
 }

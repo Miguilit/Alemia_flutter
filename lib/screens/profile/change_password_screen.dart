@@ -39,7 +39,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Password updated successfully',
+                context.l10n.profilePasswordUpdated,
                 style: TextStyle(color: AppTheme.getTextColor(context)),
               ),
               backgroundColor: AppTheme.getCardColor(context),
@@ -51,7 +51,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(context.l10n.profileErrorWithDetails(e)),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       } finally {
@@ -92,7 +95,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ),
                   Expanded(
                     child: Text(
-                      'Change Password',
+                      context.l10n.profileChangePasswordTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
@@ -116,7 +119,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     children: <Widget>[
                       const SizedBox(height: 16),
                       Text(
-                        'Enter your current password and choose a new one',
+                        context.l10n.profileChangePasswordDescription,
                         style: TextStyle(
                           color: AppTheme.getTextColor(
                             context,
@@ -132,8 +135,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         obscureText: !_isCurrentPasswordVisible,
                         decoration: _passwordInputDecoration(
                           context,
-                          label: 'Current Password',
-                          hint: 'Enter current password',
+                          label: context.l10n.profileCurrentPasswordLabel,
+                          hint: context.l10n.profileCurrentPasswordHint,
                           isPasswordVisible: _isCurrentPasswordVisible,
                           onToggleVisibility: () {
                             setState(() {
@@ -144,7 +147,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your current password';
+                            return context.l10n.profileCurrentPasswordRequired;
                           }
                           return null;
                         },
@@ -157,7 +160,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         decoration: _passwordInputDecoration(
                           context,
                           label: context.l10n.newPassword,
-                          hint: 'Enter new password',
+                          hint: context.l10n.profileNewPasswordHint,
                           isPasswordVisible: _isNewPasswordVisible,
                           onToggleVisibility: () {
                             setState(() {
@@ -167,10 +170,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter a new password';
+                            return context.l10n.profileNewPasswordRequired;
                           }
                           if (value.length < 8) {
-                            return 'Password must be at least 8 characters';
+                            return context.l10n.profilePasswordMinLength;
                           }
                           return null;
                         },
@@ -183,7 +186,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         decoration: _passwordInputDecoration(
                           context,
                           label: context.l10n.confirmNewPassword,
-                          hint: 'Confirm new password',
+                          hint: context.l10n.profileConfirmPasswordHint,
                           isPasswordVisible: _isConfirmPasswordVisible,
                           onToggleVisibility: () {
                             setState(() {
@@ -194,10 +197,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please confirm your password';
+                            return context.l10n.profileConfirmPasswordRequired;
                           }
                           if (value != _newPasswordController.text) {
-                            return 'Passwords do not match';
+                            return context.l10n.profilePasswordsDoNotMatch;
                           }
                           return null;
                         },

@@ -743,3 +743,831 @@ class _AppLocalizationsDelegate
 extension AppLocalizationsBuildContext on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this);
 }
+
+extension AuthScreenLocalizations on AppLocalizations {
+  String get authInvalidInputTitle => _t('authInvalidInputTitle');
+
+  String get authEnterEmailAndPassword => _t('authEnterEmailAndPassword');
+
+  String get authOtpSentTitle => _t('authOtpSentTitle');
+
+  String get authVerifyEmailPrompt => _t('authVerifyEmailPrompt');
+
+  String get authLoginSuccessfulTitle => _t('authLoginSuccessfulTitle');
+
+  String get authWelcomeBack => _t('authWelcomeBack');
+
+  String get authLoginFailedTitle => _t('authLoginFailedTitle');
+
+  String get authCheckCredentials => _t('authCheckCredentials');
+
+  String get authShowPassword => _t('authShowPassword');
+
+  String get authHidePassword => _t('authHidePassword');
+
+  String get authFillAllFields => _t('authFillAllFields');
+
+  String get authPasswordMismatchTitle => _t('authPasswordMismatchTitle');
+
+  String get authPasswordsDoNotMatch => _t('authPasswordsDoNotMatch');
+
+  String get authRegistrationSuccessfulTitle =>
+      _t('authRegistrationSuccessfulTitle');
+
+  String get authAccountCreated => _t('authAccountCreated');
+
+  String get authRegistrationFailedTitle => _t('authRegistrationFailedTitle');
+
+  String get authRegistrationFailed => _t('authRegistrationFailed');
+
+  String get authEmailExample => _t('authEmailExample');
+
+  String get authFirstNameExample => _t('authFirstNameExample');
+
+  String get authLastNameExample => _t('authLastNameExample');
+
+  String get authVerificationSuccessfulTitle =>
+      _t('authVerificationSuccessfulTitle');
+
+  String get authVerificationFailedTitle => _t('authVerificationFailedTitle');
+
+  String get authCodeResentTitle => _t('authCodeResentTitle');
+
+  String get authCheckEmailForNewCode => _t('authCheckEmailForNewCode');
+
+  String get authResendFailedTitle => _t('authResendFailedTitle');
+}
+
+extension CheckoutPaymentLocalizations on AppLocalizations {
+  String get checkoutTitle => _t('checkoutTitle');
+  String get checkoutCourseSummary => _t('checkoutCourseSummary');
+
+  String checkoutStudentsCount(int count) {
+    final String key = count == 1
+        ? 'checkoutStudentsCountOne'
+        : 'checkoutStudentsCountMany';
+    return _t(key).replaceAll('{count}', '$count');
+  }
+
+  String get checkoutPriceBreakdown => _t('checkoutPriceBreakdown');
+  String get checkoutCoursePrice => _t('checkoutCoursePrice');
+
+  String checkoutDiscountPercent(String percent) =>
+      _t('checkoutDiscountPercent').replaceAll('{percent}', percent);
+
+  String get checkoutTotal => _t('checkoutTotal');
+  String get checkoutPromoCode => _t('checkoutPromoCode');
+  String get checkoutPromoCodeHint => _t('checkoutPromoCodeHint');
+  String get checkoutRemove => _t('checkoutRemove');
+  String get checkoutApply => _t('checkoutApply');
+
+  String checkoutCouponCodeApplied(String code) =>
+      _t('checkoutCouponCodeApplied').replaceAll('{code}', code);
+
+  String get checkoutPaymentMethod => _t('checkoutPaymentMethod');
+
+  String checkoutPayWith(String method) =>
+      _t('checkoutPayWith').replaceAll('{method}', method);
+
+  String get checkoutConfirmPayment => _t('checkoutConfirmPayment');
+  String get checkoutPaymentVerificationFailed =>
+      _t('checkoutPaymentVerificationFailed');
+
+  String checkoutFailedToVerifyPayment(String detail) =>
+      _t('checkoutFailedToVerifyPayment').replaceAll('{detail}', detail);
+
+  String checkoutPaymentFailed(String? reason) {
+    final String detail = reason?.trim() ?? '';
+    if (detail.isEmpty) {
+      return _t('checkoutPaymentFailed');
+    }
+
+    return _t('checkoutPaymentFailedWithReason').replaceAll('{reason}', detail);
+  }
+
+  String checkoutPaymentInitializationError(String detail) =>
+      _t('checkoutPaymentInitializationError').replaceAll('{detail}', detail);
+
+  String checkoutPaymentStatus(String? status) {
+    final String normalized = status?.trim().toLowerCase() ?? '';
+    String label;
+
+    switch (normalized) {
+      case 'success':
+      case 'valid':
+        label = _t('checkoutStatusSuccess');
+        break;
+      case 'pending':
+        label = _t('checkoutStatusPending');
+        break;
+      case 'cancelled':
+      case 'canceled':
+        label = _t('checkoutStatusCancelled');
+        break;
+      default:
+        label = _t('checkoutStatusFailed');
+        break;
+    }
+
+    return _t('checkoutPaymentStatus').replaceAll('{status}', label);
+  }
+
+  String checkoutError(String detail) =>
+      _t('checkoutError').replaceAll('{detail}', detail);
+
+  String checkoutStripeError(String? message) {
+    final String detail = message?.trim() ?? '';
+    if (detail.isEmpty) {
+      return _t('checkoutPaymentFailed');
+    }
+
+    return _t('checkoutStripeError').replaceAll('{detail}', detail);
+  }
+
+  String checkoutProviderPayment(String provider) =>
+      _t('checkoutProviderPayment').replaceAll('{provider}', provider);
+
+  String get checkoutInvalidPaypalData => _t('checkoutInvalidPaypalData');
+  String get checkoutPaymentCancelled => _t('checkoutPaymentCancelled');
+  String get checkoutCouponApplied => _t('checkoutCouponApplied');
+  String get checkoutInvalidCoupon => _t('checkoutInvalidCoupon');
+
+  String checkoutCouponValidationFailed(String detail) =>
+      _t('checkoutCouponValidationFailed').replaceAll('{detail}', detail);
+
+  String get checkoutSelectPaymentMethod => _t('checkoutSelectPaymentMethod');
+  String get checkoutLoginRequired => _t('checkoutLoginRequired');
+  String get checkoutEnrollmentFailed => _t('checkoutEnrollmentFailed');
+
+  String get checkoutDuplicateCoursesTitle =>
+      _t('checkoutDuplicateCoursesTitle');
+  String get checkoutCancel => _t('checkoutCancel');
+  String get checkoutProceedAnyway => _t('checkoutProceedAnyway');
+  String get checkoutEnrolled => _t('checkoutEnrolled');
+  String get checkoutFailed => _t('checkoutFailed');
+  String get checkoutEnrollmentRequested => _t('checkoutEnrollmentRequested');
+  String get checkoutBundleTitle => _t('checkoutBundleTitle');
+
+  String checkoutForBundle(String title) =>
+      _t('checkoutForBundle').replaceAll('{title}', title);
+
+  String checkoutTotalAmount(String amount) =>
+      _t('checkoutTotalAmount').replaceAll('{amount}', amount);
+
+  String get checkoutPayOffline => _t('checkoutPayOffline');
+
+  String get enrollmentSuccessTitle => _t('enrollmentSuccessTitle');
+  String get enrollmentSuccessfulTitle => _t('enrollmentSuccessfulTitle');
+  String get enrollmentBundleFallback => _t('enrollmentBundleFallback');
+
+  String enrollmentBundleSuccess(String bundle) =>
+      _t('enrollmentBundleSuccess').replaceAll('{bundle}', bundle);
+
+  String get enrollmentCourseSuccess => _t('enrollmentCourseSuccess');
+  String get enrollmentBundleCoursesTitle => _t('enrollmentBundleCoursesTitle');
+  String get enrollmentCourseDetails => _t('enrollmentCourseDetails');
+  String get enrollmentCourseFallback => _t('enrollmentCourseFallback');
+
+  String enrollmentRatingReviews(String rating, int count) {
+    final String key = count == 1
+        ? 'enrollmentRatingReviewsOne'
+        : 'enrollmentRatingReviewsMany';
+
+    return _t(
+      key,
+    ).replaceAll('{rating}', rating).replaceAll('{count}', '$count');
+  }
+
+  String get enrollmentWhatsIncluded => _t('enrollmentWhatsIncluded');
+
+  String enrollmentVideoLessons(int count) {
+    final String key = count == 1
+        ? 'enrollmentVideoLessonsOne'
+        : 'enrollmentVideoLessonsMany';
+    return _t(key).replaceAll('{count}', '$count');
+  }
+
+  String get enrollmentLifetimeAccess => _t('enrollmentLifetimeAccess');
+  String get enrollmentAssignmentsQuizzes => _t('enrollmentAssignmentsQuizzes');
+  String get enrollmentCertificate => _t('enrollmentCertificate');
+  String get enrollmentStartLearning => _t('enrollmentStartLearning');
+  String get enrollmentEnrolledBadge => _t('enrollmentEnrolledBadge');
+
+  String get offlineUploadReceiptRequired => _t('offlineUploadReceiptRequired');
+  String get offlineEnrollmentRequestFailed =>
+      _t('offlineEnrollmentRequestFailed');
+  String get offlineTransactionDetails => _t('offlineTransactionDetails');
+  String get offlinePaymentTitle => _t('offlinePaymentTitle');
+  String get offlinePaymentDetails => _t('offlinePaymentDetails');
+  String get offlineTransactionReference => _t('offlineTransactionReference');
+  String get offlineTransactionReferenceHint =>
+      _t('offlineTransactionReferenceHint');
+  String get offlineTransactionReferenceRequired =>
+      _t('offlineTransactionReferenceRequired');
+  String get offlinePaymentReceipt => _t('offlinePaymentReceipt');
+  String get offlineUploadReceiptImage => _t('offlineUploadReceiptImage');
+  String get offlineSubmitEnrollmentRequest =>
+      _t('offlineSubmitEnrollmentRequest');
+
+  String get eventPaymentBookingFailed => _t('eventPaymentBookingFailed');
+  String get eventPaymentOrderSummary => _t('eventPaymentOrderSummary');
+  String get eventPaymentEvent => _t('eventPaymentEvent');
+  String get eventPaymentTicketType => _t('eventPaymentTicketType');
+  String get eventPaymentQuantity => _t('eventPaymentQuantity');
+  String get eventPaymentSubtotal => _t('eventPaymentSubtotal');
+  String get eventPaymentServiceFee => _t('eventPaymentServiceFee');
+  String get eventPaymentMethodsTitle => _t('eventPaymentMethodsTitle');
+  String get eventPaymentCardDetails => _t('eventPaymentCardDetails');
+  String get eventPaymentCardHolderName => _t('eventPaymentCardHolderName');
+  String get eventPaymentCardHolderExample =>
+      _t('eventPaymentCardHolderExample');
+  String get eventPaymentCardNumber => _t('eventPaymentCardNumber');
+  String get eventPaymentExpiry => _t('eventPaymentExpiry');
+  String get eventPaymentExpiryHint => _t('eventPaymentExpiryHint');
+  String get eventPaymentCvv => _t('eventPaymentCvv');
+  String get eventPaymentCompleteRegistration =>
+      _t('eventPaymentCompleteRegistration');
+  String get eventPaymentPayNow => _t('eventPaymentPayNow');
+
+  String eventPaymentMethodName(String identifier) {
+    switch (identifier) {
+      case 'card':
+        return _t('eventPaymentMethodCard');
+      case 'paypal':
+        return 'PayPal';
+      case 'apple':
+        return 'Apple Pay';
+      case 'google':
+        return 'Google Pay';
+      default:
+        return identifier;
+    }
+  }
+}
+
+extension CommunityCourseLocalizations on AppLocalizations {
+  String communityErrorLoadingQuestions(Object error) =>
+      _t('communityErrorLoadingQuestions').replaceAll('{error}', '$error');
+
+  String get communityQuestionTitleHint => _t('communityQuestionTitleHint');
+
+  String get communityTagsHint => _t('communityTagsHint');
+
+  String get communityQuestionDescriptionHint =>
+      _t('communityQuestionDescriptionHint');
+
+  String communityErrorLoadingQuestion(Object error) =>
+      _t('communityErrorLoadingQuestion').replaceAll('{error}', '$error');
+
+  String communityFailedPostAnswer(Object error) =>
+      _t('communityFailedPostAnswer').replaceAll('{error}', '$error');
+
+  String get communityAnswerAcceptedMessage =>
+      _t('communityAnswerAcceptedMessage');
+
+  String communityGenericError(Object error) =>
+      _t('communityGenericError').replaceAll('{error}', '$error');
+
+  String get assignmentAttachFileOrComment =>
+      _t('assignmentAttachFileOrComment');
+
+  String get courseSubmissionFailed => _t('courseSubmissionFailed');
+
+  String get quizNoQuestionsFound => _t('quizNoQuestionsFound');
+
+  String communityFailedToVote(Object error) =>
+      _t('communityFailedToVote').replaceAll('{error}', '$error');
+
+  String communityFailedSubmitReply(Object error) =>
+      _t('communityFailedSubmitReply').replaceAll('{error}', '$error');
+
+  String get communityDeleteReplyTitle => _t('communityDeleteReplyTitle');
+
+  String get communityDeleteReplyConfirmation =>
+      _t('communityDeleteReplyConfirmation');
+
+  String get communityCancel => _t('communityCancel');
+
+  String get communityDelete => _t('communityDelete');
+
+  String get communityReplyDeletedSuccessfully =>
+      _t('communityReplyDeletedSuccessfully');
+
+  String communityFailedDeleteReply(Object error) =>
+      _t('communityFailedDeleteReply').replaceAll('{error}', '$error');
+
+  String get communityDiscussionDetailsTitle =>
+      _t('communityDiscussionDetailsTitle');
+
+  String get communityThreadNotFound => _t('communityThreadNotFound');
+
+  String get communityPinned => _t('communityPinned');
+
+  String get communityAnnouncement => _t('communityAnnouncement');
+
+  String get communityDeleteThreadTitle => _t('communityDeleteThreadTitle');
+
+  String get communityDeleteThreadConfirmation =>
+      _t('communityDeleteThreadConfirmation');
+
+  String communityFailedDeleteThread(Object error) =>
+      _t('communityFailedDeleteThread').replaceAll('{error}', '$error');
+
+  String get communityInstructor => _t('communityInstructor');
+
+  String get communityTypeReplyHint => _t('communityTypeReplyHint');
+
+  String get communityAskQuestionOrPostTopic =>
+      _t('communityAskQuestionOrPostTopic');
+
+  String get communityTitleLabel => _t('communityTitleLabel');
+
+  String get communityQuestionAboutHint => _t('communityQuestionAboutHint');
+
+  String get communityTitleRequired => _t('communityTitleRequired');
+
+  String get communityContentDetailsLabel => _t('communityContentDetailsLabel');
+
+  String get communityContentDetailsHint => _t('communityContentDetailsHint');
+
+  String get communityContentDetailsRequired =>
+      _t('communityContentDetailsRequired');
+
+  String communityFailedPostThread(Object error) =>
+      _t('communityFailedPostThread').replaceAll('{error}', '$error');
+
+  String get communityPostThread => _t('communityPostThread');
+
+  String get communitySearchDiscussionsHint =>
+      _t('communitySearchDiscussionsHint');
+}
+
+extension ProfileSettingsLocalizations on AppLocalizations {
+  String get profileDeleteAccountTitle => _t('profileDeleteAccountTitle');
+
+  String get profileDeleteAccountConfirmation =>
+      _t('profileDeleteAccountConfirmation');
+
+  String get profileCancel => _t('profileCancel');
+
+  String get profileDelete => _t('profileDelete');
+
+  String get profileDeletionRequestSubmitted =>
+      _t('profileDeletionRequestSubmitted');
+
+  String profileErrorWithDetails(Object error) =>
+      _t('profileErrorWithDetails').replaceAll('{error}', '$error');
+
+  String get profileAccountSection => _t('profileAccountSection');
+
+  String get profileEditTitle => _t('profileEditTitle');
+
+  String get profileEditSubtitle => _t('profileEditSubtitle');
+
+  String get profileChangePasswordTitle => _t('profileChangePasswordTitle');
+
+  String get profileChangePasswordSubtitle =>
+      _t('profileChangePasswordSubtitle');
+
+  String get profileDeletionPendingTitle => _t('profileDeletionPendingTitle');
+
+  String get profileAwaitingAdminApproval => _t('profileAwaitingAdminApproval');
+
+  String get profileDeleteAccountSubtitle => _t('profileDeleteAccountSubtitle');
+
+  String get profileDeletionPendingMessage =>
+      _t('profileDeletionPendingMessage');
+
+  String get profilePrivacySecuritySection =>
+      _t('profilePrivacySecuritySection');
+
+  String get profileNoPagesAvailable => _t('profileNoPagesAvailable');
+
+  String profileViewPage(String title) =>
+      _t('profileViewPage').replaceAll('{title}', title);
+
+  String get profileRateAppTitle => _t('profileRateAppTitle');
+
+  String get profileRateAppSubtitle => _t('profileRateAppSubtitle');
+
+  String get profileShareAppTitle => _t('profileShareAppTitle');
+
+  String get profileShareAppSubtitle => _t('profileShareAppSubtitle');
+
+  String profileFailedToLoadSettings(Object error) =>
+      _t('profileFailedToLoadSettings').replaceAll('{error}', '$error');
+
+  String profileFailedToUpdateSettings(Object error) =>
+      _t('profileFailedToUpdateSettings').replaceAll('{error}', '$error');
+
+  String get profileNotificationSettingsSection =>
+      _t('profileNotificationSettingsSection');
+
+  String get profileEmailNotificationsTitle =>
+      _t('profileEmailNotificationsTitle');
+
+  String get profileEmailNotificationsSubtitle =>
+      _t('profileEmailNotificationsSubtitle');
+
+  String get profileCourseRemindersTitle => _t('profileCourseRemindersTitle');
+
+  String get profileCourseRemindersSubtitle =>
+      _t('profileCourseRemindersSubtitle');
+
+  String get profileProgressReportsTitle => _t('profileProgressReportsTitle');
+
+  String get profileProgressReportsSubtitle =>
+      _t('profileProgressReportsSubtitle');
+
+  String get profileMarketingEmailsTitle => _t('profileMarketingEmailsTitle');
+
+  String get profileMarketingEmailsSubtitle =>
+      _t('profileMarketingEmailsSubtitle');
+
+  String get profileDownloadingReceipt => _t('profileDownloadingReceipt');
+
+  String get profileReceiptDownloaded => _t('profileReceiptDownloaded');
+
+  String get profileReceiptDownloadFailed => _t('profileReceiptDownloadFailed');
+
+  String get profileOpen => _t('profileOpen');
+
+  String get profileDownloadReceipt => _t('profileDownloadReceipt');
+
+  String get profilePaymentDetailsTitle => _t('profilePaymentDetailsTitle');
+
+  String get profileTransactionDetailsTitle =>
+      _t('profileTransactionDetailsTitle');
+
+  String get profileCourseLabel => _t('profileCourseLabel');
+
+  String get profileDateLabel => _t('profileDateLabel');
+
+  String get profilePaymentMethodLabel => _t('profilePaymentMethodLabel');
+
+  String get profileTransactionIdLabel => _t('profileTransactionIdLabel');
+
+  String get profileDiscountLabel => _t('profileDiscountLabel');
+
+  String get profilePromoCodeLabel => _t('profilePromoCodeLabel');
+
+  String get profileAllPayments => _t('profileAllPayments');
+
+  String profileNoPaymentsFor(String paymentMethod) =>
+      _t('profileNoPaymentsFor').replaceAll('{paymentMethod}', paymentMethod);
+
+  String profilePaymentStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return _t('profileStatusCompleted');
+      case 'pending':
+        return _t('profileStatusPending');
+      case 'failed':
+        return _t('profileStatusFailed');
+      case 'refunded':
+        return _t('profileStatusRefunded');
+      case 'cancelled':
+      case 'canceled':
+        return _t('profileStatusCancelled');
+      default:
+        return status.trim().isEmpty ? _t('profileStatusUnknown') : status;
+    }
+  }
+
+  String get profilePhotoUpdated => _t('profilePhotoUpdated');
+
+  String profilePhotoUploadFailed(Object error) =>
+      _t('profilePhotoUploadFailed').replaceAll('{error}', '$error');
+
+  String get profileUpdated => _t('profileUpdated');
+
+  String get profileFirstNameHint => _t('profileFirstNameHint');
+
+  String get profileFirstNameRequired => _t('profileFirstNameRequired');
+
+  String get profileLastNameHint => _t('profileLastNameHint');
+
+  String get profileLastNameRequired => _t('profileLastNameRequired');
+
+  String get profileEmailHint => _t('profileEmailHint');
+
+  String get profileEmailRequired => _t('profileEmailRequired');
+
+  String get profileEmailInvalid => _t('profileEmailInvalid');
+
+  String get profilePhoneNumberLabel => _t('profilePhoneNumberLabel');
+
+  String get profilePhoneNumberHint => _t('profilePhoneNumberHint');
+
+  String get profileBioLabel => _t('profileBioLabel');
+
+  String get profileBioHint => _t('profileBioHint');
+
+  String get profileSaveChanges => _t('profileSaveChanges');
+
+  String get profilePasswordUpdated => _t('profilePasswordUpdated');
+
+  String get profileChangePasswordDescription =>
+      _t('profileChangePasswordDescription');
+
+  String get profileCurrentPasswordLabel => _t('profileCurrentPasswordLabel');
+
+  String get profileCurrentPasswordHint => _t('profileCurrentPasswordHint');
+
+  String get profileCurrentPasswordRequired =>
+      _t('profileCurrentPasswordRequired');
+
+  String get profileNewPasswordHint => _t('profileNewPasswordHint');
+
+  String get profileNewPasswordRequired => _t('profileNewPasswordRequired');
+
+  String get profilePasswordMinLength => _t('profilePasswordMinLength');
+
+  String get profileConfirmPasswordHint => _t('profileConfirmPasswordHint');
+
+  String get profileConfirmPasswordRequired =>
+      _t('profileConfirmPasswordRequired');
+
+  String get profilePasswordsDoNotMatch => _t('profilePasswordsDoNotMatch');
+
+  String get profileRatingThanks => _t('profileRatingThanks');
+
+  String get profileRateOurAppTitle => _t('profileRateOurAppTitle');
+
+  String get profileRateExperienceQuestion =>
+      _t('profileRateExperienceQuestion');
+
+  String get profileFeedbackHint => _t('profileFeedbackHint');
+
+  String get profileRateOnStore => _t('profileRateOnStore');
+
+  String get profileSubmitRating => _t('profileSubmitRating');
+
+  String get profileMaybeLater => _t('profileMaybeLater');
+}
+
+extension FinalResidualLocalizations on AppLocalizations {
+  String get residualAbout => _t('residualAbout');
+
+  String get residualAiSuggestions => _t('residualAiSuggestions');
+
+  String get residualAnonymous => _t('residualAnonymous');
+
+  String get residualApplyFilter => _t('residualApplyFilter');
+
+  String get residualAverageRating => _t('residualAverageRating');
+
+  String get residualBookings => _t('residualBookings');
+
+  String residualCertificateDownloadedTo(String path) {
+    return _t('residualCertificateDownloadedTo').replaceAll('{path}', '$path');
+  }
+
+  String get residualClear => _t('residualClear');
+
+  String get residualConnectionError => _t('residualConnectionError');
+
+  String get residualCouldNotLaunchDownloadUrl =>
+      _t('residualCouldNotLaunchDownloadUrl');
+
+  String get residualCouldNotOpenMaps => _t('residualCouldNotOpenMaps');
+
+  String get residualCourseBundles => _t('residualCourseBundles');
+
+  String residualCourseCount(int count) {
+    return _t('residualCourseCount').replaceAll('{count}', '$count');
+  }
+
+  String get residualCourses => _t('residualCourses');
+
+  String get residualDays => _t('residualDays');
+
+  String residualDownloadFailed(String error) {
+    return _t('residualDownloadFailed').replaceAll('{error}', '$error');
+  }
+
+  String get residualDownloading => _t('residualDownloading');
+
+  String get residualEndDate => _t('residualEndDate');
+
+  String get residualEndTime => _t('residualEndTime');
+
+  String residualErrorWithMessage(String message) {
+    return _t('residualErrorWithMessage').replaceAll('{message}', '$message');
+  }
+
+  String get residualEvent => _t('residualEvent');
+
+  String get residualEventInformation => _t('residualEventInformation');
+
+  String get residualEventSpeakers => _t('residualEventSpeakers');
+
+  String get residualFailedToDownloadCertificate =>
+      _t('residualFailedToDownloadCertificate');
+
+  String get residualFailedToLoadBundles => _t('residualFailedToLoadBundles');
+
+  String get residualFailedToLoadData => _t('residualFailedToLoadData');
+
+  String get residualFailedToLoadInstructor =>
+      _t('residualFailedToLoadInstructor');
+
+  String get residualFailedToLoadInstructors =>
+      _t('residualFailedToLoadInstructors');
+
+  String get residualFailedToOpenMeetingLink =>
+      _t('residualFailedToOpenMeetingLink');
+
+  String get residualFree => _t('residualFree');
+
+  String residualGoingCount(int count) {
+    return _t('residualGoingCount').replaceAll('{count}', '$count');
+  }
+
+  String get residualGuest => _t('residualGuest');
+
+  String get residualHours => _t('residualHours');
+
+  String residualHoursRange(String range) {
+    return _t('residualHoursRange').replaceAll('{range}', '$range');
+  }
+
+  String get residualInstructor => _t('residualInstructor');
+
+  String get residualInstructors => _t('residualInstructors');
+
+  String get residualJoinLiveClass => _t('residualJoinLiveClass');
+
+  String get residualLiveNow => _t('residualLiveNow');
+
+  String get residualMeetingDetailsJoin => _t('residualMeetingDetailsJoin');
+
+  String get residualMinutes => _t('residualMinutes');
+
+  String residualMinutesShort(int count) {
+    return _t('residualMinutesShort').replaceAll('{count}', '$count');
+  }
+
+  String get residualMostRecent => _t('residualMostRecent');
+
+  String get residualNoBioAvailable => _t('residualNoBioAvailable');
+
+  String get residualNoBundlesAvailable => _t('residualNoBundlesAvailable');
+
+  String residualNoBundlesFor(String query) {
+    return _t('residualNoBundlesFor').replaceAll('{query}', '$query');
+  }
+
+  String get residualNoCategoriesAvailable =>
+      _t('residualNoCategoriesAvailable');
+
+  String get residualNoDataFound => _t('residualNoDataFound');
+
+  String get residualNoInstructorsFound => _t('residualNoInstructorsFound');
+
+  String get residualOnline => _t('residualOnline');
+
+  String get residualOops => _t('residualOops');
+
+  String get residualOpen => _t('residualOpen');
+
+  String get residualOrganizer => _t('residualOrganizer');
+
+  String get residualRating => _t('residualRating');
+
+  String get residualReadLess => _t('residualReadLess');
+
+  String get residualReadMore => _t('residualReadMore');
+
+  String get residualRemainingSeats => _t('residualRemainingSeats');
+
+  String get residualRetry => _t('residualRetry');
+
+  String get residualReviews => _t('residualReviews');
+
+  String residualReviewsCount(int count) {
+    return _t('residualReviewsCount').replaceAll('{count}', '$count');
+  }
+
+  String residualScheduledFor(String date) {
+    return _t('residualScheduledFor').replaceAll('{date}', '$date');
+  }
+
+  String get residualSearchBundles => _t('residualSearchBundles');
+
+  String get residualSeconds => _t('residualSeconds');
+
+  String get residualSeeAllInfo => _t('residualSeeAllInfo');
+
+  String get residualSeeLocationOnMaps => _t('residualSeeLocationOnMaps');
+
+  String get residualSendMessage => _t('residualSendMessage');
+
+  String residualServerError(int code) {
+    return _t('residualServerError').replaceAll('{code}', '$code');
+  }
+
+  String residualShareEvent(String title, String url) {
+    return _t(
+      'residualShareEvent',
+    ).replaceAll('{title}', '$title').replaceAll('{url}', '$url');
+  }
+
+  String get residualShowLess => _t('residualShowLess');
+
+  String get residualSomethingWentWrong => _t('residualSomethingWentWrong');
+
+  String get residualSpeaker => _t('residualSpeaker');
+
+  String get residualStartDate => _t('residualStartDate');
+
+  String get residualStartTime => _t('residualStartTime');
+
+  String get residualStoragePermissionRequired =>
+      _t('residualStoragePermissionRequired');
+
+  String get residualStudent => _t('residualStudent');
+
+  String get residualStudents => _t('residualStudents');
+
+  String get residualTapToJoinLive => _t('residualTapToJoinLive');
+
+  String get residualTaskChemistryLabReport =>
+      _t('residualTaskChemistryLabReport');
+
+  String get residualTaskCompleteChapterExercises =>
+      _t('residualTaskCompleteChapterExercises');
+
+  String get residualTaskCompleted => _t('residualTaskCompleted');
+
+  String get residualTaskDraftEssay => _t('residualTaskDraftEssay');
+
+  String get residualTaskEnglishEssay => _t('residualTaskEnglishEssay');
+
+  String get residualTaskHistoryReading => _t('residualTaskHistoryReading');
+
+  String get residualTaskInProgress => _t('residualTaskInProgress');
+
+  String get residualTaskMathematicsAssignment =>
+      _t('residualTaskMathematicsAssignment');
+
+  String get residualTaskPending => _t('residualTaskPending');
+
+  String get residualTaskPhysicsProblemSet =>
+      _t('residualTaskPhysicsProblemSet');
+
+  String get residualTaskReadChapterNotes => _t('residualTaskReadChapterNotes');
+
+  String get residualTaskSolveProblems => _t('residualTaskSolveProblems');
+
+  String get residualTaskWriteExperimentResults =>
+      _t('residualTaskWriteExperimentResults');
+
+  String get residualTbd => _t('residualTbd');
+
+  String get residualTicketPrice => _t('residualTicketPrice');
+
+  String residualTotalCount(int count) {
+    return _t('residualTotalCount').replaceAll('{count}', '$count');
+  }
+
+  String get residualTotalSeats => _t('residualTotalSeats');
+
+  String get residualTryAgain => _t('residualTryAgain');
+
+  String get residualUnlimited => _t('residualUnlimited');
+
+  String get residualUpcomingLive => _t('residualUpcomingLive');
+
+  String get residualUser => _t('residualUser');
+
+  String get residualView => _t('residualView');
+
+  String get residualWhatYouWillExperience =>
+      _t('residualWhatYouWillExperience');
+}
+
+extension DynamicLegalPageLocalizations on AppLocalizations {
+  String get profilePrivacyPolicyTitle => _t('profilePrivacyPolicyTitle');
+
+  String get profileTermsConditionsTitle => _t('profileTermsConditionsTitle');
+
+  String get profileGdprComplianceTitle => _t('profileGdprComplianceTitle');
+
+  String get profileFailedLoadLegalContent =>
+      _t('profileFailedLoadLegalContent');
+}
+
+extension FinalMultilingualClosureLocalizations on AppLocalizations {
+  String get aiChatHistoryLoadFailed => _t('aiChatHistoryLoadFailed');
+  String get aiChatServerError => _t('aiChatServerError');
+  String get aiChatConnectionError => _t('aiChatConnectionError');
+  String get aiChatSendFailed => _t('aiChatSendFailed');
+  String get unknownErrorOccurred => _t('unknownErrorOccurred');
+  String get noUpcomingEvents => _t('noUpcomingEvents');
+  String get checkBackLaterForNewEvents => _t('checkBackLaterForNewEvents');
+  String get noPastEvents => _t('noPastEvents');
+  String get noAttendedEventsYet => _t('noAttendedEventsYet');
+  String get noEventsAvailable => _t('noEventsAvailable');
+  String get noEventsAvailableNow => _t('noEventsAvailableNow');
+}

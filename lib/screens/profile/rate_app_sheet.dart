@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 void showRateAppSheet(BuildContext context) {
   showModalBottomSheet<void>(
@@ -47,7 +48,7 @@ class _RateAppSheetState extends State<_RateAppSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Thank you for your rating!',
+              context.l10n.profileRatingThanks,
               style: TextStyle(color: AppTheme.getTextColor(context)),
             ),
             backgroundColor: AppTheme.getCardColor(context),
@@ -112,7 +113,7 @@ class _RateAppSheetState extends State<_RateAppSheet> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Rate Our App',
+                context.l10n.profileRateOurAppTitle,
                 style: TextStyle(
                   color: AppTheme.getTextColor(context),
                   fontSize: 24,
@@ -121,7 +122,7 @@ class _RateAppSheetState extends State<_RateAppSheet> {
               ),
               const SizedBox(height: 8),
               Text(
-                'How would you rate your experience?',
+                context.l10n.profileRateExperienceQuestion,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
@@ -167,7 +168,7 @@ class _RateAppSheetState extends State<_RateAppSheet> {
                     controller: _feedbackController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText: 'Tell us how we can improve...',
+                      hintText: context.l10n.profileFeedbackHint,
                       filled: true,
                       fillColor: Theme.of(context).brightness == Brightness.dark
                           ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -221,8 +222,8 @@ class _RateAppSheetState extends State<_RateAppSheet> {
                   ),
                   child: Text(
                     _selectedRating == 5
-                        ? 'Rate on App Store'
-                        : 'Submit Rating',
+                        ? context.l10n.profileRateOnStore
+                        : context.l10n.profileSubmitRating,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -231,7 +232,7 @@ class _RateAppSheetState extends State<_RateAppSheet> {
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
                 child: Text(
-                  'Maybe Later',
+                  context.l10n.profileMaybeLater,
                   style: TextStyle(
                     color: AppTheme.getTextColor(
                       context,

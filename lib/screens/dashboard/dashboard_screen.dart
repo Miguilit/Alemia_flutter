@@ -63,10 +63,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Error: ${dashboard.error}'),
+                  Text(
+                    context.l10n.residualErrorWithMessage(
+                      dashboard.error.toString(),
+                    ),
+                  ),
                   ElevatedButton(
                     onPressed: _loadData,
-                    child: const Text('Retry'),
+                    child: Text(context.l10n.residualRetry),
                   ),
                 ],
               ),
@@ -128,7 +132,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               margin: const EdgeInsets.only(bottom: 24),
                             ),
                           ],
-                          if (data != null && data.continueLearning.isNotEmpty) ...[
+                          if (data != null &&
+                              data.continueLearning.isNotEmpty) ...[
                             Text(
                               context.l10n.continueLearning,
                               style: TextStyle(
@@ -143,7 +148,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               courseId: data.continueLearning.first.courseId,
                               courseTitle: data.continueLearning.first.title,
                               progress: data.continueLearning.first.progress,
-                              nextLesson: data.continueLearning.first.nextLesson,
+                              nextLesson:
+                                  data.continueLearning.first.nextLesson,
                               imageUrl: data.continueLearning.first.image,
                             ),
                             const SizedBox(height: 28),
@@ -151,45 +157,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                           // Stats Cards
                           LayoutBuilder(
-                            builder: (
-                                BuildContext context,
-                                BoxConstraints constraints,
+                            builder:
+                                (
+                                  BuildContext context,
+                                  BoxConstraints constraints,
                                 ) {
-                              final bool compact = constraints.maxWidth < 340;
+                                  final bool compact =
+                                      constraints.maxWidth < 340;
 
-                              return GridView.count(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                crossAxisCount: compact ? 1 : 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: compact ? 2.55 : 1.15,
-                                children: <Widget>[
-                                  _StatCard(
-                                    title: context.l10n.totalCourses,
-                                    value: stats?.totalCourses.toString() ?? '0',
-                                    icon: HugeIcons.strokeRoundedBook01,
-                                    color: AppTheme.gold,
-                                    onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        AppRouter.myCourses,
-                                      );
-                                    },
-                                  ),
-                                  _StatCard(
-                                    title: context.l10n.completedCourses,
-                                    value: stats?.completedCourses.toString() ?? '0',
-                                    icon: Icons.check_circle,
-                                    color: AppTheme.success,
-                                    onTap: () {
-                                      Navigator.of(context).pushNamed(
-                                        AppRouter.myCourses,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
+                                  return GridView.count(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    crossAxisCount: compact ? 1 : 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    childAspectRatio: compact ? 2.55 : 1.15,
+                                    children: <Widget>[
+                                      _StatCard(
+                                        title: context.l10n.totalCourses,
+                                        value:
+                                            stats?.totalCourses.toString() ??
+                                            '0',
+                                        icon: HugeIcons.strokeRoundedBook01,
+                                        color: AppTheme.gold,
+                                        onTap: () {
+                                          Navigator.of(
+                                            context,
+                                          ).pushNamed(AppRouter.myCourses);
+                                        },
+                                      ),
+                                      _StatCard(
+                                        title: context.l10n.completedCourses,
+                                        value:
+                                            stats?.completedCourses
+                                                .toString() ??
+                                            '0',
+                                        icon: Icons.check_circle,
+                                        color: AppTheme.success,
+                                        onTap: () {
+                                          Navigator.of(
+                                            context,
+                                          ).pushNamed(AppRouter.myCourses);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
                           ),
                           const SizedBox(height: 32),
                           // Learning Activity Chart
@@ -236,7 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 route: AppRouter.certificates,
                               ),
                               _QuickAccessItem(
-                                title: 'Bookings',
+                                title: context.l10n.residualBookings,
                                 icon: HugeIcons.strokeRoundedTicket01,
                                 route: AppRouter.myTicketBookings,
                               ),
@@ -252,7 +266,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ],
                           ),
-                          if (data != null && data.continueLearning.length > 1) ...[
+                          if (data != null &&
+                              data.continueLearning.length > 1) ...[
                             const SizedBox(height: 32),
                             // Continue Learning Section
                             Text(
@@ -299,10 +314,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 BoxDecoration _dashboardCardDecoration(
-    BuildContext context, {
-      double radius = 20,
-      Color? borderColor,
-    }) {
+  BuildContext context, {
+  double radius = 20,
+  Color? borderColor,
+}) {
   final bool isDark = AppTheme.isDark(context);
 
   return BoxDecoration(
@@ -314,9 +329,7 @@ BoxDecoration _dashboardCardDecoration(
     ),
     boxShadow: <BoxShadow>[
       BoxShadow(
-        color: Colors.black.withValues(
-          alpha: isDark ? 0.24 : 0.055,
-        ),
+        color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.055),
         blurRadius: 20,
         spreadRadius: -6,
         offset: const Offset(0, 8),
@@ -346,10 +359,7 @@ class _StatCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: _dashboardCardDecoration(
-          context,
-          radius: 20,
-        ),
+        decoration: _dashboardCardDecoration(context, radius: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -362,16 +372,8 @@ class _StatCard extends StatelessWidget {
               ),
               child: Center(
                 child: icon is IconData
-                    ? Icon(
-                        icon as IconData,
-                        size: 20,
-                        color: color,
-                    )
-                    : HugeIcon(
-                        icon: icon,
-                        size: 20,
-                        color: color,
-                    ),
+                    ? Icon(icon as IconData, size: 20, color: color)
+                    : HugeIcon(icon: icon, size: 20, color: color),
               ),
             ),
             const SizedBox(height: 12),
@@ -427,10 +429,7 @@ class _QuickAccessGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (
-          BuildContext context,
-          BoxConstraints constraints,
-          ) {
+      builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact = constraints.maxWidth < 350;
         final int columnCount = compact ? 2 : 3;
 
@@ -457,10 +456,7 @@ class _QuickAccessGrid extends StatelessWidget {
                 },
                 borderRadius: BorderRadius.circular(18),
                 child: Ink(
-                  decoration: _dashboardCardDecoration(
-                    context,
-                    radius: 18,
-                  ),
+                  decoration: _dashboardCardDecoration(context, radius: 18),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
@@ -476,23 +472,24 @@ class _QuickAccessGrid extends StatelessWidget {
                             color: AppTheme.getMint100(context),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: AppTheme.getAccentColor(context)
-                                  .withValues(alpha: 0.22),
+                              color: AppTheme.getAccentColor(
+                                context,
+                              ).withValues(alpha: 0.22),
                               width: 0.8,
                             ),
                           ),
                           alignment: Alignment.center,
                           child: item.icon is IconData
                               ? Icon(
-                            item.icon as IconData,
-                            size: 24,
-                            color: AppTheme.getAccentColor(context),
-                          )
+                                  item.icon as IconData,
+                                  size: 24,
+                                  color: AppTheme.getAccentColor(context),
+                                )
                               : HugeIcon(
-                            icon: item.icon,
-                            size: 24,
-                            color: AppTheme.getAccentColor(context),
-                          ),
+                                  icon: item.icon,
+                                  size: 24,
+                                  color: AppTheme.getAccentColor(context),
+                                ),
                         ),
                         const SizedBox(height: 9),
                         Flexible(
@@ -602,23 +599,24 @@ class _ContinueLearningHeroCard extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     child: imageUrl != null && imageUrl!.isNotEmpty
                         ? Image.network(
-                      AppConfig.getImageUrl(imageUrl),
-                      fit: BoxFit.cover,
-                      errorBuilder: (
-                          BuildContext context,
-                          Object error,
-                          StackTrace? stackTrace,
-                          ) {
-                        return Image.asset(
-                          'assets/img/banner.png',
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
+                            AppConfig.getImageUrl(imageUrl),
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (
+                                  BuildContext context,
+                                  Object error,
+                                  StackTrace? stackTrace,
+                                ) {
+                                  return Image.asset(
+                                    'assets/img/banner.png',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                          )
                         : Image.asset(
-                      'assets/img/banner.png',
-                      fit: BoxFit.cover,
-                    ),
+                            'assets/img/banner.png',
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -682,8 +680,7 @@ class _ContinueLearningHeroCard extends StatelessWidget {
                             backgroundColor: Colors.white.withValues(
                               alpha: 0.12,
                             ),
-                            valueColor:
-                            const AlwaysStoppedAnimation<Color>(
+                            valueColor: const AlwaysStoppedAnimation<Color>(
                               AppTheme.goldLight,
                             ),
                           ),
@@ -694,7 +691,7 @@ class _ContinueLearningHeroCard extends StatelessWidget {
                             Expanded(
                               child: Text(
                                 '${(safeProgress * 100).toStringAsFixed(0)}% '
-                                    '${context.l10n.complete}',
+                                '${context.l10n.complete}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -763,10 +760,7 @@ class _ContinueLearningCard extends StatelessWidget {
       },
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: _dashboardCardDecoration(
-          context,
-          radius: 20,
-        ),
+        decoration: _dashboardCardDecoration(context, radius: 20),
         child: Row(
           children: <Widget>[
             Container(
@@ -862,10 +856,7 @@ class _LearningActivityChart extends StatelessWidget {
       return Container(
         height: 100,
         padding: const EdgeInsets.all(20),
-        decoration: _dashboardCardDecoration(
-          context,
-          radius: 20,
-        ),
+        decoration: _dashboardCardDecoration(context, radius: 20),
         alignment: Alignment.center,
         child: Text(
           context.l10n.noActivity,
@@ -884,10 +875,7 @@ class _LearningActivityChart extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _dashboardCardDecoration(
-        context,
-        radius: 20,
-      ),
+      decoration: _dashboardCardDecoration(context, radius: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -968,7 +956,9 @@ class _LearningActivityChart extends StatelessWidget {
                               end: Alignment.bottomCenter,
                               colors: [
                                 AppTheme.getAccentColor(context),
-                                AppTheme.getAccentColor(context).withValues(alpha: 0.55),
+                                AppTheme.getAccentColor(
+                                  context,
+                                ).withValues(alpha: 0.55),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(6),

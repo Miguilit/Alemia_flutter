@@ -246,8 +246,8 @@ class _LoginFormState extends State<_LoginForm> {
         context: context,
         type: ToastificationType.warning,
         style: ToastificationStyle.fillColored,
-        title: const Text('Invalid Input'),
-        description: const Text('Please enter both email and password'),
+        title: Text(context.l10n.authInvalidInputTitle),
+        description: Text(context.l10n.authEnterEmailAndPassword),
         alignment: Alignment.bottomCenter,
         autoCloseDuration: const Duration(seconds: 3),
       );
@@ -264,8 +264,10 @@ class _LoginFormState extends State<_LoginForm> {
           context: context,
           type: ToastificationType.info,
           style: ToastificationStyle.fillColored,
-          title: const Text('OTP Sent'),
-          description: Text(result['message'] ?? 'Please verify your email'),
+          title: Text(context.l10n.authOtpSentTitle),
+          description: Text(
+            result['message'] ?? context.l10n.authVerifyEmailPrompt,
+          ),
           alignment: Alignment.bottomCenter,
           autoCloseDuration: const Duration(seconds: 3),
         );
@@ -281,8 +283,8 @@ class _LoginFormState extends State<_LoginForm> {
           context: context,
           type: ToastificationType.success,
           style: ToastificationStyle.fillColored,
-          title: const Text('Login Successful'),
-          description: Text(result['message'] ?? 'Welcome back!'),
+          title: Text(context.l10n.authLoginSuccessfulTitle),
+          description: Text(result['message'] ?? context.l10n.authWelcomeBack),
           alignment: Alignment.bottomCenter,
           autoCloseDuration: const Duration(seconds: 3),
         );
@@ -296,8 +298,10 @@ class _LoginFormState extends State<_LoginForm> {
         context: context,
         type: ToastificationType.error,
         style: ToastificationStyle.fillColored,
-        title: const Text('Login Failed'),
-        description: Text(result['message'] ?? 'Please check your credentials'),
+        title: Text(context.l10n.authLoginFailedTitle),
+        description: Text(
+          result['message'] ?? context.l10n.authCheckCredentials,
+        ),
         alignment: Alignment.bottomCenter,
         autoCloseDuration: const Duration(seconds: 4),
       );
@@ -321,7 +325,7 @@ class _LoginFormState extends State<_LoginForm> {
             controller: _emailController,
             decoration: InputDecoration(
               labelText: context.l10n.email,
-              hintText: 'tom@mail.com',
+              hintText: context.l10n.authEmailExample,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -418,7 +422,9 @@ class _LoginFormState extends State<_LoginForm> {
                     ),
                   ),
                   child: Text(
-                    'Show',
+                    widget.isPasswordVisible
+                        ? context.l10n.authHidePassword
+                        : context.l10n.authShowPassword,
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 14,
@@ -561,8 +567,8 @@ class _SignUpFormState extends State<_SignUpForm> {
       toastification.show(
         context: context,
         type: ToastificationType.warning,
-        title: const Text('Invalid Input'),
-        description: const Text('Please fill all fields'),
+        title: Text(context.l10n.authInvalidInputTitle),
+        description: Text(context.l10n.authFillAllFields),
         autoCloseDuration: const Duration(seconds: 3),
       );
       return;
@@ -572,8 +578,8 @@ class _SignUpFormState extends State<_SignUpForm> {
       toastification.show(
         context: context,
         type: ToastificationType.warning,
-        title: const Text('Password Mismatch'),
-        description: const Text('Passwords do not match'),
+        title: Text(context.l10n.authPasswordMismatchTitle),
+        description: Text(context.l10n.authPasswordsDoNotMatch),
         autoCloseDuration: const Duration(seconds: 3),
       );
       return;
@@ -596,8 +602,8 @@ class _SignUpFormState extends State<_SignUpForm> {
       toastification.show(
         context: context,
         type: ToastificationType.success,
-        title: const Text('Registration Successful'),
-        description: Text(result['message'] ?? 'Account created successfully'),
+        title: Text(context.l10n.authRegistrationSuccessfulTitle),
+        description: Text(result['message'] ?? context.l10n.authAccountCreated),
         autoCloseDuration: const Duration(seconds: 3),
       );
 
@@ -605,7 +611,8 @@ class _SignUpFormState extends State<_SignUpForm> {
         MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
     } else {
-      String errorMessage = result['message'] ?? 'Registration failed';
+      String errorMessage =
+          result['message'] ?? context.l10n.authRegistrationFailed;
       if (result['errors'] != null) {
         // You might want to format errors better here
         errorMessage = result['message'];
@@ -614,7 +621,7 @@ class _SignUpFormState extends State<_SignUpForm> {
       toastification.show(
         context: context,
         type: ToastificationType.error,
-        title: const Text('Registration Failed'),
+        title: Text(context.l10n.authRegistrationFailedTitle),
         description: Text(errorMessage),
         autoCloseDuration: const Duration(seconds: 4),
       );
@@ -634,7 +641,7 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _firstNameController,
             decoration: InputDecoration(
               labelText: context.l10n.firstName,
-              hintText: 'John',
+              hintText: context.l10n.authFirstNameExample,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -678,7 +685,7 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _lastNameController,
             decoration: InputDecoration(
               labelText: context.l10n.lastName,
-              hintText: 'Doe',
+              hintText: context.l10n.authLastNameExample,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -722,7 +729,7 @@ class _SignUpFormState extends State<_SignUpForm> {
             controller: _emailController,
             decoration: InputDecoration(
               labelText: context.l10n.email,
-              hintText: 'john@mail.com',
+              hintText: context.l10n.authEmailExample,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? AppTheme.surfaceDark.withValues(alpha: 0.5)
@@ -819,7 +826,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                     ),
                   ),
                   child: Text(
-                    'Show',
+                    widget.isPasswordVisible
+                        ? context.l10n.authHidePassword
+                        : context.l10n.authShowPassword,
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 14,
@@ -894,7 +903,9 @@ class _SignUpFormState extends State<_SignUpForm> {
                     ),
                   ),
                   child: Text(
-                    'Show',
+                    widget.isPasswordVisible
+                        ? context.l10n.authHidePassword
+                        : context.l10n.authShowPassword,
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 14,

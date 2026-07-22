@@ -45,9 +45,11 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading question: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.l10n.communityErrorLoadingQuestion(e)),
+          ),
+        );
       }
     }
   }
@@ -65,9 +67,9 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       _scrollToBottom();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to post answer: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.communityFailedPostAnswer(e))),
+        );
       }
     }
   }
@@ -77,15 +79,15 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       await _service.acceptAnswer(answerId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Answer marked as accepted')),
+          SnackBar(content: Text(context.l10n.communityAnswerAcceptedMessage)),
         );
         _fetchQuestionDetails(); // Refresh
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.communityGenericError(e))),
+        );
       }
     }
   }

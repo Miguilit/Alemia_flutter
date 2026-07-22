@@ -45,6 +45,21 @@ class _AiChatScreenState extends State<AiChatScreen> {
     }
   }
 
+  String _localizedProviderError(BuildContext context, String errorCode) {
+    switch (errorCode) {
+      case 'history_load_failed':
+        return context.l10n.aiChatHistoryLoadFailed;
+      case 'server_error':
+        return context.l10n.aiChatServerError;
+      case 'connection_error':
+        return context.l10n.aiChatConnectionError;
+      case 'send_failed':
+        return context.l10n.aiChatSendFailed;
+      default:
+        return context.l10n.aiChatServerError;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +79,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Nova - AI Assistant',
+              context.l10n.novaAiAssistant,
               style: TextStyle(
                 color: AppTheme.getTextColor(context),
                 fontSize: 18,
@@ -110,11 +125,14 @@ class _AiChatScreenState extends State<AiChatScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(provider.error!),
+                        Text(
+                          _localizedProviderError(context, provider.error!),
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () => provider.fetchHistory(),
-                          child: const Text('Try Again'),
+                          child: Text(context.l10n.residualTryAgain),
                         ),
                       ],
                     ),

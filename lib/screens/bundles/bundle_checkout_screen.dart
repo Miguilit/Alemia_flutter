@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/bundle.dart';
 import '../../services/course_service.dart';
 import '../../providers/settings_provider.dart';
@@ -17,7 +18,9 @@ class _BundleCheckoutScreenState extends State<BundleCheckoutScreen> {
   bool _isProcessing = false;
 
   void _enrollOffline() async {
-    setState(() { _isProcessing = true; });
+    setState(() {
+      _isProcessing = true;
+    });
     try {
       final courseService = CourseService();
       final response = await courseService.enrollBundle(
@@ -33,68 +36,109 @@ class _BundleCheckoutScreenState extends State<BundleCheckoutScreen> {
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         if (data['is_duplicate_warning'] == true) {
-            bool? proceed = await showDialog(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                    title: const Text('Duplicate Courses'),
-                    content: Text(data['message']),
-                    actions: [
-                        TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
-                        TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Proceed Anyway')),
-                    ],
-                )
+          bool? proceed = await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(ctx.l10n.checkoutDuplicateCoursesTitle),
+              content: Text(data['message']),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(ctx.l10n.checkoutCancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(ctx.l10n.checkoutProceedAnyway),
+                ),
+              ],
+            ),
+          );
+          if (!mounted) return;
+          if (proceed == true) {
+            final confirmResponse = await courseService.enrollBundle(
+              widget.bundle.id,
+              'offline',
+              transactionId: 'TEST-TX-${DateTime.now().millisecondsSinceEpoch}',
+              confirmDuplicate: true,
             );
-            if (!mounted) return;
-            if (proceed == true) {
-                final confirmResponse = await courseService.enrollBundle(
-                    widget.bundle.id,
-                    'offline',
-                    transactionId: 'TEST-TX-${DateTime.now().millisecondsSinceEpoch}',
-                    confirmDuplicate: true,
-                );
 
-                if (!mounted) return;
-                final finalData = jsonDecode(confirmResponse.body);
-                if (confirmResponse.statusCode == 200) {
-                    messenger.showSnackBar(SnackBar(content: Text(finalData['message'] ?? 'Enrolled!')));
-                    nav.pop();
-                } else {
-                    messenger.showSnackBar(SnackBar(content: Text(finalData['message'] ?? 'Failed')));
-                }
+            if (!mounted) return;
+            final finalData = jsonDecode(confirmResponse.body);
+            if (confirmResponse.statusCode == 200) {
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    finalData['message'] ?? context.l10n.checkoutEnrolled,
+                  ),
+                ),
+              );
+              nav.pop();
+            } else {
+              messenger.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    finalData['message'] ?? context.l10n.checkoutFailed,
+                  ),
+                ),
+              );
             }
+          }
         } else {
-            messenger.showSnackBar(SnackBar(content: Text(data['message'] ?? 'Enrollment requested!')));
-            nav.pop();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                data['message'] ?? context.l10n.checkoutEnrollmentRequested,
+              ),
+            ),
+          );
+          nav.pop();
         }
       } else {
-        messenger.showSnackBar(SnackBar(content: Text(data['message'] ?? 'Failed')));
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text(data['message'] ?? context.l10n.checkoutFailed),
+          ),
+        );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.checkoutError('$e'))));
     } finally {
-      if (mounted) setState(() { _isProcessing = false; });
+      if (mounted)
+        setState(() {
+          _isProcessing = false;
+        });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout Bundle')),
+      appBar: AppBar(title: Text(context.l10n.checkoutBundleTitle)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Checkout for ${widget.bundle.title}'),
+            Text(context.l10n.checkoutForBundle(widget.bundle.title)),
             const SizedBox(height: 20),
-            Text('Total: ${Provider.of<SettingsProvider>(context, listen: false).formatPrice(widget.bundle.price)}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              context.l10n.checkoutTotalAmount(
+                Provider.of<SettingsProvider>(
+                  context,
+                  listen: false,
+                ).formatPrice(widget.bundle.price),
+              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 40),
             _isProcessing
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: _enrollOffline,
-                    child: const Text('Pay with Offline Payment'),
-                  )
+                    child: Text(context.l10n.checkoutPayOffline),
+                  ),
           ],
         ),
       ),

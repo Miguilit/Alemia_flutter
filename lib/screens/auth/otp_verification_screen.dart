@@ -90,7 +90,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         toastification.show(
           context: context,
           type: ToastificationType.success,
-          title: const Text('Verification Successful'),
+          title: Text(context.l10n.authVerificationSuccessfulTitle),
           autoCloseDuration: const Duration(seconds: 2),
         );
         Navigator.of(context).pushAndRemoveUntil(
@@ -101,7 +101,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         toastification.show(
           context: context,
           type: ToastificationType.error,
-          title: const Text('Verification Failed'),
+          title: Text(context.l10n.authVerificationFailedTitle),
           description: Text(result['message']),
           autoCloseDuration: const Duration(seconds: 3),
         );
@@ -134,15 +134,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       toastification.show(
         context: context,
         type: ToastificationType.success,
-        title: const Text('Code Resent'),
-        description: const Text('Check your email for the new code'),
+        title: Text(context.l10n.authCodeResentTitle),
+        description: Text(context.l10n.authCheckEmailForNewCode),
         autoCloseDuration: const Duration(seconds: 3),
       );
     } else {
       toastification.show(
         context: context,
         type: ToastificationType.error,
-        title: const Text('Resend Failed'),
+        title: Text(context.l10n.authResendFailedTitle),
         description: Text(result['message']),
         autoCloseDuration: const Duration(seconds: 3),
       );
@@ -411,7 +411,9 @@ class _OtpVerificationCard extends StatelessWidget {
                 Text(
                   context.l10n.didntReceiveCode,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.6),
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
@@ -434,7 +436,9 @@ class _OtpVerificationCard extends StatelessWidget {
                     style: TextStyle(
                       color: canResend
                           ? AppTheme.getTextColor(context)
-                          : AppTheme.getTextColor(context).withValues(alpha: 0.4),
+                          : AppTheme.getTextColor(
+                              context,
+                            ).withValues(alpha: 0.4),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -460,7 +464,9 @@ class _OtpVerificationCard extends StatelessWidget {
                 child: Text(
                   context.l10n.backToLogin,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.7),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,7 @@ import '../../models/course.dart';
 class EnrollmentSuccessScreen extends StatelessWidget {
   final int? enrollmentId;
   final Course? course;
+
   /// Optional list of bundle courses — provided when it was a bundle purchase
   final List<Course>? bundleCourses;
   final String? bundleTitle;
@@ -69,7 +71,7 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                          'Enrollment Success',
+                          context.l10n.enrollmentSuccessTitle,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppTheme.getTextColor(context),
@@ -123,7 +125,7 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                           const SizedBox(height: 32),
                           // Success Title
                           Text(
-                            'Enrollment Successful!',
+                            context.l10n.enrollmentSuccessfulTitle,
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 28,
@@ -136,8 +138,11 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                           // Success Message
                           Text(
                             isBundle
-                                ? 'Congratulations! You have successfully enrolled in all courses of the ${bundleTitle ?? 'bundle'}.'
-                                : 'Congratulations! You have successfully\nenrolled in the course.',
+                                ? context.l10n.enrollmentBundleSuccess(
+                                    bundleTitle ??
+                                        context.l10n.enrollmentBundleFallback,
+                                  )
+                                : context.l10n.enrollmentCourseSuccess,
                             style: TextStyle(
                               color: AppTheme.getTextColor(
                                 context,
@@ -171,19 +176,25 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                         height: 32,
                                         decoration: BoxDecoration(
                                           color: AppTheme.getMint100(context),
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         child: Center(
                                           child: HugeIcon(
                                             icon: HugeIcons.strokeRoundedBook01,
                                             size: 18,
-                                            color: AppTheme.getPrimaryColor(context),
+                                            color: AppTheme.getPrimaryColor(
+                                              context,
+                                            ),
                                           ),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       Text(
-                                        'Courses in This Bundle',
+                                        context
+                                            .l10n
+                                            .enrollmentBundleCoursesTitle,
                                         style: TextStyle(
                                           color: AppTheme.getTextColor(context),
                                           fontSize: 18,
@@ -194,7 +205,9 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                     ],
                                   ),
                                   const SizedBox(height: 16),
-                                  ...bundleCourses!.asMap().entries.map((entry) {
+                                  ...bundleCourses!.asMap().entries.map((
+                                    entry,
+                                  ) {
                                     final idx = entry.key;
                                     final c = entry.value;
                                     return Column(
@@ -203,11 +216,15 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                           Divider(
                                             height: 1,
                                             thickness: 1,
-                                            color: AppTheme.getTextColor(context)
-                                                .withValues(alpha: 0.08),
+                                            color: AppTheme.getTextColor(
+                                              context,
+                                            ).withValues(alpha: 0.08),
                                           ),
                                         if (idx > 0) const SizedBox(height: 12),
-                                        _BundleCourseRow(course: c, settingsProvider: settingsProvider),
+                                        _BundleCourseRow(
+                                          course: c,
+                                          settingsProvider: settingsProvider,
+                                        ),
                                         const SizedBox(height: 12),
                                       ],
                                     );
@@ -231,7 +248,7 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Text(
-                                    'Course Details',
+                                    context.l10n.enrollmentCourseDetails,
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(context),
                                       fontSize: 18,
@@ -241,14 +258,17 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 20),
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
                                       // Course Thumbnail
                                       Container(
                                         width: 100,
                                         height: 80,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           gradient: const LinearGradient(
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
@@ -259,7 +279,9 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                           ),
                                         ),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                           child: course?.thumbnail != null
                                               ? Image.network(
                                                   course!.thumbnail!,
@@ -279,7 +301,10 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              course?.title ?? 'Enrolled Course',
+                                              course?.title ??
+                                                  context
+                                                      .l10n
+                                                      .enrollmentCourseFallback,
                                               style: TextStyle(
                                                 color: AppTheme.getTextColor(
                                                   context,
@@ -297,10 +322,12 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                                 Container(
                                                   width: 20,
                                                   height: 20,
-                                                  decoration: const BoxDecoration(
-                                                    color: AppTheme.softOrange800,
-                                                    shape: BoxShape.circle,
-                                                  ),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: AppTheme
+                                                            .softOrange800,
+                                                        shape: BoxShape.circle,
+                                                      ),
                                                   child: Center(
                                                     child: HugeIcon(
                                                       icon: HugeIcons
@@ -312,11 +339,23 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                                 ),
                                                 const SizedBox(width: 6),
                                                 Text(
-                                                  '${course?.rating?.toStringAsFixed(1) ?? '0.0'} (${course?.reviewsCount ?? 0} reviews)',
+                                                  context.l10n
+                                                      .enrollmentRatingReviews(
+                                                        course?.rating
+                                                                ?.toStringAsFixed(
+                                                                  1,
+                                                                ) ??
+                                                            '0.0',
+                                                        course?.reviewsCount ??
+                                                            0,
+                                                      ),
                                                   style: TextStyle(
-                                                    color: AppTheme.getTextColor(
-                                                      context,
-                                                    ).withValues(alpha: 0.7),
+                                                    color:
+                                                        AppTheme.getTextColor(
+                                                          context,
+                                                        ).withValues(
+                                                          alpha: 0.7,
+                                                        ),
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -329,10 +368,11 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                                 Container(
                                                   width: 20,
                                                   height: 20,
-                                                  decoration: const BoxDecoration(
-                                                    color: Colors.red,
-                                                    shape: BoxShape.circle,
-                                                  ),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                        color: Colors.red,
+                                                        shape: BoxShape.circle,
+                                                      ),
                                                   child: Center(
                                                     child: HugeIcon(
                                                       icon: HugeIcons
@@ -344,11 +384,18 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                                 ),
                                                 const SizedBox(width: 6),
                                                 Text(
-                                                  '${course?.studentsCount ?? 0} Students',
+                                                  context.l10n
+                                                      .checkoutStudentsCount(
+                                                        course?.studentsCount ??
+                                                            0,
+                                                      ),
                                                   style: TextStyle(
-                                                    color: AppTheme.getTextColor(
-                                                      context,
-                                                    ).withValues(alpha: 0.7),
+                                                    color:
+                                                        AppTheme.getTextColor(
+                                                          context,
+                                                        ).withValues(
+                                                          alpha: 0.7,
+                                                        ),
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w600,
                                                   ),
@@ -371,7 +418,7 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   // What's Included
                                   Text(
-                                    'What\'s Included',
+                                    context.l10n.enrollmentWhatsIncluded,
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(context),
                                       fontSize: 18,
@@ -382,29 +429,36 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   _FeatureItem(
                                     icon: HugeIcons.strokeRoundedAiVideo,
-                                    title: '30 Video Lessons',
+                                    title: context.l10n.enrollmentVideoLessons(
+                                      course?.lessonsCount ?? 30,
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   _FeatureItem(
                                     icon: HugeIcons.strokeRoundedBook01,
-                                    title: 'Lifetime Access',
+                                    title:
+                                        context.l10n.enrollmentLifetimeAccess,
                                   ),
                                   const SizedBox(height: 16),
                                   _FeatureItem(
                                     icon: HugeIcons.strokeRoundedAssignments,
-                                    title: 'Assignments & Quizzes',
+                                    title: context
+                                        .l10n
+                                        .enrollmentAssignmentsQuizzes,
                                   ),
                                   const SizedBox(height: 16),
                                   _FeatureItem(
                                     icon: HugeIcons.strokeRoundedCertificate01,
-                                    title: 'Certificate of Completion',
+                                    title: context.l10n.enrollmentCertificate,
                                   ),
                                 ],
                               ),
                             ),
                           ],
 
-                          const SizedBox(height: 100), // Space for bottom button
+                          const SizedBox(
+                            height: 100,
+                          ), // Space for bottom button
                         ],
                       ),
                     ),
@@ -451,9 +505,9 @@ class EnrollmentSuccessScreen extends StatelessWidget {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Start Learning',
-                    style: TextStyle(
+                  child: Text(
+                    context.l10n.enrollmentStartLearning,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
@@ -520,7 +574,9 @@ class _BundleCourseRow extends StatelessWidget {
                 Text(
                   course.instructorName!,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.6),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -547,7 +603,7 @@ class _BundleCourseRow extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                'Enrolled',
+                context.l10n.enrollmentEnrolledBadge,
                 style: TextStyle(
                   color: AppTheme.getPrimaryColor(context),
                   fontSize: 11,
@@ -571,7 +627,11 @@ class _BundleCourseRow extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: const Icon(Icons.play_circle_outline, color: Colors.white, size: 24),
+      child: const Icon(
+        Icons.play_circle_outline,
+        color: Colors.white,
+        size: 24,
+      ),
     );
   }
 }

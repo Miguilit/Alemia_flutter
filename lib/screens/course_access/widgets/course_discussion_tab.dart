@@ -5,15 +5,13 @@ import '../../../providers/course_discussion_provider.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/course_discussion.dart';
 import '../../../theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../course_discussion_detail_screen.dart';
 
 class CourseDiscussionTab extends StatefulWidget {
   final int courseId;
 
-  const CourseDiscussionTab({
-    super.key,
-    required this.courseId,
-  });
+  const CourseDiscussionTab({super.key, required this.courseId});
 
   @override
   State<CourseDiscussionTab> createState() => _CourseDiscussionTabState();
@@ -41,22 +39,23 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       context.read<CourseDiscussionProvider>().fetchDiscussions(
-            widget.courseId,
-            filter: _selectedFilter,
-            search: _searchController.text,
-          );
+        widget.courseId,
+        filter: _selectedFilter,
+        search: _searchController.text,
+      );
     }
   }
 
   Future<void> _loadData({bool refresh = false}) async {
     await context.read<CourseDiscussionProvider>().fetchDiscussions(
-          widget.courseId,
-          refresh: refresh,
-          filter: _selectedFilter,
-          search: _searchController.text,
-        );
+      widget.courseId,
+      refresh: refresh,
+      filter: _selectedFilter,
+      search: _searchController.text,
+    );
   }
 
   void _onFilterChanged(String filter) {
@@ -95,20 +94,27 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Ask a Question / Post Topic',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                context.l10n.communityAskQuestionOrPostTopic,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: titleController,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'What is your question about?',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  labelText: context.l10n.communityTitleLabel,
+                  hintText: context.l10n.communityQuestionAboutHint,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'Title is required' : null,
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? context.l10n.communityTitleRequired
+                    : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -116,12 +122,16 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                 maxLines: 4,
                 style: const TextStyle(fontSize: 14),
                 decoration: InputDecoration(
-                  labelText: 'Content / Details',
-                  hintText: 'Provide details about your question...',
+                  labelText: context.l10n.communityContentDetailsLabel,
+                  hintText: context.l10n.communityContentDetailsHint,
                   alignLabelWithHint: true,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'Content details are required' : null,
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? context.l10n.communityContentDetailsRequired
+                    : null,
               ),
               const SizedBox(height: 20),
               Row(
@@ -129,14 +139,16 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                    child: Text(context.l10n.communityCancel),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         try {
-                          await this.context.read<CourseDiscussionProvider>().createDiscussion(
+                          await this.context
+                              .read<CourseDiscussionProvider>()
+                              .createDiscussion(
                                 widget.courseId,
                                 titleController.text,
                                 contentController.text,
@@ -145,7 +157,11 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                           _loadData(refresh: true);
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to post: $e')),
+                            SnackBar(
+                              content: Text(
+                                context.l10n.communityFailedPostThread(e),
+                              ),
+                            ),
                           );
                         }
                       }
@@ -154,7 +170,7 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                       backgroundColor: AppTheme.primary,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text('Post Thread'),
+                    child: Text(context.l10n.communityPostThread),
                   ),
                 ],
               ),
@@ -187,7 +203,7 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
               onSubmitted: (_) => _onSearch(),
               style: const TextStyle(fontSize: 13.5),
               decoration: InputDecoration(
-                hintText: 'Search discussions...',
+                hintText: context.l10n.communitySearchDiscussionsHint,
                 prefixIcon: const Icon(Icons.search, size: 20),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -214,7 +230,10 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
           // Filters
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              vertical: 4.0,
+            ),
             child: Row(
               children: [
                 _buildFilterChip('all', 'All Threads'),
@@ -236,7 +255,9 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                   : ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16.0),
-                      itemCount: provider.discussions.length + (provider.isLoading ? 1 : 0),
+                      itemCount:
+                          provider.discussions.length +
+                          (provider.isLoading ? 1 : 0),
                       itemBuilder: (context, index) {
                         if (index == provider.discussions.length) {
                           return const Center(
@@ -312,7 +333,8 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                 children: [
                   CircleAvatar(
                     radius: 16,
-                    backgroundImage: d.userPhoto != null && d.userPhoto!.isNotEmpty
+                    backgroundImage:
+                        d.userPhoto != null && d.userPhoto!.isNotEmpty
                         ? NetworkImage(d.userPhoto!)
                         : null,
                     child: d.userPhoto == null || d.userPhoto!.isEmpty
@@ -326,11 +348,17 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                       children: [
                         Text(
                           d.userName,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
                         ),
                         Text(
                           dateStr,
-                          style: TextStyle(color: Colors.grey[500], fontSize: 10),
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ),
@@ -338,23 +366,53 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                   if (d.isPinned)
                     Container(
                       margin: const EdgeInsets.only(left: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.amber[100], borderRadius: BorderRadius.circular(4)),
-                      child: Text('Pinned', style: TextStyle(color: Colors.amber[900], fontSize: 9, fontWeight: FontWeight.bold)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[100],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        context.l10n.communityPinned,
+                        style: TextStyle(
+                          color: Colors.amber[900],
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   if (d.isAnnouncement)
                     Container(
                       margin: const EdgeInsets.only(left: 4),
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(4)),
-                      child: Text('Announce', style: TextStyle(color: Colors.blue[900], fontSize: 9, fontWeight: FontWeight.bold)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[100],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        context.l10n.communityAnnouncement,
+                        style: TextStyle(
+                          color: Colors.blue[900],
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                 ],
               ),
               const SizedBox(height: 10),
               Text(
                 d.title,
-                style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -368,20 +426,26 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                 children: [
                   InkWell(
                     onTap: () {
-                      context.read<CourseDiscussionProvider>().toggleLikeDiscussion(
-                            widget.courseId,
-                            d.id,
-                          );
+                      context
+                          .read<CourseDiscussionProvider>()
+                          .toggleLikeDiscussion(widget.courseId, d.id);
                     },
                     borderRadius: BorderRadius.circular(12),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       child: Row(
                         children: [
                           Icon(
-                            d.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                            d.isLiked
+                                ? Icons.thumb_up
+                                : Icons.thumb_up_outlined,
                             size: 14,
-                            color: d.isLiked ? AppTheme.primary : Colors.grey[600],
+                            color: d.isLiked
+                                ? AppTheme.primary
+                                : Colors.grey[600],
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -389,7 +453,9 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: d.isLiked ? AppTheme.primary : Colors.grey[600],
+                              color: d.isLiked
+                                  ? AppTheme.primary
+                                  : Colors.grey[600],
                             ),
                           ),
                         ],
@@ -397,11 +463,19 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Icon(Icons.comment_outlined, size: 14, color: Colors.grey[600]),
+                  Icon(
+                    Icons.comment_outlined,
+                    size: 14,
+                    color: Colors.grey[600],
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     '${d.repliesCount}',
-                    style: TextStyle(fontSize: 11, color: Colors.grey[600], fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -420,11 +494,19 @@ class _CourseDiscussionTabState extends State<CourseDiscussionTab> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey[300]),
+              Icon(
+                Icons.chat_bubble_outline,
+                size: 64,
+                color: Colors.grey[300],
+              ),
               const SizedBox(height: 16),
               const Text(
                 'No Discussions Yet',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               const Text(

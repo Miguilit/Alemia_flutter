@@ -31,13 +31,16 @@ class AiChatProvider with ChangeNotifier {
               .map((json) => AiChatMessage.fromJson(json))
               .toList();
         } else {
-          _error = data['message'] ?? 'Failed to load history';
+          _error = 'history_load_failed';
+          debugPrint('AI chat history error: ${data['message']}');
         }
       } else {
-        _error = 'Server error: ${response.statusCode}';
+        _error = 'server_error';
+        debugPrint('AI chat server error: ${response.statusCode}');
       }
     } catch (e) {
-      _error = 'Connection error: $e';
+      _error = 'connection_error';
+      debugPrint('AI chat connection error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -63,10 +66,12 @@ class AiChatProvider with ChangeNotifier {
           _messages.add(AiChatMessage.fromJson(data['ai_message']));
         }
       } else {
-        _error = 'Failed to send message: ${response.statusCode}';
+        _error = 'send_failed';
+        debugPrint('AI chat send error: ${response.statusCode}');
       }
     } catch (e) {
-      _error = 'Connection error: $e';
+      _error = 'connection_error';
+      debugPrint('AI chat connection error: $e');
     } finally {
       _isSending = false;
       notifyListeners();

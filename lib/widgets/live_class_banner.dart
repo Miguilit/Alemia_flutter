@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/live_class.dart';
 import '../theme/app_theme.dart';
+import '../l10n/app_localizations.dart';
 
 class LiveClassBanner extends StatelessWidget {
   final LiveClass liveClass;
@@ -23,13 +24,13 @@ class LiveClassBanner extends StatelessWidget {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        throw 'Could not launch ${liveClass.joinUrl}';
+        throw StateError('meeting_link_unavailable');
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to open meeting link: $e'),
+            content: Text(context.l10n.residualFailedToOpenMeetingLink),
             backgroundColor: Colors.redAccent,
           ),
         );
@@ -40,10 +41,14 @@ class LiveClassBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLive = liveClass.status == 'live';
-    final formattedTime = DateFormat('MMM dd, yyyy @ hh:mm a').format(liveClass.scheduledAt.toLocal());
+    final String locale = Localizations.localeOf(context).toLanguageTag();
+    final String formattedTime = DateFormat.yMMMd(
+      locale,
+    ).add_jm().format(liveClass.scheduledAt.toLocal());
 
     return Container(
-      margin: margin ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin:
+          margin ?? const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -55,7 +60,8 @@ class LiveClassBanner extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: (isLive ? const Color(0xFFEF4444) : const Color(0xFF6C5CE7)).withOpacity(0.3),
+            color: (isLive ? const Color(0xFFEF4444) : const Color(0xFF6C5CE7))
+                .withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -71,7 +77,10 @@ class LiveClassBanner extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
@@ -82,9 +91,9 @@ class LiveClassBanner extends StatelessWidget {
                           if (isLive) ...[
                             _PulsingDot(),
                             const SizedBox(width: 6),
-                            const Text(
-                              'LIVE NOW',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.residualLiveNow,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w900,
@@ -98,22 +107,24 @@ class LiveClassBanner extends StatelessWidget {
                               size: 13,
                             ),
                             const SizedBox(width: 6),
-                            const Text(
-                              'UPCOMING LIVE',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.residualUpcomingLive,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.8,
                               ),
                             ),
-                          ]
+                          ],
                         ],
                       ),
                     ),
                     const Spacer(),
                     Text(
-                      '${liveClass.durationMinutes} mins',
+                      context.l10n.residualMinutesShort(
+                        liveClass.durationMinutes,
+                      ),
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -134,7 +145,7 @@ class LiveClassBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Scheduled for: $formattedTime',
+                  context.l10n.residualScheduledFor(formattedTime),
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.85),
                     fontSize: 13,
@@ -144,7 +155,7 @@ class LiveClassBanner extends StatelessWidget {
                 if (isLive) ...[
                   const SizedBox(height: 4),
                   Text(
-                    'Tap below to join the live video session now.',
+                    context.l10n.residualTapToJoinLive,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.85),
                       fontSize: 12,
@@ -158,7 +169,9 @@ class LiveClassBanner extends StatelessWidget {
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: isLive ? const Color(0xFFB91C1C) : const Color(0xFF4834DF),
+                          foregroundColor: isLive
+                              ? const Color(0xFFB91C1C)
+                              : const Color(0xFF4834DF),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -167,12 +180,18 @@ class LiveClassBanner extends StatelessWidget {
                         ),
                         onPressed: () => _joinMeeting(context),
                         icon: HugeIcon(
-                          icon: isLive ? HugeIcons.strokeRoundedPlay : HugeIcons.strokeRoundedVideoReplay,
-                          color: isLive ? const Color(0xFFB91C1C) : const Color(0xFF4834DF),
+                          icon: isLive
+                              ? HugeIcons.strokeRoundedPlay
+                              : HugeIcons.strokeRoundedVideoReplay,
+                          color: isLive
+                              ? const Color(0xFFB91C1C)
+                              : const Color(0xFF4834DF),
                           size: 18,
                         ),
                         label: Text(
-                          isLive ? 'Join Live Class' : 'Meeting Details / Join link',
+                          isLive
+                              ? context.l10n.residualJoinLiveClass
+                              : context.l10n.residualMeetingDetailsJoin,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
@@ -209,7 +228,8 @@ class _PulsingDot extends StatefulWidget {
   State<_PulsingDot> createState() => _PulsingDotState();
 }
 
-class _PulsingDotState extends State<_PulsingDot> with SingleTickerProviderStateMixin {
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

@@ -478,16 +478,16 @@ class _EmptyEventsState extends StatelessWidget {
     String message;
     switch (filterType) {
       case 'upcoming':
-        title = 'No Upcoming Events';
-        message = 'Check back later for new events';
+        title = context.l10n.noUpcomingEvents;
+        message = context.l10n.checkBackLaterForNewEvents;
         break;
       case 'past':
-        title = 'No Past Events';
-        message = 'You haven\'t attended any events yet';
+        title = context.l10n.noPastEvents;
+        message = context.l10n.noAttendedEventsYet;
         break;
       default:
-        title = 'No Events';
-        message = 'There are no events available at the moment';
+        title = context.l10n.noEventsAvailable;
+        message = context.l10n.noEventsAvailableNow;
     }
 
     return Center(

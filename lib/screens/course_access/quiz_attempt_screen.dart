@@ -243,20 +243,24 @@ class _QuizAttemptScreenState extends State<QuizAttemptScreen>
           _showResults();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'] ?? 'Submission failed')),
+            SnackBar(
+              content: Text(
+                data['message'] ?? context.l10n.courseSubmissionFailed,
+              ),
+            ),
           );
         }
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Submission failed')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.courseSubmissionFailed)),
+        );
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.communityGenericError(e))),
+        );
       }
     }
   }
@@ -479,7 +483,7 @@ class _QuizAttemptScreenState extends State<QuizAttemptScreen>
         appBar: widget.showAppBar
             ? AppBar(backgroundColor: Colors.transparent, elevation: 0)
             : null,
-        body: const Center(child: Text('No questions found for this quiz.')),
+        body: Center(child: Text(context.l10n.quizNoQuestionsFound)),
       );
     }
 

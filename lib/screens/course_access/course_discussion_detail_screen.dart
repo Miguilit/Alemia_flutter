@@ -5,6 +5,7 @@ import '../../models/course_discussion.dart';
 import '../../providers/course_discussion_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class CourseDiscussionDetailScreen extends StatefulWidget {
   final int courseId;
@@ -17,10 +18,12 @@ class CourseDiscussionDetailScreen extends StatefulWidget {
   });
 
   @override
-  State<CourseDiscussionDetailScreen> createState() => _CourseDiscussionDetailScreenState();
+  State<CourseDiscussionDetailScreen> createState() =>
+      _CourseDiscussionDetailScreenState();
 }
 
-class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScreen> {
+class _CourseDiscussionDetailScreenState
+    extends State<CourseDiscussionDetailScreen> {
   final TextEditingController _replyController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -29,9 +32,9 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CourseDiscussionProvider>().fetchDiscussionDetails(
-            widget.courseId,
-            widget.discussionId,
-          );
+        widget.courseId,
+        widget.discussionId,
+      );
     });
   }
 
@@ -48,10 +51,10 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
 
     try {
       await context.read<CourseDiscussionProvider>().createReply(
-            widget.courseId,
-            widget.discussionId,
-            text,
-          );
+        widget.courseId,
+        widget.discussionId,
+        text,
+      );
       _replyController.clear();
       FocusScope.of(context).unfocus();
       // Scroll to bottom
@@ -66,7 +69,7 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit reply: $e')),
+        SnackBar(content: Text(context.l10n.communityFailedSubmitReply(e))),
       );
     }
   }
@@ -75,14 +78,17 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Reply'),
-        content: const Text('Are you sure you want to delete this reply?'),
+        title: Text(context.l10n.communityDeleteReplyTitle),
+        content: Text(context.l10n.communityDeleteReplyConfirmation),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(context.l10n.communityCancel),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(context.l10n.communityDelete),
           ),
         ],
       ),
@@ -91,16 +97,18 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
     if (confirm == true) {
       try {
         await context.read<CourseDiscussionProvider>().deleteReply(
-              widget.courseId,
-              widget.discussionId,
-              replyId,
-            );
+          widget.courseId,
+          widget.discussionId,
+          replyId,
+        );
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reply deleted successfully')),
+          SnackBar(
+            content: Text(context.l10n.communityReplyDeletedSuccessfully),
+          ),
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete reply: $e')),
+          SnackBar(content: Text(context.l10n.communityFailedDeleteReply(e))),
         );
       }
     }
@@ -115,7 +123,7 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text('Discussion Details'),
+        title: Text(context.l10n.communityDiscussionDetailsTitle),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,
@@ -123,45 +131,53 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
       body: provider.isLoading && discussion == null
           ? const Center(child: CircularProgressIndicator())
           : discussion == null
-              ? Center(child: Text(provider.error ?? 'Thread not found'))
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(16.0),
-                        children: [
-                          // Main Post
-                          _buildMainPost(discussion, currentUser?.id),
-                          const SizedBox(height: 24),
-                          
-                          // Replies Header
-                          Text(
-                            'Replies (${discussion.replies.length})',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          
-                          // Replies List
-                          ...discussion.replies.map((reply) => _buildReplyCard(reply, currentUser?.id)),
-                          const SizedBox(height: 40),
-                        ],
+          ? Center(
+              child: Text(
+                provider.error ?? context.l10n.communityThreadNotFound,
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(16.0),
+                    children: [
+                      // Main Post
+                      _buildMainPost(discussion, currentUser?.id),
+                      const SizedBox(height: 24),
+
+                      // Replies Header
+                      Text(
+                        'Replies (${discussion.replies.length})',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
-                    ),
-                    
-                    // Chat-style persistent reply input bar
-                    _buildReplyInputBar(provider.isActionLoading),
-                  ],
+                      const SizedBox(height: 12),
+
+                      // Replies List
+                      ...discussion.replies.map(
+                        (reply) => _buildReplyCard(reply, currentUser?.id),
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
+
+                // Chat-style persistent reply input bar
+                _buildReplyInputBar(provider.isActionLoading),
+              ],
+            ),
     );
   }
 
   Widget _buildMainPost(CourseDiscussion discussion, int? currentUserId) {
-    final dateStr = DateFormat('MMM dd, yyyy • hh:mm A').format(discussion.createdAt);
+    final dateStr = DateFormat(
+      'MMM dd, yyyy • hh:mm A',
+    ).format(discussion.createdAt);
 
     return Card(
       color: Colors.white,
@@ -176,10 +192,14 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
               children: [
                 CircleAvatar(
                   radius: 20,
-                  backgroundImage: discussion.userPhoto != null && discussion.userPhoto!.isNotEmpty
+                  backgroundImage:
+                      discussion.userPhoto != null &&
+                          discussion.userPhoto!.isNotEmpty
                       ? NetworkImage(discussion.userPhoto!)
                       : null,
-                  child: discussion.userPhoto == null || discussion.userPhoto!.isEmpty
+                  child:
+                      discussion.userPhoto == null ||
+                          discussion.userPhoto!.isEmpty
                       ? const Icon(Icons.person)
                       : null,
                 ),
@@ -190,7 +210,10 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                     children: [
                       Text(
                         discussion.userName,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -203,28 +226,62 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                 if (discussion.isPinned)
                   Container(
                     margin: const EdgeInsets.only(left: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: Colors.amber[100], borderRadius: BorderRadius.circular(4)),
-                    child: Text('Pinned', style: TextStyle(color: Colors.amber[900], fontSize: 10, fontWeight: FontWeight.bold)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber[100],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      context.l10n.communityPinned,
+                      style: TextStyle(
+                        color: Colors.amber[900],
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 if (discussion.isAnnouncement)
                   Container(
                     margin: const EdgeInsets.only(left: 6),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: Colors.blue[100], borderRadius: BorderRadius.circular(4)),
-                    child: Text('Announcement', style: TextStyle(color: Colors.blue[900], fontSize: 10, fontWeight: FontWeight.bold)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      context.l10n.communityAnnouncement,
+                      style: TextStyle(
+                        color: Colors.blue[900],
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
               ],
             ),
             const SizedBox(height: 16),
             Text(
               discussion.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               discussion.content,
-              style: TextStyle(fontSize: 14, color: Colors.grey[800], height: 1.5),
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[800],
+                height: 1.5,
+              ),
             ),
             const Divider(height: 32),
             Row(
@@ -232,18 +289,24 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
               children: [
                 InkWell(
                   onTap: () {
-                    context.read<CourseDiscussionProvider>().toggleLikeDiscussion(
-                          widget.courseId,
-                          discussion.id,
-                        );
+                    context
+                        .read<CourseDiscussionProvider>()
+                        .toggleLikeDiscussion(widget.courseId, discussion.id);
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: discussion.isLiked ? AppTheme.primary.withOpacity(0.1) : Colors.transparent,
+                      color: discussion.isLiked
+                          ? AppTheme.primary.withOpacity(0.1)
+                          : Colors.transparent,
                       border: Border.all(
-                        color: discussion.isLiked ? AppTheme.primary : Colors.grey[300]!,
+                        color: discussion.isLiked
+                            ? AppTheme.primary
+                            : Colors.grey[300]!,
                       ),
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -251,9 +314,13 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          discussion.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                          discussion.isLiked
+                              ? Icons.thumb_up
+                              : Icons.thumb_up_outlined,
                           size: 14,
-                          color: discussion.isLiked ? AppTheme.primary : Colors.grey[600],
+                          color: discussion.isLiked
+                              ? AppTheme.primary
+                              : Colors.grey[600],
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -261,7 +328,9 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: discussion.isLiked ? AppTheme.primary : Colors.grey[600],
+                            color: discussion.isLiked
+                                ? AppTheme.primary
+                                : Colors.grey[600],
                           ),
                         ),
                       ],
@@ -270,19 +339,29 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                 ),
                 if (discussion.userId == currentUserId)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.redAccent,
+                    ),
                     onPressed: () async {
                       final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Delete Thread'),
-                          content: const Text('Are you sure you want to delete this discussion thread?'),
+                          title: Text(context.l10n.communityDeleteThreadTitle),
+                          content: Text(
+                            context.l10n.communityDeleteThreadConfirmation,
+                          ),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: Text(context.l10n.communityCancel),
+                            ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              style: TextButton.styleFrom(foregroundColor: Colors.red),
-                              child: const Text('Delete'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.red,
+                              ),
+                              child: Text(context.l10n.communityDelete),
                             ),
                           ],
                         ),
@@ -290,15 +369,18 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
 
                       if (confirm == true) {
                         try {
-                          await context.read<CourseDiscussionProvider>().deleteDiscussion(
-                                widget.courseId,
-                                discussion.id,
-                              );
+                          await context
+                              .read<CourseDiscussionProvider>()
+                              .deleteDiscussion(widget.courseId, discussion.id);
                           if (mounted) Navigator.pop(context);
                         } catch (e) {
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to delete thread: $e')),
+                              SnackBar(
+                                content: Text(
+                                  context.l10n.communityFailedDeleteThread(e),
+                                ),
+                              ),
                             );
                           }
                         }
@@ -314,9 +396,11 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
   }
 
   Widget _buildReplyCard(CourseDiscussionReply reply, int? currentUserId) {
-    // Check if reply user is instructor/staff. (Ideally backend flags this or we check user role if available. 
+    // Check if reply user is instructor/staff. (Ideally backend flags this or we check user role if available.
     // For now we check if profile photo or details look like instructor, but let's just make it a clean default view.)
-    final isInstructor = reply.userName.toLowerCase().contains('instructor') || reply.userName.toLowerCase().contains('teacher');
+    final isInstructor =
+        reply.userName.toLowerCase().contains('instructor') ||
+        reply.userName.toLowerCase().contains('teacher');
     final dateStr = reply.createdAt.toLocal().toString().substring(0, 16);
 
     return Card(
@@ -325,7 +409,7 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: isInstructor 
+        side: isInstructor
             ? BorderSide(color: AppTheme.primary.withOpacity(0.3), width: 1)
             : BorderSide(color: Colors.grey[200]!, width: 0.5),
       ),
@@ -338,7 +422,8 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundImage: reply.userPhoto != null && reply.userPhoto!.isNotEmpty
+                  backgroundImage:
+                      reply.userPhoto != null && reply.userPhoto!.isNotEmpty
                       ? NetworkImage(reply.userPhoto!)
                       : null,
                   child: reply.userPhoto == null || reply.userPhoto!.isEmpty
@@ -354,14 +439,30 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                         children: [
                           Text(
                             reply.userName,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                           if (isInstructor) ...[
                             const SizedBox(width: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(color: AppTheme.primary, borderRadius: BorderRadius.circular(4)),
-                              child: const Text('Instructor', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primary,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                context.l10n.communityInstructor,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ],
                         ],
@@ -376,7 +477,11 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                 ),
                 if (reply.userId == currentUserId)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Colors.redAccent,
+                    ),
                     onPressed: () => _deleteReply(reply.id),
                     constraints: const BoxConstraints(),
                     padding: EdgeInsets.zero,
@@ -386,7 +491,11 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
             const SizedBox(height: 10),
             Text(
               reply.content,
-              style: const TextStyle(fontSize: 13.5, color: Colors.black87, height: 1.4),
+              style: const TextStyle(
+                fontSize: 13.5,
+                color: Colors.black87,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -394,20 +503,27 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                 InkWell(
                   onTap: () {
                     context.read<CourseDiscussionProvider>().toggleLikeReply(
-                          widget.courseId,
-                          reply.id,
-                        );
+                      widget.courseId,
+                      reply.id,
+                    );
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          reply.isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                          reply.isLiked
+                              ? Icons.thumb_up
+                              : Icons.thumb_up_outlined,
                           size: 12,
-                          color: reply.isLiked ? AppTheme.primary : Colors.grey[600],
+                          color: reply.isLiked
+                              ? AppTheme.primary
+                              : Colors.grey[600],
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -415,7 +531,9 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: reply.isLiked ? AppTheme.primary : Colors.grey[600],
+                            color: reply.isLiked
+                                ? AppTheme.primary
+                                : Colors.grey[600],
                           ),
                         ),
                       ],
@@ -447,10 +565,13 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                   controller: _replyController,
                   maxLines: null,
                   style: const TextStyle(fontSize: 14),
-                  decoration: const InputDecoration(
-                    hintText: 'Type a reply...',
-                    hintStyle: TextStyle(color: Colors.grey),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: InputDecoration(
+                    hintText: context.l10n.communityTypeReplyHint,
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     border: InputBorder.none,
                   ),
                 ),
@@ -467,7 +588,11 @@ class _CourseDiscussionDetailScreenState extends State<CourseDiscussionDetailScr
                     backgroundColor: AppTheme.primary,
                     radius: 20,
                     child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white, size: 18),
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                       onPressed: _submitReply,
                     ),
                   ),

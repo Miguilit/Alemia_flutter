@@ -44,9 +44,9 @@ class _NotificationSettingsScreenState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to load settings: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.profileFailedToLoadSettings(e))),
+        );
         setState(() => _isLoading = false);
       }
     }
@@ -63,7 +63,9 @@ class _NotificationSettingsScreenState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update settings: $e')),
+          SnackBar(
+            content: Text(context.l10n.profileFailedToUpdateSettings(e)),
+          ),
         );
         // Re-fetch to reset state on failure
         _fetchSettings();
@@ -141,7 +143,9 @@ class _NotificationSettingsScreenState
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: Text(
-                                    'Account Settings',
+                                    context
+                                        .l10n
+                                        .profileNotificationSettingsSection,
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(
                                         context,
@@ -163,9 +167,12 @@ class _NotificationSettingsScreenState
                                     children: <Widget>[
                                       _NotificationToggleItem(
                                         icon: HugeIcons.strokeRoundedMail01,
-                                        title: 'Email Notifications',
-                                        subtitle:
-                                            'Receive important announcements about your courses and enrollments',
+                                        title: context
+                                            .l10n
+                                            .profileEmailNotificationsTitle,
+                                        subtitle: context
+                                            .l10n
+                                            .profileEmailNotificationsSubtitle,
                                         value: _emailNotifications,
                                         onChanged: (value) {
                                           setState(
@@ -176,9 +183,12 @@ class _NotificationSettingsScreenState
                                       ),
                                       _NotificationToggleItem(
                                         icon: HugeIcons.strokeRoundedClock01,
-                                        title: 'Course Reminders',
-                                        subtitle:
-                                            'Get reminders about upcoming lessons, quizzes, and deadlines',
+                                        title: context
+                                            .l10n
+                                            .profileCourseRemindersTitle,
+                                        subtitle: context
+                                            .l10n
+                                            .profileCourseRemindersSubtitle,
                                         value: _courseReminders,
                                         onChanged: (value) {
                                           setState(
@@ -190,9 +200,12 @@ class _NotificationSettingsScreenState
                                       _NotificationToggleItem(
                                         icon:
                                             HugeIcons.strokeRoundedAnalytics01,
-                                        title: 'Progress Reports',
-                                        subtitle:
-                                            'Receive weekly summaries of your course progress and achievements',
+                                        title: context
+                                            .l10n
+                                            .profileProgressReportsTitle,
+                                        subtitle: context
+                                            .l10n
+                                            .profileProgressReportsSubtitle,
                                         value: _progressReports,
                                         onChanged: (value) {
                                           setState(
@@ -203,9 +216,12 @@ class _NotificationSettingsScreenState
                                       ),
                                       _NotificationToggleItem(
                                         icon: HugeIcons.strokeRoundedTag01,
-                                        title: 'Marketing Emails',
-                                        subtitle:
-                                            'Receive tips, exclusive offers, and new course recommendations',
+                                        title: context
+                                            .l10n
+                                            .profileMarketingEmailsTitle,
+                                        subtitle: context
+                                            .l10n
+                                            .profileMarketingEmailsSubtitle,
                                         value: _marketingEmails,
                                         onChanged: (value) {
                                           setState(
@@ -347,7 +363,9 @@ class _NotificationToggleItem extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.6),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),

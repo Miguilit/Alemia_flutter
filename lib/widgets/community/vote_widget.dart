@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/community_service.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 
 class VoteWidget extends StatefulWidget {
   final String type;
@@ -62,9 +63,9 @@ class _VoteWidgetState extends State<VoteWidget> {
           _votes = originalVotes;
           _isVoting = false;
         });
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Failed to vote: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.communityFailedToVote(e))),
+        );
       }
     }
   }

@@ -3,6 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter_html/flutter_html.dart';
 
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/custom_page_service.dart';
 
 class PrivacyTermsScreen extends StatefulWidget {
@@ -43,7 +44,7 @@ class _PrivacyTermsScreenState extends State<PrivacyTermsScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Failed to load content';
+          _error = context.l10n.profileFailedLoadLegalContent;
           _isLoading = false;
         });
       }

@@ -53,25 +53,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  String _localizedCustomPageTitle(BuildContext context, CustomPage page) {
+    final String slug = page.slug.trim().toLowerCase().replaceAll('_', '-');
+
+    final String title = page.title.trim().toLowerCase();
+
+    if (slug.contains('privacy') || title.contains('privacy')) {
+      return context.l10n.profilePrivacyPolicyTitle;
+    }
+
+    if (slug.contains('terms') ||
+        title.contains('terms') ||
+        title.contains('conditions')) {
+      return context.l10n.profileTermsConditionsTitle;
+    }
+
+    if (slug.contains('gdpr') ||
+        title.contains('gdpr') ||
+        title.contains('rgpd')) {
+      return context.l10n.profileGdprComplianceTitle;
+    }
+
+    return page.title;
+  }
+
   Future<void> _showDeleteAccountDialog() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This action cannot be undone.',
-        ),
+        title: Text(context.l10n.profileDeleteAccountTitle),
+        content: Text(context.l10n.profileDeleteAccountConfirmation),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text(
-              'Cancel',
+              context.l10n.profileCancel,
               style: TextStyle(color: AppTheme.getTextColor(context)),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(
+              context.l10n.profileDelete,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -99,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  'Deletion request submitted. Awaiting admin approval.',
+                  context.l10n.profileDeletionRequestSubmitted,
                   style: TextStyle(color: AppTheme.getTextColor(context)),
                 ),
                 backgroundColor: AppTheme.getCardColor(context),
@@ -111,9 +136,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       } catch (e) {
         if (mounted) {
           Navigator.pop(context); // Close loading
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Error: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(context.l10n.profileErrorWithDetails(e))),
+          );
         }
       }
     }
@@ -164,7 +189,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'Account',
+                  context.l10n.profileAccountSection,
                   style: TextStyle(
                     color: AppTheme.getTextColor(
                       context,
@@ -184,8 +209,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: <Widget>[
                     _MenuItemWithCustomIcon(
                       icon: Icons.person_outline,
-                      title: 'Edit Profile',
-                      subtitle: 'Update your personal information',
+                      title: context.l10n.profileEditTitle,
+                      subtitle: context.l10n.profileEditSubtitle,
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -196,8 +221,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     _MenuItemWithCustomIcon(
                       icon: Icons.lock_outline,
-                      title: 'Change Password',
-                      subtitle: 'Update your account password',
+                      title: context.l10n.profileChangePasswordTitle,
+                      subtitle: context.l10n.profileChangePasswordSubtitle,
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
@@ -220,18 +245,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ? Icons.access_time_rounded
                               : Icons.delete_outline,
                           title: isPending
-                              ? 'Deletion Pending'
-                              : 'Delete Account',
+                              ? context.l10n.profileDeletionPendingTitle
+                              : context.l10n.profileDeleteAccountTitle,
                           subtitle: isPending
-                              ? 'Awaiting admin approval'
-                              : 'Permanently remove your account',
+                              ? context.l10n.profileAwaitingAdminApproval
+                              : context.l10n.profileDeleteAccountSubtitle,
                           isDestructive: !isPending,
                           onTap: isPending
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
+                                    SnackBar(
                                       content: Text(
-                                        'Your account deletion request is awaiting approval.',
+                                        context
+                                            .l10n
+                                            .profileDeletionPendingMessage,
                                       ),
                                     ),
                                   );
@@ -249,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  'Privacy & Security',
+                  context.l10n.profilePrivacySecuritySection,
                   style: TextStyle(
                     color: AppTheme.getTextColor(
                       context,
@@ -276,7 +303,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Padding(
                         padding: const EdgeInsets.all(20),
                         child: Text(
-                          'No pages available',
+                          context.l10n.profileNoPagesAvailable,
                           style: TextStyle(
                             color: AppTheme.getTextColor(
                               context,
@@ -286,15 +313,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       )
                     else
                       ..._customPages.map((page) {
+                        final String localizedTitle = _localizedCustomPageTitle(
+                          context,
+                          page,
+                        );
+
                         return _MenuItem(
                           icon: HugeIcons.strokeRoundedFile01,
-                          title: page.title,
-                          subtitle: 'View ${page.title}',
+                          title: localizedTitle,
+                          subtitle: context.l10n.profileViewPage(
+                            localizedTitle,
+                          ),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => PrivacyTermsScreen(
-                                  title: page.title,
+                                  title: localizedTitle,
                                   slug: page.slug,
                                 ),
                               ),
@@ -361,16 +395,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     _MenuItem(
                       icon: HugeIcons.strokeRoundedStar,
-                      title: 'Rate App',
-                      subtitle: 'Rate us on the app store',
+                      title: context.l10n.profileRateAppTitle,
+                      subtitle: context.l10n.profileRateAppSubtitle,
                       onTap: () {
                         showRateAppSheet(context);
                       },
                     ),
                     _MenuItem(
                       icon: HugeIcons.strokeRoundedShare01,
-                      title: 'Share App',
-                      subtitle: 'Share with friends and family',
+                      title: context.l10n.profileShareAppTitle,
+                      subtitle: context.l10n.profileShareAppSubtitle,
                       onTap: () {
                         showShareAppSheet(context);
                       },

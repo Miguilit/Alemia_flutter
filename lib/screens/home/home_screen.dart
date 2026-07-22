@@ -123,13 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           }
         } else {
-          _handleError('Failed to load data');
+          _handleError(context.l10n.residualFailedToLoadData);
         }
       } else {
-        _handleError('Server error: ${response.statusCode}');
+        _handleError(context.l10n.residualServerError(response.statusCode));
       }
     } catch (e) {
-      _handleError('Connection error: $e');
+      _handleError(context.l10n.residualConnectionError);
     }
   }
 
@@ -283,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Oops!',
+              context.l10n.residualOops,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -306,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 _fetchData();
               },
               icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
+              label: Text(context.l10n.residualTryAgain),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMainContent() {
     final data = _homeData;
     if (data == null) {
-      return const Center(child: Text('No data found'));
+      return Center(child: Text(context.l10n.residualNoDataFound));
     }
 
     return CustomScrollView(
@@ -411,7 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _SectionHeader(
-                title: 'Course Bundles',
+                title: context.l10n.residualCourseBundles,
                 actionText: context.l10n.seeAll,
                 onSeeAllTap: () {
                   Navigator.of(context).push(
@@ -505,7 +505,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      '$courseCount Courses',
+                                      context.l10n.residualCourseCount(
+                                        courseCount,
+                                      ),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -562,7 +564,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _SectionHeader(
-                title: 'AI Suggestions',
+                title: context.l10n.residualAiSuggestions,
                 actionText: context.l10n.seeAll,
                 onSeeAllTap: () {
                   Navigator.of(context).push(
@@ -585,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: _SectionHeader(
-                title: 'Most Recent',
+                title: context.l10n.residualMostRecent,
                 actionText: context.l10n.seeAll,
                 onSeeAllTap: () {
                   Navigator.of(context).push(
@@ -689,7 +691,9 @@ class _HomeAppBar extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isAuthenticated ? (user?.name ?? 'User') : 'Guest',
+                      isAuthenticated
+                          ? (user?.name ?? context.l10n.residualUser)
+                          : context.l10n.residualGuest,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 20,
@@ -1631,7 +1635,7 @@ class _PopularCoursesRow extends StatelessWidget {
                               Text(
                                 course.price != null
                                     ? settingsProvider.formatPrice(course.price)
-                                    : 'Free',
+                                    : context.l10n.residualFree,
                                 style: TextStyle(
                                   color: AppTheme.getTextColor(context),
                                   fontSize: 14,
@@ -1888,7 +1892,7 @@ class _AiSuggestionsRow extends StatelessWidget {
                               Text(
                                 course.price != null
                                     ? settingsProvider.formatPrice(course.price)
-                                    : 'Free',
+                                    : context.l10n.residualFree,
                                 style: TextStyle(
                                   color: AppTheme.getTextColor(context),
                                   fontSize: 14,
@@ -2110,7 +2114,7 @@ class _MostRecentCourseDetails extends StatelessWidget {
               Text(
                 course.price != null
                     ? settingsProvider.formatPrice(course.price)
-                    : 'Free',
+                    : context.l10n.residualFree,
                 style: TextStyle(
                   color: AppTheme.getTextColor(context),
                   fontSize: 15,

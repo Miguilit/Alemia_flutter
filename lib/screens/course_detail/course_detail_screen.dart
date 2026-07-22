@@ -708,11 +708,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_error ?? 'An unknown error occurred'),
+              Text(_error ?? context.l10n.unknownErrorOccurred),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _fetchCourseDetail,
-                child: const Text('Retry'),
+                child: Text(context.l10n.retry),
               ),
             ],
           ),

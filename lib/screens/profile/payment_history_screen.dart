@@ -222,7 +222,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: _FilterChip(
-                        label: filter,
+                        label: filter == 'All'
+                            ? context.l10n.profileAllPayments
+                            : filter,
                         isSelected:
                             _selectedFilter.toLowerCase() ==
                             filter.toLowerCase(),
@@ -243,7 +245,7 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen> {
                       icon: Icons.payment,
                       message: _payments.isEmpty
                           ? context.l10n.noPayments
-                          : 'No payments found for $_selectedFilter',
+                          : context.l10n.profileNoPaymentsFor(_selectedFilter),
                     )
                   : RefreshIndicator(
                       onRefresh: () => _loadPayments(),
@@ -412,7 +414,7 @@ class _PaymentCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        payment.status.toUpperCase(),
+                        context.l10n.profilePaymentStatus(payment.status),
                         style: TextStyle(
                           color: _getStatusColor(payment.status),
                           fontSize: 10,
@@ -577,9 +579,9 @@ class _PaymentDetailSheet extends StatelessWidget {
   Future<void> _downloadReceipt(BuildContext context) async {
     if (payment.receiptUrl == null) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Downloading receipt...')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.profileDownloadingReceipt)),
+    );
 
     try {
       final fileName = 'receipt_${payment.id}.pdf';
@@ -591,10 +593,10 @@ class _PaymentDetailSheet extends StatelessWidget {
         if (filePath != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Receipt downloaded successfully'),
+              content: Text(context.l10n.profileReceiptDownloaded),
               backgroundColor: Colors.green,
               action: SnackBarAction(
-                label: 'Open',
+                label: context.l10n.profileOpen,
                 textColor: Colors.white,
                 onPressed: () {
                   OpenFilex.open(filePath);
@@ -604,8 +606,8 @@ class _PaymentDetailSheet extends StatelessWidget {
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to download receipt'),
+            SnackBar(
+              content: Text(context.l10n.profileReceiptDownloadFailed),
               backgroundColor: Colors.red,
             ),
           );
@@ -614,7 +616,10 @@ class _PaymentDetailSheet extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(context.l10n.profileErrorWithDetails(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -723,7 +728,7 @@ class _PaymentDetailSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    payment.status.toUpperCase(),
+                    context.l10n.profilePaymentStatus(payment.status),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -774,7 +779,7 @@ class _PaymentDetailSheet extends StatelessWidget {
                   Consumer<SettingsProvider>(
                     builder: (context, settingsProvider, _) => _buildDetailRow(
                       context,
-                      'Discount',
+                      context.l10n.profileDiscountLabel,
                       '-${settingsProvider.formatPrice(payment.discountAmount)}',
                     ),
                   ),
@@ -782,7 +787,7 @@ class _PaymentDetailSheet extends StatelessWidget {
                     _buildDivider(context),
                     _buildDetailRow(
                       context,
-                      'Promo Code',
+                      context.l10n.profilePromoCodeLabel,
                       payment.couponCode!,
                     ),
                   ],
@@ -791,7 +796,7 @@ class _PaymentDetailSheet extends StatelessWidget {
                   _buildDivider(context),
                   _buildDetailRow(
                     context,
-                    'Transaction ID',
+                    context.l10n.profileTransactionIdLabel,
                     payment.transactionId!,
                   ),
                 ],
@@ -810,7 +815,7 @@ class _PaymentDetailSheet extends StatelessWidget {
                   size: 20,
                   color: Colors.white,
                 ),
-                label: const Text('Download Receipt'),
+                label: Text(context.l10n.profileDownloadReceipt),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.getPrimaryColor(context),
                   foregroundColor: Colors.white,

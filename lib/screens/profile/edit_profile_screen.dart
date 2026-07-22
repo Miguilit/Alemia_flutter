@@ -66,7 +66,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           messenger.showSnackBar(
             SnackBar(
               content: Text(
-                'Profile photo updated successfully',
+                context.l10n.profilePhotoUpdated,
                 style: TextStyle(color: textColor),
               ),
               backgroundColor: cardColor,
@@ -79,7 +79,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       if (mounted) {
         messenger.showSnackBar(
           SnackBar(
-            content: Text('Error uploading photo: $e'),
+            content: Text(context.l10n.profilePhotoUploadFailed(e)),
             backgroundColor: Colors.red,
           ),
         );
@@ -118,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           messenger.showSnackBar(
             SnackBar(
               content: Text(
-                'Profile updated successfully',
+                context.l10n.profileUpdated,
                 style: TextStyle(color: textColor),
               ),
               backgroundColor: cardColor,
@@ -130,7 +130,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       } catch (e) {
         if (mounted) {
           messenger.showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(context.l10n.profileErrorWithDetails(e)),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       } finally {
@@ -173,7 +176,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                   Expanded(
                     child: Text(
-                      'Edit Profile',
+                      context.l10n.profileEditTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
@@ -245,11 +248,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: _inputDecoration(
                           context,
                           label: context.l10n.firstName,
-                          hint: 'Enter your first name',
+                          hint: context.l10n.profileFirstNameHint,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your first name';
+                            return context.l10n.profileFirstNameRequired;
                           }
                           return null;
                         },
@@ -261,11 +264,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: _inputDecoration(
                           context,
                           label: context.l10n.lastName,
-                          hint: 'Enter your last name',
+                          hint: context.l10n.profileLastNameHint,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your last name';
+                            return context.l10n.profileLastNameRequired;
                           }
                           return null;
                         },
@@ -278,14 +281,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         decoration: _inputDecoration(
                           context,
                           label: context.l10n.email,
-                          hint: 'Enter your email',
+                          hint: context.l10n.profileEmailHint,
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return context.l10n.profileEmailRequired;
                           }
                           if (!value.contains('@')) {
-                            return 'Please enter a valid email';
+                            return context.l10n.profileEmailInvalid;
                           }
                           return null;
                         },
@@ -297,8 +300,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         keyboardType: TextInputType.phone,
                         decoration: _inputDecoration(
                           context,
-                          label: 'Phone Number',
-                          hint: 'Enter your phone number',
+                          label: context.l10n.profilePhoneNumberLabel,
+                          hint: context.l10n.profilePhoneNumberHint,
                         ),
                         validator: (value) {
                           return null; // Phone is optional in backend validation but typical to have
@@ -311,8 +314,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         maxLines: 4,
                         decoration: _inputDecoration(
                           context,
-                          label: 'Bio',
-                          hint: 'Tell us about yourself',
+                          label: context.l10n.profileBioLabel,
+                          hint: context.l10n.profileBioHint,
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -340,7 +343,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                 )
                               : Text(
-                                  'Save Changes',
+                                  context.l10n.profileSaveChanges,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

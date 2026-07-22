@@ -114,7 +114,7 @@ class _AssignmentSubmitScreenState extends State<AssignmentSubmitScreen> {
     if (_attachedFilePath == null && _commentsController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please attach a file or write a comment.'),
+          content: Text(context.l10n.assignmentAttachFileOrComment),
           backgroundColor: Colors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -151,19 +151,23 @@ class _AssignmentSubmitScreenState extends State<AssignmentSubmitScreen> {
           _showSuccessDialog();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'] ?? 'Submission failed')),
+            SnackBar(
+              content: Text(
+                data['message'] ?? context.l10n.courseSubmissionFailed,
+              ),
+            ),
           );
         }
       } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Submission failed')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.courseSubmissionFailed)),
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.communityGenericError(e))),
+        );
       }
     } finally {
       if (mounted) {
@@ -688,7 +692,9 @@ class _AssignmentSubmitScreenState extends State<AssignmentSubmitScreen> {
                   decoration: InputDecoration(
                     hintText: context.l10n.addComments,
                     hintStyle: TextStyle(
-                      color: AppTheme.getTextColor(context).withValues(alpha: 0.5),
+                      color: AppTheme.getTextColor(
+                        context,
+                      ).withValues(alpha: 0.5),
                       fontSize: 14,
                     ),
                     border: OutlineInputBorder(

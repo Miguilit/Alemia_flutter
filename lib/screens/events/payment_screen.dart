@@ -80,16 +80,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final Map<String, dynamic> errorData =
             jsonDecode(response.body) as Map<String, dynamic>;
         final String message =
-            (errorData['message'] as String?) ?? 'Failed to book event.';
+            (errorData['message'] as String?) ??
+            context.l10n.eventPaymentBookingFailed;
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.checkoutError('$e'))),
+        );
       }
     } finally {
       if (mounted) {
@@ -101,22 +102,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   final List<Map<String, dynamic>> _paymentMethods = <Map<String, dynamic>>[
-    <String, dynamic>{
-      'id': 'card',
-      'name': 'Credit/Debit Card',
-      'icon': Icons.credit_card,
-    },
-    <String, dynamic>{
-      'id': 'paypal',
-      'name': 'PayPal',
-      'icon': Icons.account_balance_wallet,
-    },
-    <String, dynamic>{'id': 'apple', 'name': 'Apple Pay', 'icon': Icons.apple},
-    <String, dynamic>{
-      'id': 'google',
-      'name': 'Google Pay',
-      'icon': Icons.account_balance,
-    },
+    <String, dynamic>{'id': 'card', 'icon': Icons.credit_card},
+    <String, dynamic>{'id': 'paypal', 'icon': Icons.account_balance_wallet},
+    <String, dynamic>{'id': 'apple', 'icon': Icons.apple},
+    <String, dynamic>{'id': 'google', 'icon': Icons.account_balance},
   ];
 
   @override
@@ -166,7 +155,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Order Summary',
+                        l10n.eventPaymentOrderSummary,
                         style: TextStyle(
                           color: AppTheme.getTextColor(context),
                           fontSize: 18,
@@ -174,27 +163,30 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      _SummaryRow(label: 'Event', value: widget.event.title),
+                      _SummaryRow(
+                        label: l10n.eventPaymentEvent,
+                        value: widget.event.title,
+                      ),
                       const SizedBox(height: 12),
                       _SummaryRow(
-                        label: 'Ticket Type',
+                        label: l10n.eventPaymentTicketType,
                         value: widget.ticketType,
                       ),
                       const SizedBox(height: 12),
                       _SummaryRow(
-                        label: 'Quantity',
+                        label: l10n.eventPaymentQuantity,
                         value: widget.quantity.toString(),
                       ),
                       const Divider(height: 24),
                       _SummaryRow(
-                        label: 'Subtotal',
+                        label: l10n.eventPaymentSubtotal,
                         value: widget.subtotal == 0
                             ? l10n.free
                             : settingsProvider.formatPrice(widget.subtotal),
                       ),
                       const SizedBox(height: 8),
                       _SummaryRow(
-                        label: 'Service Fee',
+                        label: l10n.eventPaymentServiceFee,
                         value: widget.serviceFee == 0
                             ? l10n.free
                             : settingsProvider.formatPrice(widget.serviceFee),
@@ -204,7 +196,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Text(
-                            'Total',
+                            l10n.checkoutTotal,
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 18,
@@ -238,7 +230,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'Card Details',
+                          l10n.eventPaymentMethodsTitle,
                           style: TextStyle(
                             color: AppTheme.getTextColor(context),
                             fontSize: 18,
@@ -287,7 +279,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Text(
-                                      method['name'] as String,
+                                      l10n.eventPaymentMethodName(
+                                        method['id'] as String,
+                                      ),
                                       style: TextStyle(
                                         color: AppTheme.getTextColor(context),
                                         fontSize: 16,
@@ -317,7 +311,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            'Card Details',
+                            l10n.eventPaymentCardDetails,
                             style: TextStyle(
                               color: AppTheme.getTextColor(context),
                               fontSize: 18,
@@ -328,8 +322,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           TextField(
                             controller: _cardHolderController,
                             decoration: InputDecoration(
-                              labelText: 'Card Holder Name',
-                              hintText: 'John Doe',
+                              labelText: l10n.eventPaymentCardHolderName,
+                              hintText: l10n.eventPaymentCardHolderExample,
                               filled: true,
                               fillColor: AppTheme.getCardColor(context),
                               border: OutlineInputBorder(
@@ -357,7 +351,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           TextField(
                             controller: _cardNumberController,
                             decoration: InputDecoration(
-                              labelText: 'Card Number',
+                              labelText: l10n.eventPaymentCardNumber,
                               hintText: '1234 5678 9012 3456',
                               filled: true,
                               fillColor: AppTheme.getCardColor(context),
@@ -390,8 +384,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 child: TextField(
                                   controller: _expiryController,
                                   decoration: InputDecoration(
-                                    labelText: 'Expiry',
-                                    hintText: 'MM/YY',
+                                    labelText: l10n.eventPaymentExpiry,
+                                    hintText: l10n.eventPaymentExpiryHint,
                                     filled: true,
                                     fillColor: AppTheme.getCardColor(context),
                                     border: OutlineInputBorder(
@@ -424,7 +418,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                 child: TextField(
                                   controller: _cvvController,
                                   decoration: InputDecoration(
-                                    labelText: 'CVV',
+                                    labelText: l10n.eventPaymentCvv,
                                     hintText: '123',
                                     filled: true,
                                     fillColor: AppTheme.getCardColor(context),
@@ -510,8 +504,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         children: <Widget>[
                           Text(
                             widget.total == 0
-                                ? 'Complete Registration'
-                                : 'Pay Now',
+                                ? l10n.eventPaymentCompleteRegistration
+                                : l10n.eventPaymentPayNow,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -536,10 +530,13 @@ class _SummaryRow extends StatelessWidget {
   final String label;
   final String value;
 
-  bool _isAmountValue(String value, SettingsProvider settingsProvider) {
+  bool _isAmountValue(
+    String value,
+    SettingsProvider settingsProvider,
+    String freeLabel,
+  ) {
     return value.contains(settingsProvider.currencySymbol) ||
-        value == 'Free' ||
-        value == 'free';
+        value == freeLabel;
   }
 
   @override
@@ -559,7 +556,7 @@ class _SummaryRow extends StatelessWidget {
         Text(
           value,
           style: TextStyle(
-            color: _isAmountValue(value, settingsProvider)
+            color: _isAmountValue(value, settingsProvider, context.l10n.free)
                 ? (Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
                       : AppTheme.getTextColor(context))

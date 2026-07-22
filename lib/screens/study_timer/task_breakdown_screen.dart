@@ -13,10 +13,9 @@ class TaskBreakdownScreen extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness:
-            Theme.of(context).brightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
+        statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark,
         statusBarBrightness: Theme.of(context).brightness == Brightness.dark
             ? Brightness.dark
             : Brightness.light,
@@ -25,44 +24,45 @@ class TaskBreakdownScreen extends StatelessWidget {
 
     final List<_TaskData> tasks = <_TaskData>[
       _TaskData(
-        title: 'Mathematics Assignment',
-        description: 'Complete chapter 5 exercises',
-        duration: '25 min',
-        status: 'Completed',
+        title: context.l10n.residualTaskMathematicsAssignment,
+        description: context.l10n.residualTaskCompleteChapterExercises,
+        duration: context.l10n.residualMinutesShort(25),
+        status: context.l10n.residualTaskCompleted,
         color: AppTheme.getPrimaryColor(context),
       ),
       _TaskData(
-        title: 'Physics Problem Set',
-        description: 'Solve problems 1-10',
-        duration: '50 min',
-        status: 'In Progress',
+        title: context.l10n.residualTaskPhysicsProblemSet,
+        description: context.l10n.residualTaskSolveProblems,
+        duration: context.l10n.residualMinutesShort(50),
+        status: context.l10n.residualTaskInProgress,
         color: AppTheme.softOrange800,
       ),
       _TaskData(
-        title: 'Chemistry Lab Report',
-        description: 'Write up experiment results',
-        duration: '30 min',
-        status: 'Pending',
+        title: context.l10n.residualTaskChemistryLabReport,
+        description: context.l10n.residualTaskWriteExperimentResults,
+        duration: context.l10n.residualMinutesShort(30),
+        status: context.l10n.residualTaskPending,
         color: AppTheme.softBlue800,
       ),
       _TaskData(
-        title: 'English Essay',
-        description: 'Draft introduction and body paragraphs',
-        duration: '45 min',
-        status: 'Pending',
+        title: context.l10n.residualTaskEnglishEssay,
+        description: context.l10n.residualTaskDraftEssay,
+        duration: context.l10n.residualMinutesShort(45),
+        status: context.l10n.residualTaskPending,
         color: AppTheme.getTextColor(context).withValues(alpha: 0.3),
       ),
       _TaskData(
-        title: 'History Reading',
-        description: 'Read chapter 8 and take notes',
-        duration: '40 min',
-        status: 'Completed',
+        title: context.l10n.residualTaskHistoryReading,
+        description: context.l10n.residualTaskReadChapterNotes,
+        duration: context.l10n.residualMinutesShort(40),
+        status: context.l10n.residualTaskCompleted,
         color: AppTheme.getPrimaryColor(context),
       ),
     ];
 
-    final int completedTasks =
-        tasks.where((t) => t.status == 'Completed').length;
+    final int completedTasks = tasks
+        .where((t) => t.status == context.l10n.residualTaskCompleted)
+        .length;
     final int totalTasks = tasks.length;
     final double completionRate = completedTasks / totalTasks;
 
@@ -274,8 +274,9 @@ class _TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCompleted = task.status == 'Completed';
-    final bool isInProgress = task.status == 'In Progress';
+    final bool isCompleted = task.status == context.l10n.residualTaskCompleted;
+    final bool isInProgress =
+        task.status == context.l10n.residualTaskInProgress;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -299,8 +300,8 @@ class _TaskCard extends StatelessWidget {
               color: isCompleted
                   ? AppTheme.getPrimaryColor(context)
                   : isInProgress
-                      ? AppTheme.softOrange800
-                      : AppTheme.getTextColor(context).withValues(alpha: 0.2),
+                  ? AppTheme.softOrange800
+                  : AppTheme.getTextColor(context).withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -339,7 +340,9 @@ class _TaskCard extends StatelessWidget {
                 Text(
                   task.description,
                   style: TextStyle(
-                    color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.6),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Montserrat',
@@ -363,7 +366,8 @@ class _TaskCard extends StatelessWidget {
                           Icon(
                             Icons.timer_outlined,
                             size: 12,
-                            color: Theme.of(context).brightness == Brightness.dark
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
                                 ? Colors.white
                                 : AppTheme.getPrimaryColor(context),
                           ),
@@ -371,7 +375,9 @@ class _TaskCard extends StatelessWidget {
                           Text(
                             task.duration,
                             style: TextStyle(
-                              color: Theme.of(context).brightness == Brightness.dark
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
                                   ? Colors.white
                                   : AppTheme.getPrimaryColor(context),
                               fontSize: 11,
@@ -390,10 +396,12 @@ class _TaskCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: isCompleted
-                            ? AppTheme.getPrimaryColor(context).withValues(alpha: 0.15)
+                            ? AppTheme.getPrimaryColor(
+                                context,
+                              ).withValues(alpha: 0.15)
                             : isInProgress
-                                ? AppTheme.softOrange800.withValues(alpha: 0.15)
-                                : AppTheme.getBackgroundColor(context),
+                            ? AppTheme.softOrange800.withValues(alpha: 0.15)
+                            : AppTheme.getBackgroundColor(context),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -401,11 +409,13 @@ class _TaskCard extends StatelessWidget {
                         style: TextStyle(
                           color: isCompleted
                               ? (Theme.of(context).brightness == Brightness.dark
-                                  ? Colors.white
-                                  : AppTheme.getPrimaryColor(context))
+                                    ? Colors.white
+                                    : AppTheme.getPrimaryColor(context))
                               : isInProgress
-                                  ? AppTheme.softOrange800
-                                  : AppTheme.getTextColor(context).withValues(alpha: 0.6),
+                              ? AppTheme.softOrange800
+                              : AppTheme.getTextColor(
+                                  context,
+                                ).withValues(alpha: 0.6),
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Montserrat',

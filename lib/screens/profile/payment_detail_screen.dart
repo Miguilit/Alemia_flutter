@@ -5,6 +5,7 @@ import 'package:open_filex/open_filex.dart';
 import '../../theme/app_theme.dart';
 import '../../models/payment.dart';
 import '../../services/payment_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class PaymentDetailScreen extends StatelessWidget {
   final Payment payment;
@@ -14,9 +15,9 @@ class PaymentDetailScreen extends StatelessWidget {
   Future<void> _downloadReceipt(BuildContext context) async {
     if (payment.receiptUrl == null) return;
 
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Downloading receipt...')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(context.l10n.profileDownloadingReceipt)),
+    );
 
     try {
       final fileName = 'receipt_${payment.id}.pdf';
@@ -28,10 +29,10 @@ class PaymentDetailScreen extends StatelessWidget {
         if (filePath != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Receipt downloaded successfully'),
+              content: Text(context.l10n.profileReceiptDownloaded),
               backgroundColor: Colors.green,
               action: SnackBarAction(
-                label: 'Open',
+                label: context.l10n.profileOpen,
                 textColor: Colors.white,
                 onPressed: () {
                   OpenFilex.open(filePath);
@@ -44,7 +45,7 @@ class PaymentDetailScreen extends StatelessWidget {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to download receipt'),
+              content: Text(context.l10n.profileReceiptDownloadFailed),
               backgroundColor: Colors.red,
             ),
           );
@@ -53,7 +54,10 @@ class PaymentDetailScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(context.l10n.profileErrorWithDetails(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -65,7 +69,7 @@ class PaymentDetailScreen extends StatelessWidget {
       backgroundColor: AppTheme.getBackgroundColor(context),
       appBar: AppBar(
         title: Text(
-          'Payment Details',
+          context.l10n.profilePaymentDetailsTitle,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
             fontSize: 20,
@@ -162,7 +166,7 @@ class PaymentDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              payment.status.toUpperCase(),
+              context.l10n.profilePaymentStatus(payment.status),
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -193,7 +197,7 @@ class PaymentDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Transaction Details',
+            context.l10n.profileTransactionDetailsTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -201,22 +205,30 @@ class PaymentDetailScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24),
-          _buildDetailRow(context, 'Course', payment.courseTitle),
+          _buildDetailRow(
+            context,
+            context.l10n.profileCourseLabel,
+            payment.courseTitle,
+          ),
           _buildDivider(context),
           _buildDetailRow(
             context,
-            'Date',
+            context.l10n.profileDateLabel,
             DateFormat('MMM d, yyyy h:mm a').format(payment.createdAt),
           ),
           _buildDivider(context),
           _buildDetailRow(
             context,
-            'Payment Method',
+            context.l10n.profilePaymentMethodLabel,
             payment.paymentMethod.toUpperCase(),
           ),
           if (payment.transactionId != null) ...[
             _buildDivider(context),
-            _buildDetailRow(context, 'Transaction ID', payment.transactionId!),
+            _buildDetailRow(
+              context,
+              context.l10n.profileTransactionIdLabel,
+              payment.transactionId!,
+            ),
           ],
         ],
       ),
@@ -273,7 +285,7 @@ class PaymentDetailScreen extends StatelessWidget {
           size: 20,
           color: Colors.white,
         ),
-        label: Text('Download Receipt'),
+        label: Text(context.l10n.profileDownloadReceipt),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppTheme.getPrimaryColor(context),
           foregroundColor: Colors.white,

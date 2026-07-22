@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,45 +29,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isExpanded = false;
   bool _isEventInfoExpanded = false;
 
-  String _formatDate(DateTime date) {
-    final List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
-  }
+  String get _localeTag => Localizations.localeOf(context).toLanguageTag();
 
-  String _formatDayOfWeek(DateTime date) {
-    final List<String> days = <String>[
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    return days[date.weekday - 1];
+  String _formatDate(DateTime date) {
+    return DateFormat.yMMMd(_localeTag).format(date);
   }
 
   String _formatFullDate(DateTime date) {
-    return '${_formatDayOfWeek(date)}, ${_formatDate(date)}';
+    return DateFormat.yMMMMEEEEd(_localeTag).format(date);
   }
 
   Future<void> _showShareSheet(BuildContext context) async {
     final String url = '${AppConfig.baseUrl}/events/${widget.event.id}';
     await SharePlus.instance.share(
-      ShareParams(text: 'Check out this event: ${widget.event.title}\n$url'),
+      ShareParams(
+        text: context.l10n.residualShareEvent(widget.event.title, url),
+      ),
     );
   }
 
@@ -85,9 +63,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       await launchUrl(appleMapsUri);
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Could not open maps.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.residualCouldNotOpenMaps)),
+        );
       }
     }
   }
@@ -197,7 +175,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  event.summary ?? 'Event',
+                                  event.summary ?? context.l10n.residualEvent,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
@@ -248,7 +226,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   if (event.confirmedBookingsCount > 0)
                                     const SizedBox(width: 8),
                                   Text(
-                                    '${event.confirmedBookingsCount} going',
+                                    context.l10n.residualGoingCount(
+                                      event.confirmedBookingsCount,
+                                    ),
                                     style: TextStyle(
                                       color: AppTheme.getTextColor(context),
                                       fontSize: 14,
@@ -312,7 +292,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Organizer',
+                                  context.l10n.residualOrganizer,
                                   style: TextStyle(
                                     color: AppTheme.getTextColor(
                                       context,
@@ -353,7 +333,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     Text(
                                       event.startDate != null
                                           ? _formatFullDate(event.startDate!)
-                                          : 'TBD',
+                                          : context.l10n.residualTbd,
                                       style: TextStyle(
                                         color: AppTheme.getTextColor(context),
                                         fontSize: 16,
@@ -423,7 +403,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Text(
-                                              'Event Information',
+                                              context
+                                                  .l10n
+                                                  .residualEventInformation,
                                               style: TextStyle(
                                                 color: AppTheme.getTextColor(
                                                   context,
@@ -435,41 +417,55 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                             const SizedBox(height: 16),
                                             _InfoRow(
                                               icon: Icons.calendar_today,
-                                              label: 'Start Date',
+                                              label: context
+                                                  .l10n
+                                                  .residualStartDate,
                                               value: event.startDate != null
                                                   ? _formatDate(
                                                       event.startDate!,
                                                     )
-                                                  : 'TBD',
+                                                  : context.l10n.residualTbd,
                                             ),
                                             _InfoRow(
                                               icon: Icons.calendar_today,
-                                              label: 'End Date',
+                                              label:
+                                                  context.l10n.residualEndDate,
                                               value: event.endDate != null
                                                   ? _formatDate(event.endDate!)
                                                   : (event.startDate != null
                                                         ? _formatDate(
                                                             event.startDate!,
                                                           )
-                                                        : 'TBD'),
+                                                        : context
+                                                              .l10n
+                                                              .residualTbd),
                                             ),
                                             _InfoRow(
                                               icon: Icons.access_time,
-                                              label: 'Start Time',
-                                              value: event.startTime ?? 'TBD',
+                                              label: context
+                                                  .l10n
+                                                  .residualStartTime,
+                                              value:
+                                                  event.startTime ??
+                                                  context.l10n.residualTbd,
                                             ),
                                             _InfoRow(
                                               icon: Icons.access_time_filled,
-                                              label: 'End Time',
-                                              value: event.endTime ?? 'TBD',
+                                              label:
+                                                  context.l10n.residualEndTime,
+                                              value:
+                                                  event.endTime ??
+                                                  context.l10n.residualTbd,
                                             ),
                                             _InfoRow(
                                               icon: Icons.confirmation_number,
-                                              label: 'Ticket Price',
+                                              label: context
+                                                  .l10n
+                                                  .residualTicketPrice,
                                               value:
                                                   event.price == 0 ||
                                                       event.price == null
-                                                  ? 'Free'
+                                                  ? context.l10n.residualFree
                                                   : settingsProvider
                                                         .formatPrice(
                                                           event.price,
@@ -481,22 +477,36 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                             ),
                                             _InfoRow(
                                               icon: Icons.event_seat,
-                                              label: 'Total Seat',
+                                              label: context
+                                                  .l10n
+                                                  .residualTotalSeats,
                                               value:
-                                                  '${event.totalSeats ?? 'Unlimited'}',
+                                                  event.totalSeats
+                                                      ?.toString() ??
+                                                  context
+                                                      .l10n
+                                                      .residualUnlimited,
                                             ),
                                             _InfoRow(
                                               icon: Icons.event_seat_outlined,
-                                              label: 'Remaining Seats',
+                                              label: context
+                                                  .l10n
+                                                  .residualRemainingSeats,
                                               value: event.totalSeats != null
                                                   ? '${event.totalSeats! - event.confirmedBookingsCount}'
-                                                  : 'Unlimited',
+                                                  : context
+                                                        .l10n
+                                                        .residualUnlimited,
                                             ),
                                             _InfoRow(
                                               icon: Icons.book_online,
-                                              label: 'Bookings',
-                                              value:
-                                                  '${event.confirmedBookingsCount} total',
+                                              label:
+                                                  context.l10n.residualBookings,
+                                              value: context.l10n
+                                                  .residualTotalCount(
+                                                    event
+                                                        .confirmedBookingsCount,
+                                                  ),
                                             ),
                                           ],
                                         ),
@@ -537,8 +547,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               },
                               child: Text(
                                 _isEventInfoExpanded
-                                    ? 'Show Less'
-                                    : 'See All Info',
+                                    ? context.l10n.residualShowLess
+                                    : context.l10n.residualSeeAllInfo,
                                 style: TextStyle(
                                   color: AppTheme.getPrimaryColor(context),
                                   fontWeight: FontWeight.bold,
@@ -559,7 +569,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              "What you'll experience",
+                              context.l10n.residualWhatYouWillExperience,
                               style: TextStyle(
                                 color: AppTheme.getTextColor(context),
                                 fontSize: 20,
@@ -673,7 +683,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     Text(
                                       event.locationDescription ??
                                           event.location ??
-                                          'Online',
+                                          context.l10n.residualOnline,
                                       style: TextStyle(
                                         color: AppTheme.getTextColor(context),
                                         fontSize: 16,
@@ -682,7 +692,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      event.location ?? 'Online',
+                                      event.location ??
+                                          context.l10n.residualOnline,
                                       style: TextStyle(
                                         color: AppTheme.getTextColor(
                                           context,
@@ -705,7 +716,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             ),
                             child: Text(
-                              'See Location on Maps',
+                              context.l10n.residualSeeLocationOnMaps,
                               style: TextStyle(
                                 color:
                                     Theme.of(context).brightness ==
@@ -767,7 +778,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: Text(
-                                _isExpanded ? 'Read less' : 'Read more...',
+                                _isExpanded
+                                    ? context.l10n.residualReadLess
+                                    : context.l10n.residualReadMore,
                                 style: TextStyle(
                                   color:
                                       Theme.of(context).brightness ==
@@ -793,7 +806,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'Event Speakers',
+                              context.l10n.residualEventSpeakers,
                               style: TextStyle(
                                 color:
                                     Theme.of(context).brightness ==
@@ -896,7 +909,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                           child: Column(
                                             children: <Widget>[
                                               Text(
-                                                name ?? 'Speaker',
+                                                name ??
+                                                    context
+                                                        .l10n
+                                                        .residualSpeaker,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 textAlign: TextAlign.center,
@@ -974,7 +990,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                 child: Text(
                                   event.locationDescription ??
                                       event.location ??
-                                      'Online',
+                                      context.l10n.residualOnline,
                                   style: TextStyle(
                                     color: AppTheme.getTextColor(
                                       context,
@@ -1298,19 +1314,19 @@ class _CountdownTimerState extends State<_CountdownTimer> {
         children: <Widget>[
           _TimerUnit(
             value: _timeLeft.inDays.toString().padLeft(2, '0'),
-            label: 'DAYS',
+            label: context.l10n.residualDays,
           ),
           _TimerUnit(
             value: (_timeLeft.inHours % 24).toString().padLeft(2, '0'),
-            label: 'HOURS',
+            label: context.l10n.residualHours,
           ),
           _TimerUnit(
             value: (_timeLeft.inMinutes % 60).toString().padLeft(2, '0'),
-            label: 'MINUTES',
+            label: context.l10n.residualMinutes,
           ),
           _TimerUnit(
             value: (_timeLeft.inSeconds % 60).toString().padLeft(2, '0'),
-            label: 'SECONDS',
+            label: context.l10n.residualSeconds,
           ),
         ],
       ),

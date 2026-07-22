@@ -563,7 +563,7 @@ class _CourseCard extends StatelessWidget {
                           Text(
                             course.price != null
                                 ? settingsProvider.formatPrice(course.price)
-                                : 'Free',
+                                : context.l10n.residualFree,
                             style: const TextStyle(
                               color: AppTheme.primary,
                               fontSize: 15,
@@ -667,9 +667,9 @@ class _FilterSheetState extends State<_FilterSheet> {
                 ),
                 TextButton(
                   onPressed: _clearFilters,
-                  child: const Text(
-                    'Clear',
-                    style: TextStyle(color: Colors.white),
+                  child: Text(
+                    context.l10n.residualClear,
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -700,7 +700,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                     ),
                     const SizedBox(height: 16),
                     if (widget.categories.isEmpty)
-                      const Text('No categories available'),
+                      Text(context.l10n.residualNoCategoriesAvailable),
                     Wrap(
                       spacing: 12,
                       runSpacing: 12,
@@ -793,7 +793,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                           range,
                         );
                         return _FilterChip(
-                          label: '$range Hours',
+                          label: context.l10n.residualHoursRange(range),
                           isSelected: isSelected,
                           onTap: () {
                             setState(() {
@@ -820,9 +820,9 @@ class _FilterSheetState extends State<_FilterSheet> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'Apply Filter',
-                          style: TextStyle(
+                        child: Text(
+                          context.l10n.residualApplyFilter,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

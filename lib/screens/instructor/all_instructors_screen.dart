@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
+import '../../l10n/app_localizations.dart';
 import '../../services/instructor_service.dart';
 import '../../models/instructor.dart';
 import '../../widgets/bottom_nav_bar.dart';
@@ -43,13 +44,13 @@ class _AllInstructorsScreenState extends State<AllInstructorsScreen> {
             });
           }
         } else {
-          _handleError('Failed to load instructors');
+          _handleError(context.l10n.residualFailedToLoadInstructors);
         }
       } else {
-        _handleError('Server error: ${response.statusCode}');
+        _handleError(context.l10n.residualServerError(response.statusCode));
       }
     } catch (e) {
-      _handleError('Connection error: $e');
+      _handleError(context.l10n.residualConnectionError);
     }
   }
 
@@ -77,7 +78,7 @@ class _AllInstructorsScreenState extends State<AllInstructorsScreen> {
           statusBarBrightness: Brightness.light, // For iOS
         ),
         title: Text(
-          'Instructors',
+          context.l10n.residualInstructors,
           style: TextStyle(
             color: AppTheme.getTextColor(context),
             fontSize: 20,
@@ -112,7 +113,7 @@ class _AllInstructorsScreenState extends State<AllInstructorsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _error ?? 'Something went wrong',
+              _error ?? context.l10n.residualSomethingWentWrong,
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.getTextColor(context)),
             ),
@@ -129,7 +130,7 @@ class _AllInstructorsScreenState extends State<AllInstructorsScreen> {
                 backgroundColor: AppTheme.primary,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Try Again'),
+              child: Text(context.l10n.residualTryAgain),
             ),
           ],
         ),
@@ -141,7 +142,7 @@ class _AllInstructorsScreenState extends State<AllInstructorsScreen> {
     if (_instructors.isEmpty) {
       return Center(
         child: Text(
-          'No instructors found',
+          context.l10n.residualNoInstructorsFound,
           style: TextStyle(
             color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
           ),
@@ -237,7 +238,9 @@ class _InstructorGridCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${instructor.coursesCount ?? 0} Courses',
+                    context.l10n.residualCourseCount(
+                      instructor.coursesCount ?? 0,
+                    ),
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 14,
