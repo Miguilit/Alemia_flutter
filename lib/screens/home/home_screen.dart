@@ -28,6 +28,7 @@ import '../bundles/bundles_screen.dart';
 import '../ai_suggestions/ai_suggestions_screen.dart';
 import '../wishlist/wishlist_screen.dart';
 import '../notifications/notifications_screen.dart';
+import '../../providers/notification_provider.dart';
 import '../dashboard/dashboard_screen.dart';
 import '../../widgets/live_class_banner.dart';
 import '../auth/auth_screen.dart';
@@ -414,9 +415,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 actionText: context.l10n.seeAll,
                 onSeeAllTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const BundlesScreen(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const BundlesScreen()),
                   );
                 },
               ),
@@ -474,16 +473,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                         errorBuilder: (_, e, st) => Container(
                                           height: 110,
                                           color: Colors.grey.shade200,
-                                          child: Icon(Icons.layers_outlined,
-                                              color: Colors.grey.shade400, size: 32),
+                                          child: Icon(
+                                            Icons.layers_outlined,
+                                            color: Colors.grey.shade400,
+                                            size: 32,
+                                          ),
                                         ),
                                       )
                                     : Container(
                                         height: 110,
                                         width: double.infinity,
                                         color: Colors.grey.shade200,
-                                        child: Icon(Icons.layers_outlined,
-                                            color: Colors.grey.shade400, size: 32),
+                                        child: Icon(
+                                          Icons.layers_outlined,
+                                          color: Colors.grey.shade400,
+                                          size: 32,
+                                        ),
                                       ),
                               ),
                               if (courseCount > 0)
@@ -492,7 +497,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   left: 8,
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFFF3C00),
                                       borderRadius: BorderRadius.circular(20),
@@ -500,9 +507,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: Text(
                                       '$courseCount Courses',
                                       style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold),
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -526,7 +534,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    context.read<SettingsProvider>().formatPrice(bundle.price),
+                                    context
+                                        .read<SettingsProvider>()
+                                        .formatPrice(bundle.price),
                                     style: TextStyle(
                                       color: AppTheme.primary,
                                       fontWeight: FontWeight.bold,
@@ -636,7 +646,9 @@ class _HomeAppBar extends StatelessWidget {
                     color: AppTheme.getCardColor(context),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppTheme.getAccentColor(context).withValues(alpha: 0.60),
+                      color: AppTheme.getAccentColor(
+                        context,
+                      ).withValues(alpha: 0.60),
                       width: 1.2,
                     ),
                     boxShadow: <BoxShadow>[
@@ -716,7 +728,9 @@ class _HomeAppBar extends StatelessWidget {
                                 boxShadow: <BoxShadow>[
                                   BoxShadow(
                                     color: Colors.black.withValues(
-                                      alpha: AppTheme.isDark(context) ? 0.22 : 0.06,
+                                      alpha: AppTheme.isDark(context)
+                                          ? 0.22
+                                          : 0.06,
                                     ),
                                     blurRadius: 10,
                                     spreadRadius: -4,
@@ -791,7 +805,9 @@ class _HomeAppBar extends StatelessWidget {
                                 boxShadow: <BoxShadow>[
                                   BoxShadow(
                                     color: Colors.black.withValues(
-                                      alpha: AppTheme.isDark(context) ? 0.22 : 0.06,
+                                      alpha: AppTheme.isDark(context)
+                                          ? 0.22
+                                          : 0.06,
                                     ),
                                     blurRadius: 10,
                                     spreadRadius: -4,
@@ -845,12 +861,22 @@ class _HomeAppBar extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const NotificationsScreen(),
+                    onTap: () async {
+                      final NotificationProvider notificationProvider = context
+                          .read<NotificationProvider>();
+
+                      await Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (BuildContext context) =>
+                              const NotificationsScreen(),
                         ),
                       );
+
+                      if (!context.mounted) {
+                        return;
+                      }
+
+                      await notificationProvider.refreshUnreadCount();
                     },
                     child: Stack(
                       alignment: Alignment.center,
@@ -884,22 +910,7 @@ class _HomeAppBar extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Positioned(
-                          right: 6,
-                          top: 6,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: AppTheme.getBackgroundColor(context),
-                                width: 1.5,
-                              ),
-                            ),
-                          ),
-                        ),
+                        const _NotificationBadgeDot(),
                       ],
                     ),
                   ),
@@ -914,10 +925,7 @@ class _HomeAppBar extends StatelessWidget {
 }
 
 class _SearchRow extends StatelessWidget {
-  const _SearchRow({
-    required this.controller,
-    required this.onSearch,
-  });
+  const _SearchRow({required this.controller, required this.onSearch});
 
   final TextEditingController controller;
   final Function(String) onSearch;
@@ -931,15 +939,10 @@ class _SearchRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.getCardColor(context),
         borderRadius: BorderRadius.circular(27),
-        border: Border.all(
-          color: AppTheme.getBorderColor(context),
-          width: 0.8,
-        ),
+        border: Border.all(color: AppTheme.getBorderColor(context), width: 0.8),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(
-              alpha: isDark ? 0.24 : 0.055,
-            ),
+            color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.055),
             blurRadius: 18,
             spreadRadius: -6,
             offset: const Offset(0, 8),
@@ -962,10 +965,7 @@ class _SearchRow extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
               prefixIcon: Padding(
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  right: 10,
-                ),
+                padding: const EdgeInsets.only(left: 16, right: 10),
                 child: HugeIcon(
                   icon: HugeIcons.strokeRoundedSearch01,
                   size: 19,
@@ -1004,9 +1004,9 @@ class _SearchRow extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                        color: AppTheme.getAccentColor(context).withValues(
-                          alpha: 0.24,
-                        ),
+                        color: AppTheme.getAccentColor(
+                          context,
+                        ).withValues(alpha: 0.24),
                         blurRadius: 12,
                         spreadRadius: -4,
                         offset: const Offset(0, 5),
@@ -1072,22 +1072,19 @@ class _HeroBannerSliderState extends State<_HeroBannerSlider> {
       return;
     }
 
-    _autoSlideTimer = Timer.periodic(
-      const Duration(seconds: 4),
-          (_) {
-        if (!mounted || !_controller.hasClients) {
-          return;
-        }
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || !_controller.hasClients) {
+        return;
+      }
 
-        final int nextPage = (_page + 1) % widget.banners.length;
+      final int nextPage = (_page + 1) % widget.banners.length;
 
-        _controller.animateToPage(
-          nextPage,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOutCubic,
-        );
-      },
-    );
+      _controller.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOutCubic,
+      );
+    });
   }
 
   @override
@@ -1147,25 +1144,22 @@ class _HeroBannerSliderState extends State<_HeroBannerSlider> {
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List<Widget>.generate(
-            widget.banners.length,
-                (int index) {
-              final bool isActive = index == _page;
+          children: List<Widget>.generate(widget.banners.length, (int index) {
+            final bool isActive = index == _page;
 
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 250),
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                height: 5,
-                width: isActive ? 20 : 8,
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? AppTheme.getAccentColor(context)
-                      : AppTheme.getBorderColor(context),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              );
-            },
-          ),
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              height: 5,
+              width: isActive ? 20 : 8,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? AppTheme.getAccentColor(context)
+                    : AppTheme.getBorderColor(context),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -1279,13 +1273,11 @@ class _TopCategoriesRow extends StatelessWidget {
               ? const Color(0xFF2B2F36)
               : AppTheme.goldSoft;
 
-          final Color borderColor = AppTheme.getAccentColor(context).withValues(
-            alpha: isDark ? 0.75 : 0.35,
-          );
+          final Color borderColor = AppTheme.getAccentColor(
+            context,
+          ).withValues(alpha: isDark ? 0.75 : 0.35);
 
-          final Color iconColor = isDark
-              ? AppTheme.goldLight
-              : AppTheme.black;
+          final Color iconColor = isDark ? AppTheme.goldLight : AppTheme.black;
 
           final Color labelColor = AppTheme.getTextColor(context);
 
@@ -1358,9 +1350,9 @@ class _TopCategoriesRow extends StatelessWidget {
                           ),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: AppTheme.getAccentColor(context).withValues(
-                                alpha: isDark ? 0.16 : 0.08,
-                              ),
+                              color: AppTheme.getAccentColor(
+                                context,
+                              ).withValues(alpha: isDark ? 0.16 : 0.08),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -2128,6 +2120,74 @@ class _MostRecentCourseDetails extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+class _NotificationBadgeDot extends StatefulWidget {
+  const _NotificationBadgeDot();
+
+  @override
+  State<_NotificationBadgeDot> createState() => _NotificationBadgeDotState();
+}
+
+class _NotificationBadgeDotState extends State<_NotificationBadgeDot>
+    with WidgetsBindingObserver {
+  NotificationProvider? _notificationProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      _notificationProvider = context.read<NotificationProvider>();
+      _notificationProvider?.refreshUnreadCount();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _notificationProvider?.refreshUnreadCount();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasUnread = context.select<NotificationProvider, bool>(
+      (NotificationProvider provider) => provider.hasUnreadNotifications,
+    );
+
+    if (!hasUnread) {
+      return const SizedBox.shrink();
+    }
+
+    return Positioned(
+      right: 6,
+      top: 6,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: Colors.redAccent,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: AppTheme.getBackgroundColor(context),
+            width: 1.5,
+          ),
+        ),
+      ),
     );
   }
 }

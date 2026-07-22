@@ -89,6 +89,22 @@ class AppLocalizations {
   String get message => _t('message');
   String get myCourse => _t('myCourse');
   String get wishlist => _t('wishlist');
+  String get savedForLater => _t('savedForLater');
+  String wishlistCoursesCount(int count) =>
+      _t('wishlistCoursesCount').replaceAll('{count}', '$count');
+  String get recentlyAdded => _t('recentlyAdded');
+  String get priceLowToHigh => _t('priceLowToHigh');
+  String get priceHighToLow => _t('priceHighToLow');
+  String get highestRated => _t('highestRated');
+  String get removeFromWishlist => _t('removeFromWishlist');
+  String get removedFromWishlist => _t('removedFromWishlist');
+  String get failedUpdateWishlist => _t('failedUpdateWishlist');
+  String get emptyWishlistTitle => _t('emptyWishlistTitle');
+  String get emptyWishlistSubtitle => _t('emptyWishlistSubtitle');
+  String get browseCourses => _t('browseCourses');
+  String get freeCourse => _t('freeCourse');
+  String wishlistLessonsCount(int count) =>
+      _t('wishlistLessonsCount').replaceAll('{count}', '$count');
   String get events => _t('events');
   String get profile => _t('profile');
 
@@ -148,6 +164,28 @@ class AppLocalizations {
   String get aiPreferencesSubtitle => _t('aiPreferencesSubtitle');
   String get notifications => _t('notifications');
   String get notificationsSubtitle => _t('notificationsSubtitle');
+  String get notificationCenter => _t('notificationCenter');
+  String unreadNotificationsCount(int count) =>
+      _t('unreadNotificationsCount').replaceAll('{count}', '$count');
+  String get allNotificationsRead => _t('allNotificationsRead');
+  String get markAllAsRead => _t('markAllAsRead');
+  String get allNotificationsMarkedRead => _t('allNotificationsMarkedRead');
+  String get allNotifications => _t('allNotifications');
+  String get unreadNotifications => _t('unreadNotifications');
+  String get newNotification => _t('newNotification');
+  String get noNotificationsTitle => _t('noNotificationsTitle');
+  String get noNotificationsSubtitle => _t('noNotificationsSubtitle');
+  String get noUnreadNotificationsTitle => _t('noUnreadNotificationsTitle');
+  String get noUnreadNotificationsSubtitle =>
+      _t('noUnreadNotificationsSubtitle');
+  String get showAllNotifications => _t('showAllNotifications');
+  String get failedLoadNotifications => _t('failedLoadNotifications');
+  String get notificationsLoadErrorSubtitle =>
+      _t('notificationsLoadErrorSubtitle');
+  String get failedLoadMoreNotifications => _t('failedLoadMoreNotifications');
+  String get notificationActionFailed => _t('notificationActionFailed');
+  String get notificationDeleted => _t('notificationDeleted');
+  String get deleteNotification => _t('deleteNotification');
   String get darkMode => _t('darkMode');
   String get darkModeSubtitle => _t('darkModeSubtitle');
   String get language => _t('language');
@@ -164,40 +202,132 @@ class AppLocalizations {
   String get guestUser => _t('guestUser');
 
   String get learningAndProgress => _t('learningAndProgress');
-  String get learningOverviewSubtitle =>
-      _t('learningOverviewSubtitle');
+  String get learningOverviewSubtitle => _t('learningOverviewSubtitle');
   String get assignmentsSubtitle => _t('assignmentsSubtitle');
 
-  String get productivityAndTracking =>
-      _t('productivityAndTracking');
+  String get productivityAndTracking => _t('productivityAndTracking');
   String get studyTimerSubtitle => _t('studyTimerSubtitle');
-  String get focusProgressSubtitle =>
-      _t('focusProgressSubtitle');
-  String get weeklyReviewSubtitle =>
-      _t('weeklyReviewSubtitle');
+  String get focusProgressSubtitle => _t('focusProgressSubtitle');
+  String get weeklyReviewSubtitle => _t('weeklyReviewSubtitle');
   String get hourShort => _t('hourShort');
   String get noFocusData => _t('noFocusData');
-  String get failedLoadFocusProgress =>
-      _t('failedLoadFocusProgress');
+  String get failedLoadFocusProgress => _t('failedLoadFocusProgress');
 
   String get aiTools => _t('aiTools');
   String get novaAiAssistant => _t('novaAiAssistant');
-  String get novaAiAssistantSubtitle =>
-      _t('novaAiAssistantSubtitle');
-  String get aiLearningPathGenerator =>
-      _t('aiLearningPathGenerator');
-  String get aiLearningPathSubtitle =>
-      _t('aiLearningPathSubtitle');
+  String get novaAiAssistantSubtitle => _t('novaAiAssistantSubtitle');
+  String get aiLearningPathGenerator => _t('aiLearningPathGenerator');
+  String get aiLearningPathSubtitle => _t('aiLearningPathSubtitle');
+  String get aiPathPersonalizeTitle => _t('aiPathPersonalizeTitle');
+  String get aiPathPersonalizeSubtitle => _t('aiPathPersonalizeSubtitle');
+  String get aiPathCategories => _t('aiPathCategories');
+  String get aiPathCategoriesHint => _t('aiPathCategoriesHint');
+  String get aiPathSkillLevel => _t('aiPathSkillLevel');
+  String get aiPathBeginner => _t('aiPathBeginner');
+  String get aiPathIntermediate => _t('aiPathIntermediate');
+  String get aiPathAdvanced => _t('aiPathAdvanced');
+  String get aiPathGoal => _t('aiPathGoal');
+  String get aiPathCareerChange => _t('aiPathCareerChange');
+  String get aiPathSkillEnhancement => _t('aiPathSkillEnhancement');
+  String get aiPathPersonalInterest => _t('aiPathPersonalInterest');
+  String get aiPathCertification => _t('aiPathCertification');
+  String get aiPathFreelancing => _t('aiPathFreelancing');
+  String get aiPathCustom => _t('aiPathCustom');
+  String get aiPathCustomGoal => _t('aiPathCustomGoal');
+  String get aiPathWeeklyHours => _t('aiPathWeeklyHours');
+  String get aiPathTargetDate => _t('aiPathTargetDate');
+  String get aiPathChooseDate => _t('aiPathChooseDate');
+  String get aiPathClearDate => _t('aiPathClearDate');
+  String get aiPathLanguage => _t('aiPathLanguage');
+  String get aiPathLearningStyle => _t('aiPathLearningStyle');
+  String get aiPathFast => _t('aiPathFast');
+  String get aiPathBalanced => _t('aiPathBalanced');
+  String get aiPathInDepth => _t('aiPathInDepth');
+  String get aiPathSaveAnalyze => _t('aiPathSaveAnalyze');
+  String get aiPathReadyTitle => _t('aiPathReadyTitle');
+  String get aiPathReadyBody => _t('aiPathReadyBody');
+  String get aiPathNoMatching => _t('aiPathNoMatching');
+  String get aiPathInsufficient => _t('aiPathInsufficient');
+  String get aiPathAllCompleted => _t('aiPathAllCompleted');
+  String get aiPathProfileRequired => _t('aiPathProfileRequired');
+  String get aiPathGenerate => _t('aiPathGenerate');
+  String get aiPathGenerating => _t('aiPathGenerating');
+  String get aiPathCurrentTitle => _t('aiPathCurrentTitle');
+  String get aiPathWeeks => _t('aiPathWeeks');
+  String get aiPathHours => _t('aiPathHours');
+  String get aiPathObjective => _t('aiPathObjective');
+  String get aiPathWhy => _t('aiPathWhy');
+  String get aiPathEditPreferences => _t('aiPathEditPreferences');
+  String get aiPathArchive => _t('aiPathArchive');
+  String get aiPathArchiveTitle => _t('aiPathArchiveTitle');
+  String get aiPathArchiveBody => _t('aiPathArchiveBody');
+  String get aiPathCancel => _t('aiPathCancel');
+  String get aiPathConfirmArchive => _t('aiPathConfirmArchive');
+  String get aiPathLoading => _t('aiPathLoading');
+  String get aiPathRetry => _t('aiPathRetry');
+  String get aiPathSelectCategoryError => _t('aiPathSelectCategoryError');
+  String get aiPathCustomGoalError => _t('aiPathCustomGoalError');
+  String get aiPathWeeklyHoursError => _t('aiPathWeeklyHoursError');
+  String get aiPathConnectionError => _t('aiPathConnectionError');
+  String get aiPathCheckAvailability => _t('aiPathCheckAvailability');
+  String get novaIsThinking => _t('novaIsThinking');
+
+  String get novaWelcomeTitle => _t('novaWelcomeTitle');
+
+  String get novaWelcomeMessage => _t('novaWelcomeMessage');
+
+  String get aiConfigurationMissing => _t('aiConfigurationMissing');
+
+  String get aiAssistantUnavailable => _t('aiAssistantUnavailable');
+
+  String get unavailable => _t('unavailable');
 
   String get community => _t('community');
-  String get accountAndPayments =>
-      _t('accountAndPayments');
-  String get settingsAndPreferences =>
-      _t('settingsAndPreferences');
+  String get accountAndPayments => _t('accountAndPayments');
+  String get settingsAndPreferences => _t('settingsAndPreferences');
 
   // Chat
   String get messages => _t('messages');
+  String get privateConversations => _t('privateConversations');
+  String unreadMessagesCount(int count) =>
+      _t('unreadMessagesCount').replaceAll('{count}', '$count');
+  String get allCaughtUp => _t('allCaughtUp');
+  String get inbox => _t('inbox');
+  String get sentRequests => _t('sentRequests');
+  String get failedLoadConversations => _t('failedLoadConversations');
+  String get checkConnectionAndRetry => _t('checkConnectionAndRetry');
+  String get noConversationsTitle => _t('noConversationsTitle');
+  String get noConversationsSubtitle => _t('noConversationsSubtitle');
+  String get noPendingRequestsTitle => _t('noPendingRequestsTitle');
+  String get noPendingRequestsSubtitle => _t('noPendingRequestsSubtitle');
+  String get newMessage => _t('newMessage');
+  String get startConversation => _t('startConversation');
+  String get awaitingResponse => _t('awaitingResponse');
+  String get chooseInstructorToStart => _t('chooseInstructorToStart');
+  String get searchInstructors => _t('searchInstructors');
+  String get searchingInstructors => _t('searchingInstructors');
+  String get noInstructorsFound => _t('noInstructorsFound');
+  String get searchInstructorTitle => _t('searchInstructorTitle');
+  String get tryAnotherSearch => _t('tryAnotherSearch');
+  String get typeToSearchInstructors => _t('typeToSearchInstructors');
   String get typeMessage => _t('typeMessage');
+  String get secureChat => _t('secureChat');
+  String get failedLoadMessages => _t('failedLoadMessages');
+  String get noMessagesTitle => _t('noMessagesTitle');
+  String get noMessagesSubtitle => _t('noMessagesSubtitle');
+  String get chooseAttachment => _t('chooseAttachment');
+  String get camera => _t('camera');
+  String get gallery => _t('gallery');
+  String get files => _t('files');
+  String get takePhoto => _t('takePhoto');
+  String get chooseFromGallery => _t('chooseFromGallery');
+  String get chooseFiles => _t('chooseFiles');
+  String selectedAttachmentsCount(int count) =>
+      _t('selectedAttachmentsCount').replaceAll('{count}', '$count');
+  String get removeAttachment => _t('removeAttachment');
+  String get sendMessage => _t('sendMessage');
+  String get messageSending => _t('messageSending');
+  String get imageUnavailable => _t('imageUnavailable');
   String get online => _t('online');
   String get typing => _t('typing');
   String get sent => _t('sent');
@@ -484,11 +614,9 @@ class AppLocalizations {
   String get completedDays => _t('completedDays');
   String get missedDays => _t('missedDays');
   String get habitsThisWeek => _t('habitsThisWeek');
-  String get noWeeklyReviewData =>
-      _t('noWeeklyReviewData');
+  String get noWeeklyReviewData => _t('noWeeklyReviewData');
 
-  String get failedLoadWeeklyReview =>
-      _t('failedLoadWeeklyReview');
+  String get failedLoadWeeklyReview => _t('failedLoadWeeklyReview');
 
   // Study Timer
   String get studyTimer => _t('studyTimer');
@@ -585,13 +713,10 @@ class AppLocalizations {
   String get total => _t('total');
   String get sessionSaved => _t('sessionSaved');
   String get congratulations => _t('congratulations');
-  String get completedSessionMessage =>
-      _t('completedSessionMessage');
-
+  String get completedSessionMessage => _t('completedSessionMessage');
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
-
 }
 
 class _AppLocalizationsDelegate

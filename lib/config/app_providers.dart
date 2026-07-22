@@ -3,6 +3,7 @@ import 'package:provider/single_child_widget.dart';
 
 import '../providers/auth_provider.dart';
 import '../providers/wishlist_provider.dart';
+import '../providers/notification_provider.dart';
 import '../providers/ai_suggestions_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/settings_provider.dart';
@@ -16,6 +17,7 @@ class AppProviders {
     return [
       ChangeNotifierProvider(create: (_) => AuthProvider()..loadUser()),
       ChangeNotifierProvider(create: (_) => WishlistProvider()),
+      ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ChangeNotifierProvider(create: (_) => AiSuggestionsProvider()),
       ChangeNotifierProvider(create: (_) => AiLearningPathProvider()),
       ChangeNotifierProvider(create: (_) => DashboardProvider()),
