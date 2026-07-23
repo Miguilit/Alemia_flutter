@@ -21,10 +21,13 @@ class EventsScreen extends StatefulWidget {
 
 class _EventsScreenState extends State<EventsScreen> {
   final EventService _eventService = EventService();
-  List<Event> _events = [];
+  final TextEditingController _searchController = TextEditingController();
+
+  List<Event> _events = <Event>[];
   bool _isLoading = true;
   String _errorMessage = '';
-  String _selectedFilter = 'upcoming';
+  String _selectedTimeFilter = 'upcoming';
+  String _selectedPriceFilter = 'all';
 
   @override
   void initState() {
@@ -32,45 +35,75 @@ class _EventsScreenState extends State<EventsScreen> {
     _fetchEvents();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchEvents() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+    }
 
     try {
-      final response = await _eventService.fetchEvents(filter: _selectedFilter);
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> eventsList = data['data'] ?? [];
-        setState(() {
-          _events = eventsList.map((e) => Event.fromJson(e)).toList();
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'Failed to load events';
-          _isLoading = false;
-        });
+      final response = await _eventService.fetchEvents(
+        filter: _selectedTimeFilter,
+        priceFilter: _selectedPriceFilter,
+        search: _searchController.text,
+      );
+
+      if (!mounted) {
+        return;
       }
-    } catch (e) {
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data =
+            json.decode(response.body) as Map<String, dynamic>;
+        final List<dynamic> eventsList =
+            data['data'] as List<dynamic>? ?? <dynamic>[];
+
+        setState(() {
+          _events = eventsList
+              .whereType<Map<String, dynamic>>()
+              .map<Event>(Event.fromJson)
+              .toList();
+          _isLoading = false;
+        });
+        return;
+      }
+
       setState(() {
-        _errorMessage = 'An error occurred while fetching events';
+        _errorMessage = context.l10n.eventFailedLoad;
+        _isLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+
+      setState(() {
+        _errorMessage = context.l10n.eventFetchError;
         _isLoading = false;
       });
     }
   }
 
   void _showFilterSheet(BuildContext context) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) => _EventFilterSheet(
-        initialTimeFilter: _selectedFilter,
-        onApplyFilters: (String timeFilter) {
+        initialTimeFilter: _selectedTimeFilter,
+        initialPriceFilter: _selectedPriceFilter,
+        onApplyFilters: (_EventFilterSelection selection) {
           setState(() {
-            _selectedFilter = timeFilter;
+            _selectedTimeFilter = selection.timeFilter;
+            _selectedPriceFilter = selection.priceFilter;
           });
           _fetchEvents();
         },
@@ -78,26 +111,12 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  // Placeholder for local filtering if needed, but we use server-side filtering
-  // List<Event> get _filteredEvents => _events;
+  String _formatDate(BuildContext context, DateTime? date) {
+    if (date == null) {
+      return '';
+    }
 
-  String _formatDate(DateTime? date) {
-    if (date == null) return '';
-    final List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    return MaterialLocalizations.of(context).formatMediumDate(date);
   }
 
   @override
@@ -115,7 +134,11 @@ class _EventsScreenState extends State<EventsScreen> {
             Container(
               color: AppTheme.getBackgroundColor(context),
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-              child: _SearchBar(onFilterTap: () => _showFilterSheet(context)),
+              child: _SearchBar(
+                controller: _searchController,
+                onSearch: _fetchEvents,
+                onFilterTap: () => _showFilterSheet(context),
+              ),
             ),
             // Events List
             Expanded(
@@ -124,7 +147,7 @@ class _EventsScreenState extends State<EventsScreen> {
                   : _errorMessage.isNotEmpty
                   ? Center(child: Text(_errorMessage))
                   : _events.isEmpty
-                  ? _EmptyEventsState(filterType: _selectedFilter)
+                  ? _EmptyEventsState(filterType: _selectedTimeFilter)
                   : RefreshIndicator(
                       onRefresh: _fetchEvents,
                       child: ListView.separated(
@@ -135,7 +158,10 @@ class _EventsScreenState extends State<EventsScreen> {
                           final Event event = _events[index];
                           return _EventCard(
                             event: event,
-                            formattedDate: _formatDate(event.startDate),
+                            formattedDate: _formatDate(
+                              context,
+                              event.startDate,
+                            ),
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -257,29 +283,6 @@ class _EventCard extends StatelessWidget {
                           ),
                   ),
                 ),
-                // Category Badge
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppTheme.getCardColor(context),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      event.summary ?? 'Event',
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
                 // Booked Badge (Hide for now as we don't have isBooked in model yet)
                 /* if (event.isBooked)
                    ... */
@@ -394,7 +397,7 @@ class _EventCard extends StatelessWidget {
                         child: Text(
                           event.locationDescription ??
                               event.location ??
-                              'Online',
+                              context.l10n.online,
                           style: TextStyle(
                             color: AppTheme.getTextColor(
                               context,
@@ -432,7 +435,9 @@ class _EventCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        '${event.confirmedBookingsCount} attendees',
+                        context.l10n.eventAttendeesCount(
+                          event.confirmedBookingsCount,
+                        ),
                         style: TextStyle(
                           color: AppTheme.getTextColor(
                             context,
@@ -444,7 +449,7 @@ class _EventCard extends StatelessWidget {
                       const Spacer(),
                       Text(
                         event.price == 0.00 || event.price == null
-                            ? 'Free'
+                            ? context.l10n.free
                             : settingsProvider.formatPrice(event.price),
                         style: TextStyle(
                           color: event.price == 0.00 || event.price == null
@@ -540,23 +545,33 @@ class _EmptyEventsState extends StatelessWidget {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({required this.onFilterTap});
+  const _SearchBar({
+    required this.controller,
+    required this.onSearch,
+    required this.onFilterTap,
+  });
 
+  final TextEditingController controller;
+  final VoidCallback onSearch;
   final VoidCallback onFilterTap;
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
+
     return SizedBox(
       height: 48,
       child: Row(
         children: <Widget>[
           Expanded(
             child: TextField(
+              controller: controller,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => onSearch(),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppTheme.getCardColor(context),
-                hintText: l10n.search,
+                hintText: l10n.eventSearchHint,
                 hintStyle: TextStyle(
                   color: AppTheme.getTextColor(context).withValues(alpha: 0.65),
                   fontSize: 14,
@@ -583,9 +598,7 @@ class _SearchBar extends StatelessWidget {
                 suffixIcon: Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: GestureDetector(
-                    onTap: () {
-                      // Handle search button tap
-                    },
+                    onTap: onSearch,
                     child: Container(
                       width: 36,
                       height: 36,
@@ -594,7 +607,7 @@ class _SearchBar extends StatelessWidget {
                         color: AppTheme.primary,
                         shape: BoxShape.circle,
                       ),
-                      child: Center(
+                      child: const Center(
                         child: HugeIcon(
                           icon: HugeIcons.strokeRoundedSearch01,
                           size: 18,
@@ -642,14 +655,26 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
+class _EventFilterSelection {
+  const _EventFilterSelection({
+    required this.timeFilter,
+    required this.priceFilter,
+  });
+
+  final String timeFilter;
+  final String priceFilter;
+}
+
 class _EventFilterSheet extends StatefulWidget {
   const _EventFilterSheet({
     required this.initialTimeFilter,
+    required this.initialPriceFilter,
     required this.onApplyFilters,
   });
 
   final String initialTimeFilter;
-  final ValueChanged<String> onApplyFilters;
+  final String initialPriceFilter;
+  final ValueChanged<_EventFilterSelection> onApplyFilters;
 
   @override
   State<_EventFilterSheet> createState() => _EventFilterSheetState();
@@ -657,18 +682,43 @@ class _EventFilterSheet extends StatefulWidget {
 
 class _EventFilterSheetState extends State<_EventFilterSheet> {
   late String _selectedTimeFilter;
-  final Set<String> _selectedCategories = <String>{};
-  final Set<String> _selectedPrices = <String>{};
+  late String _selectedPriceFilter;
 
   @override
   void initState() {
     super.initState();
     _selectedTimeFilter = widget.initialTimeFilter;
+    _selectedPriceFilter = widget.initialPriceFilter;
   }
 
   @override
   Widget build(BuildContext context) {
-    final settingsProvider = Provider.of<SettingsProvider>(context);
+    final SettingsProvider settingsProvider = Provider.of<SettingsProvider>(
+      context,
+    );
+    final AppLocalizations l10n = context.l10n;
+
+    final List<_EventPriceOption> priceOptions = <_EventPriceOption>[
+      _EventPriceOption(value: 'all', label: l10n.all),
+      _EventPriceOption(value: 'free', label: l10n.free),
+      _EventPriceOption(value: 'paid', label: l10n.eventFilterPaid),
+      _EventPriceOption(
+        value: 'under_50',
+        label: l10n.eventFilterUnderPrice(settingsProvider.formatPrice(50)),
+      ),
+      _EventPriceOption(
+        value: 'between_50_100',
+        label: l10n.eventFilterPriceRange(
+          settingsProvider.formatPrice(50),
+          settingsProvider.formatPrice(100),
+        ),
+      ),
+      _EventPriceOption(
+        value: 'over_100',
+        label: l10n.eventFilterOverPrice(settingsProvider.formatPrice(100)),
+      ),
+    ];
+
     return Container(
       decoration: BoxDecoration(
         color: AppTheme.getCardColor(context),
@@ -678,14 +728,13 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
         ),
       ),
       child: DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
+        initialChildSize: 0.58,
+        minChildSize: 0.45,
+        maxChildSize: 0.82,
         expand: false,
         builder: (BuildContext context, ScrollController scrollController) {
           return Column(
             children: <Widget>[
-              // Handle bar
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
@@ -695,14 +744,13 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Header
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      'Filter Events',
+                      l10n.eventFilterTitle,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 20,
@@ -712,13 +760,12 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          _selectedTimeFilter = widget.initialTimeFilter;
-                          _selectedCategories.clear();
-                          _selectedPrices.clear();
+                          _selectedTimeFilter = 'upcoming';
+                          _selectedPriceFilter = 'all';
                         });
                       },
                       child: Text(
-                        'Reset',
+                        l10n.reset,
                         style: TextStyle(
                           color: AppTheme.primary,
                           fontSize: 14,
@@ -734,9 +781,8 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                   controller: scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   children: <Widget>[
-                    // Time Filter
                     Text(
-                      'Time',
+                      l10n.time,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 16,
@@ -748,7 +794,7 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                       children: <Widget>[
                         Expanded(
                           child: _FilterChipButton(
-                            label: 'Upcoming',
+                            label: l10n.upcoming,
                             isSelected: _selectedTimeFilter == 'upcoming',
                             onTap: () {
                               setState(() {
@@ -760,7 +806,7 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _FilterChipButton(
-                            label: 'Past',
+                            label: l10n.eventFilterPast,
                             isSelected: _selectedTimeFilter == 'past',
                             onTap: () {
                               setState(() {
@@ -772,7 +818,7 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _FilterChipButton(
-                            label: 'All',
+                            label: l10n.all,
                             isSelected: _selectedTimeFilter == 'all',
                             onTap: () {
                               setState(() {
@@ -784,9 +830,8 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                       ],
                     ),
                     const SizedBox(height: 24),
-                    // Category Filter
                     Text(
-                      'Category',
+                      l10n.price,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 16,
@@ -797,119 +842,56 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                     Wrap(
                       spacing: 12,
                       runSpacing: 12,
-                      children:
-                          <String>[
-                            'Technology',
-                            'Design',
-                            'Development',
-                            'Business',
-                            'Marketing',
-                          ].map<Widget>((String category) {
-                            final bool isSelected = _selectedCategories
-                                .contains(category);
-                            return FilterChip(
-                              label: Text(category),
-                              selected: isSelected,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  if (selected) {
-                                    _selectedCategories.add(category);
-                                  } else {
-                                    _selectedCategories.remove(category);
-                                  }
-                                });
-                              },
-                              selectedColor: AppTheme.primary.withValues(
-                                alpha: 0.2,
-                              ),
-                              checkmarkColor: AppTheme.primary,
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? AppTheme.primary
-                                    : AppTheme.getTextColor(context),
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                              ),
-                              side: BorderSide(
-                                color: isSelected
-                                    ? AppTheme.primary
-                                    : AppTheme.getTextColor(
-                                        context,
-                                      ).withValues(alpha: 0.2),
-                              ),
-                            );
-                          }).toList(),
-                    ),
-                    const SizedBox(height: 24),
-                    // Price Filter
-                    Text(
-                      'Price',
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children:
-                          <String>[
-                            'Free',
-                            'Paid',
-                            'Under ${settingsProvider.formatPrice(50)}',
-                            '${settingsProvider.formatPrice(50)} - ${settingsProvider.formatPrice(100)}',
-                            'Over ${settingsProvider.formatPrice(100)}',
-                          ].map<Widget>((String price) {
-                            final bool isSelected = _selectedPrices.contains(
-                              price,
-                            );
-                            return FilterChip(
-                              label: Text(price),
-                              selected: isSelected,
-                              onSelected: (bool selected) {
-                                setState(() {
-                                  if (selected) {
-                                    _selectedPrices.add(price);
-                                  } else {
-                                    _selectedPrices.remove(price);
-                                  }
-                                });
-                              },
-                              selectedColor: AppTheme.primary.withValues(
-                                alpha: 0.2,
-                              ),
-                              checkmarkColor: AppTheme.primary,
-                              labelStyle: TextStyle(
-                                color: isSelected
-                                    ? AppTheme.primary
-                                    : AppTheme.getTextColor(context),
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                              ),
-                              side: BorderSide(
-                                color: isSelected
-                                    ? AppTheme.primary
-                                    : AppTheme.getTextColor(
-                                        context,
-                                      ).withValues(alpha: 0.2),
-                              ),
-                            );
-                          }).toList(),
+                      children: priceOptions.map<Widget>((
+                        _EventPriceOption option,
+                      ) {
+                        final bool isSelected =
+                            _selectedPriceFilter == option.value;
+
+                        return FilterChip(
+                          label: Text(option.label),
+                          selected: isSelected,
+                          onSelected: (_) {
+                            setState(() {
+                              _selectedPriceFilter = option.value;
+                            });
+                          },
+                          selectedColor: AppTheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          checkmarkColor: AppTheme.primary,
+                          labelStyle: TextStyle(
+                            color: isSelected
+                                ? AppTheme.primary
+                                : AppTheme.getTextColor(context),
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w500,
+                          ),
+                          side: BorderSide(
+                            color: isSelected
+                                ? AppTheme.primary
+                                : AppTheme.getTextColor(
+                                    context,
+                                  ).withValues(alpha: 0.2),
+                          ),
+                        );
+                      }).toList(),
                     ),
                     const SizedBox(height: 24),
                   ],
                 ),
               ),
-              // Apply Button
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: ElevatedButton(
                   onPressed: () {
-                    widget.onApplyFilters(_selectedTimeFilter);
+                    widget.onApplyFilters(
+                      _EventFilterSelection(
+                        timeFilter: _selectedTimeFilter,
+                        priceFilter: _selectedPriceFilter,
+                      ),
+                    );
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
@@ -924,7 +906,7 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
                   child: SizedBox(
                     width: double.infinity,
                     child: Text(
-                      'Apply Filters',
+                      l10n.eventApplyFilters,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 16,
@@ -940,4 +922,11 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
       ),
     );
   }
+}
+
+class _EventPriceOption {
+  const _EventPriceOption({required this.value, required this.label});
+
+  final String value;
+  final String label;
 }

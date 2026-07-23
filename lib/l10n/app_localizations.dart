@@ -1571,3 +1571,55 @@ extension FinalMultilingualClosureLocalizations on AppLocalizations {
   String get noEventsAvailable => _t('noEventsAvailable');
   String get noEventsAvailableNow => _t('noEventsAvailableNow');
 }
+
+extension DynamicApiContentLocalizations on AppLocalizations {
+  String get communityAskQuestion => _t('communityAskQuestion');
+
+  String get communityQuestionPostedSuccessfully =>
+      _t('communityQuestionPostedSuccessfully');
+
+  String get communityFailedPostQuestion => _t('communityFailedPostQuestion');
+
+  String get communityJustNow => _t('communityJustNow');
+
+  String communityDaysAgo(int count) =>
+      _t('communityDaysAgo').replaceAll('{count}', '$count');
+
+  String communityHoursAgo(int count) =>
+      _t('communityHoursAgo').replaceAll('{count}', '$count');
+
+  String communityMinutesAgo(int count) =>
+      _t('communityMinutesAgo').replaceAll('{count}', '$count');
+
+  String communityViewsCount(int count) =>
+      _t('communityViewsCount').replaceAll('{count}', '$count');
+}
+
+extension EventFilterLocalizations on AppLocalizations {
+  String get eventFilterTitle => _t('eventFilterTitle');
+
+  String get eventFilterPast => _t('eventFilterPast');
+
+  String get eventFilterPaid => _t('eventFilterPaid');
+
+  String eventFilterUnderPrice(String price) =>
+      _t('eventFilterUnderPrice').replaceAll('{price}', price);
+
+  String eventFilterPriceRange(String min, String max) => _t(
+    'eventFilterPriceRange',
+  ).replaceAll('{min}', min).replaceAll('{max}', max);
+
+  String eventFilterOverPrice(String price) =>
+      _t('eventFilterOverPrice').replaceAll('{price}', price);
+
+  String get eventApplyFilters => _t('eventApplyFilters');
+
+  String get eventFailedLoad => _t('eventFailedLoad');
+
+  String get eventFetchError => _t('eventFetchError');
+
+  String eventAttendeesCount(int count) =>
+      _t('eventAttendeesCount').replaceAll('{count}', '$count');
+
+  String get eventSearchHint => _t('eventSearchHint');
+}

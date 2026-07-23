@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../widgets/community/vote_widget.dart';
 
@@ -313,19 +312,26 @@ class _QuestionCard extends StatelessWidget {
 
   final CommunityQuestion question;
 
-  String _getTimeAgo(DateTime dateTime) {
+  String _getTimeAgo(BuildContext context, DateTime dateTime) {
     final difference = DateTime.now().difference(dateTime);
+
     if (difference.inDays > 7) {
-      return DateFormat('MMM d, yyyy').format(dateTime);
-    } else if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
+      return MaterialLocalizations.of(context).formatMediumDate(dateTime);
     }
+
+    if (difference.inDays > 0) {
+      return context.l10n.communityDaysAgo(difference.inDays);
+    }
+
+    if (difference.inHours > 0) {
+      return context.l10n.communityHoursAgo(difference.inHours);
+    }
+
+    if (difference.inMinutes > 0) {
+      return context.l10n.communityMinutesAgo(difference.inMinutes);
+    }
+
+    return context.l10n.communityJustNow;
   }
 
   @override
@@ -385,7 +391,7 @@ class _QuestionCard extends StatelessWidget {
                 ),
               if (isAnswered) const Spacer(),
               Text(
-                _getTimeAgo(question.createdAt),
+                _getTimeAgo(context, question.createdAt),
                 style: TextStyle(
                   color: AppTheme.getTextColor(context).withValues(alpha: 0.5),
                   fontSize: 11,
@@ -498,7 +504,7 @@ class _QuestionCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${question.views} views',
+                      context.l10n.communityViewsCount(question.views),
                       style: TextStyle(
                         color: AppTheme.getTextColor(
                           context,
@@ -607,7 +613,7 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                   vertical: 8,
                 ),
                 child: Text(
-                  'Ask Question',
+                  context.l10n.communityAskQuestion,
                   style: TextStyle(
                     color: AppTheme.getTextColor(context),
                     fontSize: 18,
@@ -765,21 +771,27 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                                     Navigator.pop(context);
                                     widget.onPosted();
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         content: Text(
-                                          'Question posted successfully!',
+                                          context
+                                              .l10n
+                                              .communityQuestionPostedSuccessfully,
                                         ),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
                                   }
                                 } catch (e) {
+                                  debugPrint('Failed to post question: $e');
+
                                   if (context.mounted) {
                                     setState(() => _isPosting = false);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'Failed to post question: $e',
+                                          context
+                                              .l10n
+                                              .communityFailedPostQuestion,
                                         ),
                                         backgroundColor: Colors.red,
                                       ),
@@ -803,9 +815,9 @@ class _AskQuestionSheetState extends State<_AskQuestionSheet> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                'Ask Question',
-                                style: TextStyle(
+                            : Text(
+                                context.l10n.communityAskQuestion,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
