@@ -55,7 +55,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final Uri googleMapsUri = Uri.parse(
       'https://www.google.com/maps/search/?api=1&query=$query',
     );
-    final Uri appleMapsUri = Uri.parse('http://maps.apple.com/?q=$query');
+    final Uri appleMapsUri = Uri.parse('https://maps.apple.com/?q=$query');
 
     if (await canLaunchUrl(googleMapsUri)) {
       await launchUrl(googleMapsUri);
