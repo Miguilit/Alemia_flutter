@@ -317,7 +317,7 @@ final Map<String, String> kLangFr = <String, String>{
   'failedLoadBookings': 'Impossible de charger les réservations',
   'standardTicket': 'Standard',
   'focusProgress': 'Progression de concentration',
-  'totalFocusTime': 'Temps total de concentration',
+  'totalFocusTime': 'Temps total',
   'dailyAverage': 'Moyenne quotidienne',
   'dayStreak': 'Jours consécutifs',
   'weeklyProgress': 'Progression hebdomadaire',
@@ -522,6 +522,24 @@ final Map<String, String> kLangFr = <String, String>{
   'authAccountCreated': 'Votre compte a bien été créé.',
   'authRegistrationFailedTitle': 'Échec de l’inscription',
   'authRegistrationFailed': 'L’inscription n’a pas pu être finalisée.',
+  'authGoogleLoginSuccessfulTitle': 'Connexion Google réussie',
+  'authGoogleLoginSuccessful': 'Vous êtes connecté à Alemia avec Google.',
+  'authGoogleLoginFailedTitle': 'Échec de la connexion Google',
+  'authGoogleLoginFailed':
+      'La connexion avec Google n’a pas pu être finalisée.',
+  'authGoogleConfigurationError':
+      'Google Sign-In n’est pas encore correctement configuré pour cette version.',
+  'authFirebaseUnavailable':
+      'Le service d’authentification Firebase est momentanément indisponible.',
+  'authGoogleSessionInvalid':
+      'La session Google reçue est invalide ou a expiré.',
+  'authGoogleAccountConflict':
+      'Ce compte Google est déjà associé à un autre compte Alemia.',
+  'authNetworkError':
+      'Une erreur réseau est survenue. Vérifiez votre connexion et réessayez.',
+  'authEmailVerificationRequiredTitle': 'Vérification de l’adresse requise',
+  'authEmailVerificationRequired':
+      'Votre compte a été créé. Consultez votre e-mail avant de vous connecter.',
   'authEmailExample': 'prenom.nom@exemple.com',
   'authFirstNameExample': 'Jean',
   'authLastNameExample': 'Dupont',

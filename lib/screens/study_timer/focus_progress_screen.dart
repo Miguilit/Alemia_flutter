@@ -9,28 +9,18 @@ import 'task_breakdown_screen.dart';
 
 import '../../services/focus_service.dart';
 
-String _formatLocalizedHours(
-    BuildContext context,
-    double value,
-    ) {
-  final String languageCode =
-      Localizations.localeOf(context).languageCode;
+String _formatLocalizedHours(BuildContext context, double value) {
+  final String languageCode = Localizations.localeOf(context).languageCode;
 
-  return NumberFormat(
-    '0.0',
-    languageCode,
-  ).format(value);
+  return NumberFormat('0.0', languageCode).format(value);
 }
 
 String _localizedWeekday(
-    BuildContext context,
-    String rawDay, {
-      bool abbreviated = false,
-    }) {
-  final String normalized = rawDay
-      .trim()
-      .toLowerCase()
-      .replaceAll('.', '');
+  BuildContext context,
+  String rawDay, {
+  bool abbreviated = false,
+}) {
+  final String normalized = rawDay.trim().toLowerCase().replaceAll('.', '');
 
   final Map<String, int> weekdays = <String, int>{
     'mon': DateTime.monday,
@@ -79,14 +69,9 @@ String _localizedWeekday(
   }
 
   // Le 1er janvier 2024 était un lundi.
-  final DateTime date = DateTime(
-    2024,
-    1,
-    weekday,
-  );
+  final DateTime date = DateTime(2024, 1, weekday);
 
-  final String languageCode =
-      Localizations.localeOf(context).languageCode;
+  final String languageCode = Localizations.localeOf(context).languageCode;
 
   return abbreviated
       ? DateFormat.E(languageCode).format(date)
@@ -118,28 +103,24 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
 
   Future<void> _loadData() async {
     try {
-      final Map<String, dynamic> data =
-      await _focusService.getStats();
+      final Map<String, dynamic> data = await _focusService.getStats();
 
       if (!mounted) {
         return;
       }
 
-      final List<dynamic> weeklyData =
-      data['weekly_progress'] is List
+      final List<dynamic> weeklyData = data['weekly_progress'] is List
           ? data['weekly_progress'] as List<dynamic>
           : <dynamic>[];
 
-      final List<_DailyProgressData> dailyProgress =
-      weeklyData.map((dynamic item) {
-        final Map<String, dynamic> progress =
-        item as Map<String, dynamic>;
+      final List<_DailyProgressData> dailyProgress = weeklyData.map((
+        dynamic item,
+      ) {
+        final Map<String, dynamic> progress = item as Map<String, dynamic>;
 
         return _DailyProgressData(
           day: progress['day']?.toString() ?? '',
-          hours:
-          (progress['hours'] as num?)?.toDouble() ??
-              0.0,
+          hours: (progress['hours'] as num?)?.toDouble() ?? 0.0,
         );
       }).toList();
 
@@ -149,24 +130,17 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
         maxHours = dailyProgress
             .map((_DailyProgressData day) => day.hours)
             .reduce(
-              (double first, double second) =>
-          first > second ? first : second,
-        );
+              (double first, double second) => first > second ? first : second,
+            );
       }
 
       setState(() {
-        _totalHours =
-            (data['total_focus_hours'] as num?)
-                ?.toDouble() ??
-                0.0;
+        _totalHours = (data['total_focus_hours'] as num?)?.toDouble() ?? 0.0;
 
         _averageHours =
-            (data['daily_average_hours'] as num?)
-                ?.toDouble() ??
-                0.0;
+            (data['daily_average_hours'] as num?)?.toDouble() ?? 0.0;
 
-        _streak =
-            (data['streak'] as num?)?.toInt() ?? 0;
+        _streak = (data['streak'] as num?)?.toInt() ?? 0;
 
         _dailyProgress = dailyProgress;
         _maxHours = maxHours;
@@ -176,7 +150,7 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
     } catch (error, stackTrace) {
       debugPrint(
         'FocusProgressScreen: failed to load data: '
-            '$error\n$stackTrace',
+        '$error\n$stackTrace',
       );
 
       if (!mounted) {
@@ -235,6 +209,8 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                     child: Text(
                       context.l10n.focusProgress,
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: AppTheme.getTextColor(context),
                         fontSize: 20,
@@ -267,49 +243,64 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
             // Summary Stats
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: _StatCard(
-                      icon: Icons.timer,
-                      value:
-                      '${_formatLocalizedHours(context, _totalHours)} '
-                          '${context.l10n.hourShort}',
-                      label: context.l10n.totalFocusTime,
-                      color: AppTheme.getPrimaryColor(context),
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final bool compact = constraints.maxWidth < 360;
+                  final double gap = compact ? 8 : 12;
+
+                  return IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.timer,
+                            value:
+                                '${_formatLocalizedHours(context, _totalHours)} '
+                                '${context.l10n.hourShort}',
+                            label: context.l10n.totalFocusTime,
+                            color: AppTheme.getPrimaryColor(context),
+                            compact: compact,
+                          ),
+                        ),
+                        SizedBox(width: gap),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.trending_up,
+                            value:
+                                '${_formatLocalizedHours(context, _averageHours)} '
+                                '${context.l10n.hourShort}',
+                            label: context.l10n.dailyAverage,
+                            color: AppTheme.softBlue800,
+                            compact: compact,
+                          ),
+                        ),
+                        SizedBox(width: gap),
+                        Expanded(
+                          child: _StatCard(
+                            icon: Icons.local_fire_department,
+                            value: '$_streak',
+                            label: context.l10n.dayStreak,
+                            color: AppTheme.softOrange800,
+                            compact: compact,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StatCard(
-                      icon: Icons.trending_up,
-                      value:
-                      '${_formatLocalizedHours(context, _averageHours)} '
-                          '${context.l10n.hourShort}',
-                      label: context.l10n.dailyAverage,
-                      color: AppTheme.softBlue800,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StatCard(
-                      icon: Icons.local_fire_department,
-                      value: '$_streak',
-                      label: context.l10n.dayStreak,
-                      color: AppTheme.softOrange800,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 32),
             // Weekly Chart Title
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                children: <Widget>[
-                  Text(
+              child: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final Text title = Text(
                     context.l10n.weeklyProgress,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: AppTheme.getTextColor(context),
                       fontSize: 18,
@@ -317,10 +308,13 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                       letterSpacing: 0.2,
                       fontFamily: 'Montserrat',
                     ),
-                  ),
-                  const Spacer(),
-                  Text(
+                  );
+
+                  final Text period = Text(
                     context.l10n.thisWeek,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
                     style: TextStyle(
                       color: AppTheme.getTextColor(
                         context,
@@ -329,8 +323,28 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
                       fontWeight: FontWeight.w500,
                       fontFamily: 'Montserrat',
                     ),
-                  ),
-                ],
+                  );
+
+                  if (constraints.maxWidth < 400) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        title,
+                        const SizedBox(height: 4),
+                        Align(alignment: Alignment.centerRight, child: period),
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(child: title),
+                      const SizedBox(width: 16),
+                      Flexible(child: period),
+                    ],
+                  );
+                },
               ),
             ),
             const SizedBox(height: 20),
@@ -338,154 +352,150 @@ class _FocusProgressScreenState extends State<FocusProgressScreen> {
             Expanded(
               child: _hasLoadError || _dailyProgress.isEmpty
                   ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppTheme.getMint100(context),
-                          shape: BoxShape.circle,
-                        ),
-                        alignment: Alignment.center,
-                        child: HugeIcon(
-                          icon: HugeIcons
-                              .strokeRoundedAnalytics01,
-                          size: 36,
-                          color: AppTheme.getAccentColor(
-                            context,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _hasLoadError
-                            ? context
-                            .l10n
-                            .failedLoadFocusProgress
-                            : context.l10n.noFocusData,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppTheme.getSecondaryTextColor(
-                            context,
-                          ),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      if (_hasLoadError) ...[
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _isLoading = true;
-                              _hasLoadError = false;
-                            });
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: AppTheme.getMint100(context),
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: HugeIcon(
+                                icon: HugeIcons.strokeRoundedAnalytics01,
+                                size: 36,
+                                color: AppTheme.getAccentColor(context),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              _hasLoadError
+                                  ? context.l10n.failedLoadFocusProgress
+                                  : context.l10n.noFocusData,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: AppTheme.getSecondaryTextColor(context),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (_hasLoadError) ...[
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isLoading = true;
+                                    _hasLoadError = false;
+                                  });
 
-                            _loadData();
-                          },
-                          child: Text(context.l10n.retry),
+                                  _loadData();
+                                },
+                                child: Text(context.l10n.retry),
+                              ),
+                            ],
+                          ],
                         ),
-                      ],
-                    ],
-                  ),
-                ),
-              )
-                  : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: AppTheme.getCardColor(context),
-                        borderRadius: BorderRadius.circular(20),
                       ),
+                    )
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Column(
                         children: <Widget>[
-                          SizedBox(
-                            height: 200,
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                return Row(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  children: _dailyProgress
-                                      .map(
-                                        (data) => Expanded(
-                                          child: _BarChartItem(
-                                            day: _localizedWeekday(
-                                              context,
-                                              data.day,
-                                              abbreviated: true,
-                                            ),
-                                            hours: data.hours,
-                                            maxHours: _maxHours,
-                                          ),
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: AppTheme.getCardColor(context),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 200,
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      return Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: _dailyProgress
+                                            .map(
+                                              (data) => Expanded(
+                                                child: _BarChartItem(
+                                                  day: _localizedWeekday(
+                                                    context,
+                                                    data.day,
+                                                    abbreviated: true,
+                                                  ),
+                                                  hours: data.hours,
+                                                  maxHours: _maxHours,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                // Legend
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Container(
+                                      width: 12,
+                                      height: 12,
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.getPrimaryColor(
+                                          context,
                                         ),
-                                      )
-                                      .toList(),
-                                );
-                              },
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      context.l10n.focusHours,
+                                      style: TextStyle(
+                                        color: AppTheme.getTextColor(
+                                          context,
+                                        ).withValues(alpha: 0.6),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 24),
-                          // Legend
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.getPrimaryColor(context),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                context.l10n.focusHours,
-                                style: TextStyle(
-                                  color: AppTheme.getTextColor(
-                                    context,
-                                  ).withValues(alpha: 0.6),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                            ],
+                          // Daily Details
+                          Text(
+                            context.l10n.dailyDetails,
+                            style: TextStyle(
+                              color: AppTheme.getTextColor(context),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.2,
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
+                          const SizedBox(height: 16),
+                          ..._dailyProgress.map((data) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _DailyDetailCard(progress: data),
+                            );
+                          }),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    // Daily Details
-                    Text(
-                      context.l10n.dailyDetails,
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.2,
-                        fontFamily: 'Montserrat',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ..._dailyProgress.map((data) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _DailyDetailCard(progress: data),
-                      );
-                    }),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
@@ -507,17 +517,19 @@ class _StatCard extends StatelessWidget {
     required this.value,
     required this.label,
     required this.color,
+    this.compact = false,
   });
 
   final IconData icon;
   final String value;
   final String label;
   final Color color;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(compact ? 12 : 16),
       decoration: BoxDecoration(
         color: AppTheme.getCardColor(context),
         borderRadius: BorderRadius.circular(16),
@@ -525,8 +537,8 @@ class _StatCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Container(
-            width: 40,
-            height: 40,
+            width: compact ? 38 : 40,
+            height: compact ? 38 : 40,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
@@ -541,14 +553,17 @@ class _StatCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              color: AppTheme.getTextColor(context),
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'Montserrat',
+          SizedBox(height: compact ? 10 : 12),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: AppTheme.getTextColor(context),
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Montserrat',
+              ),
             ),
           ),
           const SizedBox(height: 4),
@@ -556,12 +571,13 @@ class _StatCard extends StatelessWidget {
             label,
             style: TextStyle(
               color: AppTheme.getTextColor(context).withValues(alpha: 0.6),
-              fontSize: 10,
+              fontSize: compact ? 9 : 10,
               fontWeight: FontWeight.w500,
               fontFamily: 'Montserrat',
             ),
             textAlign: TextAlign.center,
-            maxLines: 2,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -661,10 +677,7 @@ class _DailyDetailCard extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                _localizedWeekday(
-                  context,
-                  progress.day,
-                ),
+                _localizedWeekday(context, progress.day),
                 style: TextStyle(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
@@ -683,7 +696,7 @@ class _DailyDetailCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   '${_formatLocalizedHours(context, progress.hours)} '
-                      '${context.l10n.hourShort}',
+                  '${context.l10n.hourShort}',
                   style: TextStyle(
                     color: AppTheme.getTextColor(context),
                     fontSize: 16,

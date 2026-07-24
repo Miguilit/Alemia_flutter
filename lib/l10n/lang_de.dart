@@ -329,7 +329,7 @@ final Map<String, String> kLangDe = <String, String>{
   'sessionSaved': 'Sitzung erfolgreich gespeichert',
   'congratulations': 'Glückwunsch!',
   'completedSessionMessage': 'Sie haben eine Sitzung „{phase}“ abgeschlossen.',
-  'totalFocusTime': 'Gesamte Fokuszeit',
+  'totalFocusTime': 'Gesamtzeit',
   'dailyAverage': 'Tagesdurchschnitt',
   'dayStreak': 'Tage in Folge',
   'weeklyProgress': 'Wöchentlicher Fortschritt',
@@ -514,6 +514,25 @@ final Map<String, String> kLangDe = <String, String>{
   'authRegistrationFailedTitle': 'Registrierung fehlgeschlagen',
   'authRegistrationFailed':
       'Die Registrierung konnte nicht abgeschlossen werden.',
+  'authGoogleLoginSuccessfulTitle': 'Google-Anmeldung erfolgreich',
+  'authGoogleLoginSuccessful':
+      'Sie sind jetzt mit Google bei Alemia angemeldet.',
+  'authGoogleLoginFailedTitle': 'Google-Anmeldung fehlgeschlagen',
+  'authGoogleLoginFailed':
+      'Die Anmeldung mit Google konnte nicht abgeschlossen werden.',
+  'authGoogleConfigurationError':
+      'Google Sign-In ist für diese Version noch nicht korrekt konfiguriert.',
+  'authFirebaseUnavailable':
+      'Firebase Authentication ist vorübergehend nicht verfügbar.',
+  'authGoogleSessionInvalid':
+      'Die Google-Sitzung ist ungültig oder abgelaufen.',
+  'authGoogleAccountConflict':
+      'Dieses Google-Konto ist bereits mit einem anderen Alemia-Konto verknüpft.',
+  'authNetworkError':
+      'Ein Netzwerkfehler ist aufgetreten. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+  'authEmailVerificationRequiredTitle': 'E-Mail-Bestätigung erforderlich',
+  'authEmailVerificationRequired':
+      'Ihr Konto wurde erstellt. Prüfen Sie Ihre E-Mail, bevor Sie sich anmelden.',
   'authEmailExample': 'vorname.name@beispiel.de',
   'authFirstNameExample': 'Johann',
   'authLastNameExample': 'Müller',

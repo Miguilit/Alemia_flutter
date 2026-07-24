@@ -445,7 +445,7 @@ const Map<String, String> kLangEn = <String, String>{
   'resume': 'Resume',
   'reset': 'Reset',
   'sessionsToday': 'Sessions Today',
-  'totalFocusTime': 'Total Focus Time',
+  'totalFocusTime': 'Total time',
   'dailyAverage': 'Daily Average',
   'dayStreak': 'Day Streak',
   'focusHours': 'Focus Hours',
@@ -704,6 +704,22 @@ const Map<String, String> kLangEn = <String, String>{
   'authAccountCreated': 'Your account has been created successfully.',
   'authRegistrationFailedTitle': 'Registration failed',
   'authRegistrationFailed': 'Registration could not be completed.',
+  'authGoogleLoginSuccessfulTitle': 'Google sign-in successful',
+  'authGoogleLoginSuccessful': 'You are now signed in to Alemia with Google.',
+  'authGoogleLoginFailedTitle': 'Google sign-in failed',
+  'authGoogleLoginFailed': 'Google sign-in could not be completed.',
+  'authGoogleConfigurationError':
+      'Google Sign-In is not configured correctly for this build yet.',
+  'authFirebaseUnavailable':
+      'Firebase Authentication is temporarily unavailable.',
+  'authGoogleSessionInvalid': 'The Google session is invalid or has expired.',
+  'authGoogleAccountConflict':
+      'This Google account is already linked to another Alemia account.',
+  'authNetworkError':
+      'A network error occurred. Check your connection and try again.',
+  'authEmailVerificationRequiredTitle': 'Email verification required',
+  'authEmailVerificationRequired':
+      'Your account was created. Check your email before signing in.',
   'authEmailExample': 'first.last@example.com',
   'authFirstNameExample': 'John',
   'authLastNameExample': 'Doe',

@@ -780,6 +780,31 @@ extension AuthScreenLocalizations on AppLocalizations {
 
   String get authRegistrationFailed => _t('authRegistrationFailed');
 
+  String get authGoogleLoginSuccessfulTitle =>
+      _t('authGoogleLoginSuccessfulTitle');
+
+  String get authGoogleLoginSuccessful => _t('authGoogleLoginSuccessful');
+
+  String get authGoogleLoginFailedTitle => _t('authGoogleLoginFailedTitle');
+
+  String get authGoogleLoginFailed => _t('authGoogleLoginFailed');
+
+  String get authGoogleConfigurationError => _t('authGoogleConfigurationError');
+
+  String get authFirebaseUnavailable => _t('authFirebaseUnavailable');
+
+  String get authGoogleSessionInvalid => _t('authGoogleSessionInvalid');
+
+  String get authGoogleAccountConflict => _t('authGoogleAccountConflict');
+
+  String get authNetworkError => _t('authNetworkError');
+
+  String get authEmailVerificationRequiredTitle =>
+      _t('authEmailVerificationRequiredTitle');
+
+  String get authEmailVerificationRequired =>
+      _t('authEmailVerificationRequired');
+
   String get authEmailExample => _t('authEmailExample');
 
   String get authFirstNameExample => _t('authFirstNameExample');

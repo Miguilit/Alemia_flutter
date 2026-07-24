@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "316179457362",
+    "project_id": "alemia-org",
+    "storage_bucket": "alemia-org.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316179457362:android:42ab5cf73e9525cb16468b",
+        "android_client_info": {
+          "package_name": "com.miguil.alemia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316179457362-lcopqm1rqtcqf7li4s9q53uepstd39gd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.miguil.alemia",
+            "certificate_hash": "edc58a8e35d2cdf7d20068956f6f8b354684cfbe"
+          }
+        },
+        {
+          "client_id": "316179457362-t589mimjorkfb7qccdse2cmdqoeslgpn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.miguil.alemia",
+            "certificate_hash": "ba251ecc7d9600b4dfb3e4c344f0c0f347689d65"
+          }
+        },
+        {
+          "client_id": "316179457362-v067v0sfkrvm15fumnjjecpfd2f2fi5f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.miguil.alemia",
+            "certificate_hash": "5734de6f2bcdd455a52828fc12409920594451cd"
+          }
+        },
+        {
+          "client_id": "316179457362-5mk6sttpnvrd14boiv3j7rr1uf5gkl2q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU4NulHGgocfEKtkvV-USLH0cymNX_seY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "316179457362-5mk6sttpnvrd14boiv3j7rr1uf5gkl2q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

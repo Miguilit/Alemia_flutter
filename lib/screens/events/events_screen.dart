@@ -495,51 +495,68 @@ class _EmptyEventsState extends StatelessWidget {
         message = context.l10n.noEventsAvailableNow;
     }
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: AppTheme.getMint100(context),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: HugeIcon(
-                  icon: HugeIcons.strokeRoundedCalendar01,
-                  size: 60,
-                  color: AppTheme.getTextColor(context).withValues(alpha: 0.3),
-                ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double minimumHeight = constraints.maxHeight > 48
+            ? constraints.maxHeight - 48
+            : 0;
+
+        return SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minimumHeight),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: AppTheme.getMint100(context),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: HugeIcon(
+                        icon: HugeIcons.strokeRoundedCalendar01,
+                        size: 60,
+                        color: AppTheme.getTextColor(
+                          context,
+                        ).withValues(alpha: 0.3),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppTheme.getTextColor(context),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    message,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppTheme.getTextColor(
+                        context,
+                      ).withValues(alpha: 0.7),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: TextStyle(
-                color: AppTheme.getTextColor(context),
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.3,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: AppTheme.getTextColor(context).withValues(alpha: 0.7),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                height: 1.5,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -559,6 +576,11 @@ class _SearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
 
+    void submitSearch() {
+      FocusManager.instance.primaryFocus?.unfocus();
+      onSearch();
+    }
+
     return SizedBox(
       height: 48,
       child: Row(
@@ -567,7 +589,7 @@ class _SearchBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               textInputAction: TextInputAction.search,
-              onSubmitted: (_) => onSearch(),
+              onSubmitted: (_) => submitSearch(),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: AppTheme.getCardColor(context),
@@ -598,7 +620,7 @@ class _SearchBar extends StatelessWidget {
                 suffixIcon: Padding(
                   padding: const EdgeInsets.only(right: 6),
                   child: GestureDetector(
-                    onTap: onSearch,
+                    onTap: submitSearch,
                     child: Container(
                       width: 36,
                       height: 36,
@@ -727,198 +749,217 @@ class _EventFilterSheetState extends State<_EventFilterSheet> {
           topRight: Radius.circular(24),
         ),
       ),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.58,
-        minChildSize: 0.45,
-        maxChildSize: 0.82,
-        expand: false,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return Column(
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppTheme.getTextColor(context).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(2),
+      child: SafeArea(
+        top: false,
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.58,
+          minChildSize: 0.45,
+          maxChildSize: 0.82,
+          expand: false,
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Column(
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.only(top: 12),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppTheme.getTextColor(
+                      context,
+                    ).withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      l10n.eventFilterTitle,
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          l10n.eventFilterTitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: AppTheme.getTextColor(context),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          _selectedTimeFilter = 'upcoming';
-                          _selectedPriceFilter = 'all';
-                        });
-                      },
-                      child: Text(
-                        l10n.reset,
+                      const SizedBox(width: 8),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _selectedTimeFilter = 'upcoming';
+                            _selectedPriceFilter = 'all';
+                          });
+                        },
+                        child: Text(
+                          l10n.reset,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: AppTheme.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    children: <Widget>[
+                      Text(
+                        l10n.time,
                         style: TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 14,
+                          color: AppTheme.getTextColor(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: _FilterChipButton(
+                              label: l10n.upcoming,
+                              isSelected: _selectedTimeFilter == 'upcoming',
+                              onTap: () {
+                                setState(() {
+                                  _selectedTimeFilter = 'upcoming';
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _FilterChipButton(
+                              label: l10n.eventFilterPast,
+                              isSelected: _selectedTimeFilter == 'past',
+                              onTap: () {
+                                setState(() {
+                                  _selectedTimeFilter = 'past';
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _FilterChipButton(
+                              label: l10n.all,
+                              isSelected: _selectedTimeFilter == 'all',
+                              onTap: () {
+                                setState(() {
+                                  _selectedTimeFilter = 'all';
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Text(
+                        l10n.price,
+                        style: TextStyle(
+                          color: AppTheme.getTextColor(context),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: priceOptions.map<Widget>((
+                          _EventPriceOption option,
+                        ) {
+                          final bool isSelected =
+                              _selectedPriceFilter == option.value;
+
+                          return FilterChip(
+                            label: Text(option.label),
+                            selected: isSelected,
+                            onSelected: (_) {
+                              setState(() {
+                                _selectedPriceFilter = option.value;
+                              });
+                            },
+                            selectedColor: AppTheme.primary.withValues(
+                              alpha: 0.2,
+                            ),
+                            checkmarkColor: AppTheme.primary,
+                            labelStyle: TextStyle(
+                              color: isSelected
+                                  ? AppTheme.primary
+                                  : AppTheme.getTextColor(context),
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
+                            side: BorderSide(
+                              color: isSelected
+                                  ? AppTheme.primary
+                                  : AppTheme.getTextColor(
+                                      context,
+                                    ).withValues(alpha: 0.2),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      widget.onApplyFilters(
+                        _EventFilterSelection(
+                          timeFilter: _selectedTimeFilter,
+                          priceFilter: _selectedPriceFilter,
+                        ),
+                      );
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        l10n.eventApplyFilters,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  children: <Widget>[
-                    Text(
-                      l10n.time,
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: _FilterChipButton(
-                            label: l10n.upcoming,
-                            isSelected: _selectedTimeFilter == 'upcoming',
-                            onTap: () {
-                              setState(() {
-                                _selectedTimeFilter = 'upcoming';
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _FilterChipButton(
-                            label: l10n.eventFilterPast,
-                            isSelected: _selectedTimeFilter == 'past',
-                            onTap: () {
-                              setState(() {
-                                _selectedTimeFilter = 'past';
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _FilterChipButton(
-                            label: l10n.all,
-                            isSelected: _selectedTimeFilter == 'all',
-                            onTap: () {
-                              setState(() {
-                                _selectedTimeFilter = 'all';
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.price,
-                      style: TextStyle(
-                        color: AppTheme.getTextColor(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: priceOptions.map<Widget>((
-                        _EventPriceOption option,
-                      ) {
-                        final bool isSelected =
-                            _selectedPriceFilter == option.value;
-
-                        return FilterChip(
-                          label: Text(option.label),
-                          selected: isSelected,
-                          onSelected: (_) {
-                            setState(() {
-                              _selectedPriceFilter = option.value;
-                            });
-                          },
-                          selectedColor: AppTheme.primary.withValues(
-                            alpha: 0.2,
-                          ),
-                          checkmarkColor: AppTheme.primary,
-                          labelStyle: TextStyle(
-                            color: isSelected
-                                ? AppTheme.primary
-                                : AppTheme.getTextColor(context),
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                          ),
-                          side: BorderSide(
-                            color: isSelected
-                                ? AppTheme.primary
-                                : AppTheme.getTextColor(
-                                    context,
-                                  ).withValues(alpha: 0.2),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    widget.onApplyFilters(
-                      _EventFilterSelection(
-                        timeFilter: _selectedTimeFilter,
-                        priceFilter: _selectedPriceFilter,
-                      ),
-                    );
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      l10n.eventApplyFilters,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

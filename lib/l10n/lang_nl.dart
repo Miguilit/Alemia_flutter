@@ -325,7 +325,7 @@ final Map<String, String> kLangNl = <String, String>{
   'sessionSaved': 'Sessie succesvol opgeslagen',
   'congratulations': 'Gefeliciteerd!',
   'completedSessionMessage': 'Je hebt een sessie {phase} voltooid.',
-  'totalFocusTime': 'Totale focustijd',
+  'totalFocusTime': 'Totale tijd',
   'dailyAverage': 'Dagelijks gemiddelde',
   'dayStreak': 'Dagen op rij',
   'weeklyProgress': 'Wekelijkse voortgang',
@@ -501,6 +501,22 @@ final Map<String, String> kLangNl = <String, String>{
   'authAccountCreated': 'Je account is succesvol aangemaakt.',
   'authRegistrationFailedTitle': 'Registratie mislukt',
   'authRegistrationFailed': 'De registratie kon niet worden voltooid.',
+  'authGoogleLoginSuccessfulTitle': 'Aanmelden met Google gelukt',
+  'authGoogleLoginSuccessful': 'Je bent nu met Google aangemeld bij Alemia.',
+  'authGoogleLoginFailedTitle': 'Aanmelden met Google mislukt',
+  'authGoogleLoginFailed': 'Aanmelden met Google kon niet worden voltooid.',
+  'authGoogleConfigurationError':
+      'Google Sign-In is nog niet correct geconfigureerd voor deze versie.',
+  'authFirebaseUnavailable':
+      'Firebase Authentication is tijdelijk niet beschikbaar.',
+  'authGoogleSessionInvalid': 'De Google-sessie is ongeldig of verlopen.',
+  'authGoogleAccountConflict':
+      'Dit Google-account is al gekoppeld aan een ander Alemia-account.',
+  'authNetworkError':
+      'Er is een netwerkfout opgetreden. Controleer je verbinding en probeer opnieuw.',
+  'authEmailVerificationRequiredTitle': 'E-mailverificatie vereist',
+  'authEmailVerificationRequired':
+      'Je account is aangemaakt. Controleer je e-mail voordat je je aanmeldt.',
   'authEmailExample': 'voornaam.naam@voorbeeld.be',
   'authFirstNameExample': 'Jan',
   'authLastNameExample': 'Peeters',

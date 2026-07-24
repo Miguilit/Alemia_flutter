@@ -258,7 +258,7 @@ class _LoginFormState extends State<_LoginForm> {
 
     if (!mounted) return;
 
-    if (result['success']) {
+    if (result['success'] == true) {
       if (result['otp_required'] == true) {
         toastification.show(
           context: context,
@@ -308,8 +308,56 @@ class _LoginFormState extends State<_LoginForm> {
     }
   }
 
-  void _handleSocialLogin() {
-    // Handle Google login
+  Future<void> _handleSocialLogin() async {
+    final AuthProvider authProvider = Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    );
+
+    final Map<String, dynamic> result = await authProvider.loginWithGoogle();
+
+    if (!mounted || result['cancelled'] == true) {
+      return;
+    }
+
+    if (result['success'] == true) {
+      toastification.show(
+        context: context,
+        type: ToastificationType.success,
+        style: ToastificationStyle.fillColored,
+        title: Text(context.l10n.authGoogleLoginSuccessfulTitle),
+        description: Text(
+          result['message'] ?? context.l10n.authGoogleLoginSuccessful,
+        ),
+        alignment: Alignment.bottomCenter,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(builder: (_) => const DashboardScreen()),
+      );
+      return;
+    }
+
+    final String errorCode = result['code']?.toString() ?? '';
+    final String localizedMessage = switch (errorCode) {
+      'google_configuration_error' => context.l10n.authGoogleConfigurationError,
+      'firebase_auth_failed' => context.l10n.authFirebaseUnavailable,
+      'firebase_invalid_token' => context.l10n.authGoogleSessionInvalid,
+      'firebase_account_conflict' => context.l10n.authGoogleAccountConflict,
+      'network_error' => context.l10n.authNetworkError,
+      _ => result['message']?.toString() ?? context.l10n.authGoogleLoginFailed,
+    };
+
+    toastification.show(
+      context: context,
+      type: ToastificationType.error,
+      style: ToastificationStyle.fillColored,
+      title: Text(context.l10n.authGoogleLoginFailedTitle),
+      description: Text(localizedMessage),
+      alignment: Alignment.bottomCenter,
+      autoCloseDuration: const Duration(seconds: 5),
+    );
   }
 
   @override
@@ -516,7 +564,9 @@ class _LoginFormState extends State<_LoginForm> {
           ),
           const SizedBox(height: 12),
           // Social login buttons
-          _SocialLoginButtons(onSocialLogin: _handleSocialLogin),
+          _SocialLoginButtons(
+            onSocialLogin: authProvider.isLoading ? null : _handleSocialLogin,
+          ),
           SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
         ],
       ),
@@ -598,17 +648,35 @@ class _SignUpFormState extends State<_SignUpForm> {
 
     if (!mounted) return;
 
-    if (result['success']) {
+    if (result['success'] == true) {
+      final bool verificationRequired =
+          result['email_verification_required'] == true;
+
       toastification.show(
         context: context,
-        type: ToastificationType.success,
-        title: Text(context.l10n.authRegistrationSuccessfulTitle),
-        description: Text(result['message'] ?? context.l10n.authAccountCreated),
-        autoCloseDuration: const Duration(seconds: 3),
+        type: verificationRequired
+            ? ToastificationType.info
+            : ToastificationType.success,
+        title: Text(
+          verificationRequired
+              ? context.l10n.authEmailVerificationRequiredTitle
+              : context.l10n.authRegistrationSuccessfulTitle,
+        ),
+        description: Text(
+          result['message'] ??
+              (verificationRequired
+                  ? context.l10n.authEmailVerificationRequired
+                  : context.l10n.authAccountCreated),
+        ),
+        autoCloseDuration: const Duration(seconds: 4),
       );
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        MaterialPageRoute<void>(
+          builder: (_) => verificationRequired
+              ? const AuthScreen()
+              : const DashboardScreen(),
+        ),
       );
     } else {
       String errorMessage =
@@ -965,7 +1033,7 @@ class _SignUpFormState extends State<_SignUpForm> {
 class _SocialLoginButtons extends StatelessWidget {
   const _SocialLoginButtons({required this.onSocialLogin});
 
-  final VoidCallback onSocialLogin;
+  final VoidCallback? onSocialLogin;
 
   @override
   Widget build(BuildContext context) {
